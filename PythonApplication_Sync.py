@@ -83,19 +83,19 @@ class MainWindow(QMainWindow, MainForm):
             gl.force_download_file = False
 
             # 同步分类
-            worker = {"name":"sync_product_type", "domain_name":gl.pf_domain,"token":gl.pf_token}
+            worker = {"name": "sync_product_type", "domain_name":gl.pf_domain,"token":gl.pf_token}
             self.workerThread.worker_list = [worker]
-            worker = {"name":"sync_product_type", "domain_name":gl.ls_domain,"token":gl.ls_token}
+            worker = {"name": "sync_product_type", "domain_name":gl.ls_domain,"token":gl.ls_token}
             self.workerThread.worker_list.append(worker)
             # 同步产品
-            worker = {"name":"sync_product_info_full", "domain_name":gl.pf_domain,"token":gl.pf_token}
+            worker = {"name": "sync_product_info_full", "domain_name":gl.pf_domain,"token":gl.pf_token}
             self.workerThread.worker_list.append(worker)
-            worker = {"name":"sync_product_info_full", "domain_name":gl.ls_domain,"token":gl.ls_token}
+            worker = {"name": "sync_product_info_full", "domain_name":gl.ls_domain,"token":gl.ls_token}
             self.workerThread.worker_list.append(worker)
 
-            worker = {"name":"sync_product_info_full_offline", "domain_name":gl.pf_domain,"token":gl.pf_token}
+            worker = {"name": "sync_product_info_full_offline", "domain_name":gl.pf_domain,"token":gl.pf_token}
             self.workerThread.worker_list.append(worker)
-            worker = {"name":"sync_product_info_full_offline", "domain_name":gl.ls_domain,"token":gl.ls_token}
+            worker = {"name": "sync_product_info_full_offline", "domain_name":gl.ls_domain,"token":gl.ls_token}
             self.workerThread.worker_list.append(worker)
 
             print("workerThread start", self.workerThread)
@@ -109,8 +109,10 @@ class MainWindow(QMainWindow, MainForm):
         try:
             sync_name = "自动化增量同步"
             print(sync_name, "开始", datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+            logging.warning(sync_name + " 开始")
             self.listWidget.addItem(sync_name + " 开始 " + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
             if self.workerThread.isRunning():
+                logging.warning(sync_name + "上一次未完成，此次取消")
                 message = sync_name + " 上一次未完成，此次同步取消 " + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 self.listWidget.addItem(message)
                 self.listWidget.scrollToBottom()
@@ -119,17 +121,18 @@ class MainWindow(QMainWindow, MainForm):
             self.workerThread.selected_goodscode = ""
             gl.force_download_file = False
             # 同步产品
-            worker = {"name":"sync_product_info_recent", "domain_name":gl.pf_domain,"token":gl.pf_token}
+            worker = {"name": "sync_product_info_recent", "domain_name":gl.pf_domain,"token":gl.pf_token}
+            self.workerThread.worker_list = [worker]
+            worker = {"name": "sync_product_info_recent", "domain_name":gl.ls_domain,"token":gl.ls_token}
             self.workerThread.worker_list.append(worker)
-            worker = {"name":"sync_product_info_recent", "domain_name":gl.ls_domain,"token":gl.ls_token}
+            worker = {"name": "sync_product_info_recent_offline", "domain_name":gl.pf_domain,"token":gl.pf_token}
             self.workerThread.worker_list.append(worker)
-            worker = {"name":"sync_product_info_recent_offline", "domain_name":gl.pf_domain,"token":gl.pf_token}
-            self.workerThread.worker_list.append(worker)
-            worker = {"name":"sync_product_info_recent_offline", "domain_name":gl.ls_domain,"token":gl.ls_token}
+            worker = {"name": "sync_product_info_recent_offline", "domain_name":gl.ls_domain,"token":gl.ls_token}
             self.workerThread.worker_list.append(worker)
 
             print("workerThread start", self.workerThread)
             self.workerThread.start()
+            logging.warning(sync_name + " 提交到后台线程")
             
         except Exception as e:
             print(e)
