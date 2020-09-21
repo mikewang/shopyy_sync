@@ -5,6 +5,7 @@ etlshopyy.log
 config/ymcart.ini
 build
 config
+dist
 PythonApplication_Sync.spec
 # Datasource local storage ignored files
 /dataSources/
