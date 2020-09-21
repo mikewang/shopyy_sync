@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Python job scheduling for humans.
 

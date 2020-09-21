@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import traceback
 from PyQt5.QtCore import QThread, QCoreApplication, QObject, pyqtSignal, pyqtSlot, Qt
 import datetime
