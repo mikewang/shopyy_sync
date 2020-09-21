@@ -1,7 +1,10 @@
 # Default ignored files
 /shelf/
 /workspace.xml
-/config/ymcart.ini
+config/ymcart.ini
+build
+config
+PythonApplication_Sync.spec
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
