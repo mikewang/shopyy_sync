@@ -22,11 +22,32 @@ class SyncDao(QObject):
 
     def __init__(self):
         super(SyncDao, self).__init__()
-        config = configparser.ConfigParser()
-        init_file = os.path.normpath(os.path.join(os.curdir, "config", "ymcart.ini"))
-        config.read(init_file)
-        self._conn_str = config.get("db", "conn_str")
-        self._disk_path = config.get("db", "disk_path")
+        try:
+            config = configparser.ConfigParser()
+            configure_file = 'ymcart.ini'
+            configure_filepath = os.path.join(os.curdir, 'config', configure_file)
+            config.read(configure_filepath, encoding='UTF-8')
+            file_existed = os.path.exists(configure_filepath)
+            if file_existed == False:
+                print("config file path is ", os.path.abspath(configure_filepath))
+            for each_section in config.sections():
+                for (each_key, each_val) in config.items(each_section):
+                    # print(each_key, each_val)
+                    pass
+            self._conn_str = config.get("db", "conn_str")
+            self._disk_path = config.get("db", "disk_path")
+        except Exception as e:
+            print('str(Exception):\t', str(Exception))
+            print('str(e):\t\t', str(e))
+            print('repr(e):\t', repr(e))
+            # Get information about the exception that is currently being handled
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            print('e.message:\t', exc_value)
+            print("Note, object e and exc of Class %s is %s the same." %
+                  (type(exc_value), ('not', '')[exc_value is e]))
+            print('traceback.print_exc(): ', traceback.print_exc())
+            print('traceback.format_exc():\n%s' % traceback.format_exc())
+            print('#' * 60)
 
     def __del__(self):
        print("auto del", self)
