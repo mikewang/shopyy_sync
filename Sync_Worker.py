@@ -7,6 +7,7 @@ from Sync_Request_Api import SyncRequestApi as RequstApi
 from Sync_Write_Erp import SyncWriteErp as WriteErp
 import global_v as gl
 import sys
+import logging
 
 class SyncWorker(QThread):
     signal = pyqtSignal(dict)
@@ -403,5 +404,6 @@ class SyncWorker(QThread):
             signal_emit = {"action": "end"}
             self.signal.emit(signal_emit)
             print("thread end..", self)
+            logging.warning("数据同步" + " 在后台操作完成。" + str(self.worker_list))
 
 

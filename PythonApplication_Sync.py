@@ -21,6 +21,7 @@ from Spec_Form import Ui_Form as SpecForm
 from Sync_Worker import SyncWorker as Worker
 import global_v as gl
 import Scheduler
+import logging
 from Sync_Dao import SyncDao as Dao
 
 
@@ -34,6 +35,10 @@ class MainWindow(QMainWindow, MainForm):
         self.setupUi(self)
         self.setWindowTitle(self._title)
         self._default_scheduler = Scheduler.Scheduler()
+        logging.basicConfig(format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s',
+                            level=logging.WARNING,
+                            filename='etlshopyy.log',
+                            filemode='a')
         self.checkBox_product_auto_sync.stateChanged.connect(self.start_auto_sync)
         # btn_product_offline_sync
         self.btn_product_sync.clicked.connect(lambda: self.call_sync_dialg())
@@ -65,11 +70,13 @@ class MainWindow(QMainWindow, MainForm):
         try:
             sync_name = "自动化全量同步"
             print(sync_name, "开始", datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+            logging.warning(sync_name + " 开始")
             self.listWidget.addItem(sync_name + " 开始 " + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
             if self.workerThread.isRunning():
                 message = sync_name + " 上一次未完成，此次同步取消 " + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 self.listWidget.addItem(message)
                 self.listWidget.scrollToBottom()
+                logging.warning(sync_name + "上一次未完成，此次取消")
                 return
             self.workerThread.sync_sleep_time = 0
             self.workerThread.selected_goodscode = ""
@@ -93,6 +100,7 @@ class MainWindow(QMainWindow, MainForm):
 
             print("workerThread start", self.workerThread)
             self.workerThread.start()
+            logging.warning(sync_name + " 提交到后台线程")
             
         except Exception as e:
             print(e)
