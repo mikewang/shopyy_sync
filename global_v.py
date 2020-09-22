@@ -7,4 +7,4 @@ recent_minutes = 1440
 write_database = False
 worker_thread_isRunning = False
 force_download_file = False
-# ['PythonApplication_Sync.py','Sync_Main_Form.py','Spec_Form.py','Dialog_Form.py','global_v.py','Sync_Request_Api.py','Sync_Worker.py','Sync_Write_Erp.py','Sync_Dao.py','Scheduler.py']
+# ['Sync_Main.py','Sync_Main_Form.py','Spec_Form.py','Dialog_Form.py','global_v.py','Sync_Request_Api.py','Sync_Worker.py','Sync_Write_Erp.py','Sync_Dao.py','Scheduler.py']

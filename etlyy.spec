@@ -3,7 +3,7 @@
 block_cipher = None
 
 
-a = Analysis(['PythonApplication_Sync.py','Sync_Main_Form.py','Spec_Form.py','Dialog_Form.py','global_v.py','Sync_Request_Api.py','Sync_Worker.py','Sync_Write_Erp.py','Sync_Dao.py','Scheduler.py'],
+a = Analysis(['Sync_Main.py','Sync_Main_Form.py','Spec_Form.py','Dialog_Form.py','global_v.py','Sync_Request_Api.py','Sync_Worker.py','Sync_Write_Erp.py','Sync_Dao.py','Scheduler.py'],
              pathex=['C:\\Users\\wfg.langfang\\PycharmProjects\\shopyy_sync'],
              binaries=[],
              datas=[],
