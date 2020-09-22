@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import QThread, pyqtSignal,QRunnable,pyqtSlot
+from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot
 import datetime
-import time
 import traceback
-from Sync_Request_Api import SyncRequestApi as RequstApi
-from Sync_Write_Erp import SyncWriteErp as WriteErp
-import global_v as gl
+from sync.Sync_Request_Api import SyncRequestApi as RequstApi
+from sync.Sync_Write_Erp import SyncWriteErp as WriteErp
+from sync import global_v as gl
 import sys
 import logging
 

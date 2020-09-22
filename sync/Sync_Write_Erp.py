@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import QObject, QThread, pyqtSignal
+from PyQt5.QtCore import QObject, pyqtSignal
 import os
 import time
 import requests
-from Sync_Dao import SyncDao as Dao
-import global_v as gl
+from sync.Sync_Dao import SyncDao as Dao
+from sync import global_v as gl
 
 
 class SyncWriteErp(QObject):

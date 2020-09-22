@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import QObject, QThread, pyqtSignal
+from PyQt5.QtCore import QObject, pyqtSignal
 import configparser
 import traceback
 import sys
@@ -10,9 +10,7 @@ from PIL import Image
 import hashlib
 import pyodbc
 import datetime
-import time
-import requests
-import global_v as gl
+from sync import global_v as gl
 
 
 class SyncDao(QObject):

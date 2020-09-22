@@ -1,17 +1,12 @@
 # -*- coding: utf-8 -*-
 import traceback
-from PyQt5.QtCore import QThread, QCoreApplication, QObject, pyqtSignal, pyqtSlot, Qt
+from PyQt5.QtCore import QObject, pyqtSignal
 import datetime
 import sys
-import time
 import requests
-import os
-import configparser
 import json
-import logging
 import hashlib
-import pandas as pd
-import global_v as gl
+from sync import global_v as gl
 
 
 class SyncRequestApi(QObject):
