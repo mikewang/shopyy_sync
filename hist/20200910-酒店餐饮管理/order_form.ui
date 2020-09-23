@@ -1,0 +1,546 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>989</width>
+    <height>754</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>宾馆餐饮管理系统</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QTabWidget" name="widget_order_new">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>431</width>
+      <height>661</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>0</number>
+    </property>
+    <widget class="QWidget" name="tab_7">
+     <attribute name="title">
+      <string>点单</string>
+     </attribute>
+     <widget class="QTableView" name="table_order_food_list">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>170</y>
+        <width>401</width>
+        <height>421</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_45">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>20</y>
+        <width>71</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>订单号</string>
+      </property>
+     </widget>
+     <widget class="QDateTimeEdit" name="input_order_clicked">
+      <property name="geometry">
+       <rect>
+        <x>80</x>
+        <y>50</y>
+        <width>201</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="displayFormat">
+       <string>yyyy-MM-dd H:mm</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_49">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>90</y>
+        <width>54</width>
+        <height>12</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>桌台号</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_31">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>130</y>
+        <width>54</width>
+        <height>12</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>顾客</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="input_customer">
+      <property name="geometry">
+       <rect>
+        <x>80</x>
+        <y>130</y>
+        <width>201</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_44">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>50</y>
+        <width>71</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>点菜时间</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="input_table_no">
+      <property name="geometry">
+       <rect>
+        <x>80</x>
+        <y>90</y>
+        <width>201</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="input_order_no">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>80</x>
+        <y>20</y>
+        <width>201</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_order_check">
+      <property name="geometry">
+       <rect>
+        <x>300</x>
+        <y>20</y>
+        <width>101</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>订单确定</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBox_order_checked">
+      <property name="geometry">
+       <rect>
+        <x>300</x>
+        <y>70</y>
+        <width>71</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>有效订单</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab_8">
+     <attribute name="title">
+      <string>菜单</string>
+     </attribute>
+     <widget class="QLineEdit" name="input_food_name">
+      <property name="geometry">
+       <rect>
+        <x>60</x>
+        <y>20</y>
+        <width>201</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_38">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>20</y>
+        <width>54</width>
+        <height>12</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>菜名</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_food_query">
+      <property name="geometry">
+       <rect>
+        <x>274</x>
+        <y>20</y>
+        <width>61</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>查询</string>
+      </property>
+     </widget>
+     <widget class="QTableView" name="table_food_query">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>70</y>
+        <width>401</width>
+        <height>531</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_food_check">
+      <property name="geometry">
+       <rect>
+        <x>354</x>
+        <y>20</y>
+        <width>61</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>选中</string>
+      </property>
+     </widget>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="widget_order_list" native="true">
+    <property name="geometry">
+     <rect>
+      <x>500</x>
+      <y>20</y>
+      <width>451</width>
+      <height>651</height>
+     </rect>
+    </property>
+    <widget class="QLabel" name="label_47">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>30</y>
+       <width>71</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>订单号</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="input_order_no_account">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>30</y>
+       <width>201</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="input_table_no_account">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>70</y>
+       <width>201</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_50">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>70</y>
+       <width>54</width>
+       <height>12</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>桌台号</string>
+     </property>
+    </widget>
+    <widget class="QTableView" name="table_order_food_list_account">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>110</y>
+       <width>421</width>
+       <height>291</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="input_should_money_account">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>420</y>
+       <width>201</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_51">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>420</y>
+       <width>54</width>
+       <height>12</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>应付金额</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_52">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>470</y>
+       <width>54</width>
+       <height>12</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>实付金额</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="input_real_money_account">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>470</y>
+       <width>201</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_53">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>510</y>
+       <width>54</width>
+       <height>12</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>付款方式</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="input_combox_money_type_account">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>510</y>
+       <width>201</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <item>
+      <property name="text">
+       <string>支付宝</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>微信</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>现金</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>其他</string>
+      </property>
+     </item>
+    </widget>
+    <widget class="QPushButton" name="btn_order_save_account">
+     <property name="geometry">
+      <rect>
+       <x>70</x>
+       <y>600</y>
+       <width>301</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>订单结算</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_order_query_account">
+     <property name="geometry">
+      <rect>
+       <x>300</x>
+       <y>30</y>
+       <width>131</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>订单查询</string>
+     </property>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>989</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>订餐</string>
+    </property>
+    <addaction name="actionSchedule"/>
+    <addaction name="actionTable"/>
+   </widget>
+   <widget class="QMenu" name="menu_2">
+    <property name="title">
+     <string>帐单</string>
+    </property>
+    <addaction name="actionOrderNew"/>
+    <addaction name="actionOrderList"/>
+   </widget>
+   <widget class="QMenu" name="menu_4">
+    <property name="title">
+     <string>报表与统计</string>
+    </property>
+    <addaction name="actionOrderQuery"/>
+    <addaction name="actionAccountReport"/>
+   </widget>
+   <widget class="QMenu" name="menu_5">
+    <property name="title">
+     <string>设置</string>
+    </property>
+    <addaction name="actionUserList"/>
+    <addaction name="actionTableList"/>
+    <addaction name="actionFoodList"/>
+   </widget>
+   <widget class="QMenu" name="menu_6">
+    <property name="title">
+     <string>系统</string>
+    </property>
+    <addaction name="actionExit"/>
+    <addaction name="actionHelp"/>
+   </widget>
+   <addaction name="menu"/>
+   <addaction name="menu_2"/>
+   <addaction name="menu_4"/>
+   <addaction name="menu_5"/>
+   <addaction name="menu_6"/>
+  </widget>
+  <action name="actionSchedule">
+   <property name="text">
+    <string>预定</string>
+   </property>
+  </action>
+  <action name="actionTable">
+   <property name="text">
+    <string>桌台</string>
+   </property>
+  </action>
+  <action name="actionOrderNew">
+   <property name="text">
+    <string>点单</string>
+   </property>
+  </action>
+  <action name="actionOrderList">
+   <property name="text">
+    <string>结算</string>
+   </property>
+  </action>
+  <action name="actionOrderQuery">
+   <property name="text">
+    <string>高级查询</string>
+   </property>
+  </action>
+  <action name="actionAccountReport">
+   <property name="text">
+    <string>报表</string>
+   </property>
+  </action>
+  <action name="actionUserList">
+   <property name="text">
+    <string>员工管理</string>
+   </property>
+  </action>
+  <action name="actionTableList">
+   <property name="text">
+    <string>桌台管理</string>
+   </property>
+  </action>
+  <action name="actionFoodList">
+   <property name="text">
+    <string>菜单管理</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>退出</string>
+   </property>
+  </action>
+  <action name="actionHelp">
+   <property name="text">
+    <string>帮助</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
