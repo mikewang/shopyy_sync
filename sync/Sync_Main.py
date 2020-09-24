@@ -9,6 +9,9 @@
  #导入程序运行必须模块
 import sys
 import datetime
+import os
+import configparser
+import logging
 #PyQt5中使用的基本控件都在PyQt5.QtWidgets模块中
 from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtWidgets import QApplication, QMainWindow
@@ -19,7 +22,6 @@ from sync.Dialog_Form import Ui_Dialog as DialogForm
 from sync.Spec_Form import Ui_Form as SpecForm
 from sync.Sync_Worker import SyncWorker as Worker
 from sync import Scheduler, global_v as gl
-import logging
 from sync.Sync_Dao import SyncDao as Dao
 
 
@@ -510,6 +512,13 @@ class WindowSpec(QMainWindow, SpecForm):
 
 
 if __name__ == '__main__':
+    config = configparser.ConfigParser()
+    init_file = os.path.normpath(os.path.join(os.curdir, "config", "ymcart.ini"))
+    config.read(init_file)
+    gl.pf_domain = config.get("api_pf", "domain_name")
+    gl.pf_token = config.get("api_pf", "core_token")
+    gl.ls_domain = config.get("api_ls", "domain_name")
+    gl.ls_token = config.get("api_ls", "core_token")
     app = QApplication(sys.argv)
     mainWindow = MainWindow()
     mainWindow.show()

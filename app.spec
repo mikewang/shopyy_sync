@@ -1,11 +1,10 @@
 # -*- mode: python ; coding: utf-8 -*-
-# pyinstaller -D etlyy.spec  打包方法
 
 block_cipher = None
 
 
-a = Analysis(['Sync_Main.py','Sync_Main_Form.py','Spec_Form.py','Dialog_Form.py','global_v.py','Sync_Request_Api.py','Sync_Worker.py','Sync_Write_Erp.py','Sync_Dao.py','Scheduler.py'],
-             pathex=['C:\\Users\\wfg.langfang\\PycharmProjects\\shopyy_sync'],
+a = Analysis(['app.py', 'Model/user.py','Resource/user_resource.py','Service/user_dao.py','Service/user_service.py'],
+             pathex=['C:\\Users\\wfg.langfang\\PycharmProjects\\shopyy_sync\\OrderAPI'],
              binaries=[],
              datas=[],
              hiddenimports=[],
@@ -22,7 +21,7 @@ exe = EXE(pyz,
           a.scripts,
           [],
           exclude_binaries=True,
-          name='etlyy',
+          name='app',
           debug=False,
           bootloader_ignore_signals=False,
           strip=False,
@@ -35,4 +34,4 @@ coll = COLLECT(exe,
                strip=False,
                upx=True,
                upx_exclude=[],
-               name='etlyy')
+               name='app')

@@ -1,4 +1,4 @@
-sync/config/ymcart.ini
-PythonApplication_Sync.spec
 build
 dist
+OrderAPI/build
+OrderAPI/dist
