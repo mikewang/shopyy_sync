@@ -1,4 +1,5 @@
 # -*- mode: python ; coding: utf-8 -*-
+# pyinstaller -D etlyy.spec  打包方法
 
 block_cipher = None
 
