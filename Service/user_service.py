@@ -11,6 +11,7 @@ class UserService(UserInfo):
         self._dao = UserDao()
 
     def login(self, OpCode, timestamp, token):
+        print("login", OpCode, timestamp, token)
         user = self._dao.select_user(OpCode)
         if user is not None:
             # 加密算法，token，计算方法

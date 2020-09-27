@@ -18,7 +18,7 @@ class UserResource(Resource):
         if user_info is not None:
             return user_info.desc()
         else:
-            return {"message": "用户不存在"}, 201
+            return {"message": "用户不存在或者密码错"}, 201
 
     def post(self):
         parser = reqparse.RequestParser()
