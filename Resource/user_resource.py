@@ -8,11 +8,13 @@ class UserResource(Resource):
     def get(self, OpCode):
         parser = reqparse.RequestParser()
         parser.add_argument('token')
+        parser.add_argument('timestamp')
         args = parser.parse_args()
         print("request paramter:", args, OpCode)
         token = args["token"]
+        timestamp = args["timestamp"]
         user_service = UserService()
-        user_info = user_service.login(OpCode, 1001, token)
+        user_info = user_service.login(OpCode, timestamp, token)
         if user_info is not None:
             return user_info.desc()
         else:
