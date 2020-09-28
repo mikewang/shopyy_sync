@@ -2,6 +2,7 @@ from flask import Flask
 from flask_restful import Api
 from waitress import serve
 from Resource.user_resource import UserResource
+from Resource.product_resource import ProductResource
 
 app = Flask(__name__)
 api = Api(app)
@@ -13,7 +14,7 @@ def hello_world():
 
 
 api.add_resource(UserResource, '/User', '/User/<string:OpCode>')
-
+api.add_resource(ProductResource, '/Product', '/Product/<string:GoodsCode>')
 
 if __name__ == '__main__':
     serve(app, host="0.0.0.0", port=8997)

@@ -24,6 +24,7 @@ class UserInfo(object):
         self.CreateDate = datetime.datetime.now()
         self.OrganizeID = 0
         self.Position = 0
+        self.PositionName = ''
 
     def decode_password(self):
         base64_password = self.Password

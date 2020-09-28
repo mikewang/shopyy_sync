@@ -6,24 +6,27 @@ from flask_restful import reqparse, Resource
 from Service.user_service import UserService
 
 
-class UserResource(Resource):
+class ProductResource(Resource):
 
-    def get(self, OpCode):
+    def get(self, GoodsCode):
         try:
+            # 增加请求解析参数
             parser = reqparse.RequestParser()
+            parser.add_argument('OpCode')
             parser.add_argument('token')
             parser.add_argument('timestamp')
+            # 分析请求
             args = parser.parse_args()
-            print("request paramter:", args, OpCode)
+            OpCode = args["OpCode"]
             token = args["token"]
             timestamp = args["timestamp"]
             user_service = UserService()
-            user_info = user_service.login(OpCode, timestamp, token)
+            test_image = user_service.testImage(OpCode, timestamp, token, GoodsCode)
             result = {"code": 200, "msg": ""}
-            if user_info is not None:
-                result["data"] = user_info
+            if test_image is not None:
+                result["data"] = test_image["imageBase64"]
             else:
-                result = {"code": 201, "msg": "用户不存在或者密码错"}
+                result = {"code": 201, "msg": "产品不存在"}
             return result, result["code"]
         except Exception as e:
             print('str(Exception):\t', str(Exception))
