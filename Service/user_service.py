@@ -13,7 +13,7 @@ class UserService(UserInfo):
         self._dao = UserDao()
         self._loginUser = None
 
-    def __decodeToken(self, OpCode, timestamp, decode_password):
+    def getDecodeToken(self, OpCode, timestamp, decode_password):
         # 加密算法，token，计算方法
         data = decode_password + str(timestamp) + OpCode
         decode_token = hashlib.md5(data.encode(encoding='UTF-8')).hexdigest() + str(timestamp)
@@ -26,7 +26,7 @@ class UserService(UserInfo):
         if self._loginUser is not None:
             # 加密算法，token，计算方法
             decode_password = self._loginUser.decode_password()
-            decode_token = self.__decodeToken(OpCode, timestamp, decode_password)
+            decode_token = self.getDecodeToken(OpCode, timestamp, decode_password)
             if decode_token != token:
                 self._loginUser = None
                 print("-"*10, OpCode, 'login failure', '-'*10)
@@ -43,7 +43,7 @@ class UserService(UserInfo):
         if user is not None:
             # 加密算法，token，计算方法
             decode_password = user.decode_password()
-            decode_token = self.__decodeToken(OpCode, timestamp, decode_password)
+            decode_token = self.getDecodeToken(OpCode, timestamp, decode_password)
             if decode_token == token:
                 product_image = self._dao.select_product_image(GoodsCode)
                 # print("product_image", product_image)
