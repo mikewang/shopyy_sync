@@ -10,7 +10,7 @@ api = Api(app)
 
 @app.route('/')
 def hello_world():
-    return "Hello Order."
+    return "Hello API."
 
 
 api.add_resource(UserResource, '/User', '/User/<string:OpCode>')
