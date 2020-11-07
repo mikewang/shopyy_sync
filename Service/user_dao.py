@@ -5,6 +5,7 @@ import sys
 import os
 import pyodbc
 import datetime
+import base64
 from Model.user import UserInfo
 
 
@@ -102,6 +103,48 @@ class UserDao(object):
                 return product
             else:
                 return None
+        except Exception as e:
+            print('str(Exception):\t', str(Exception))
+            print('str(e):\t\t', str(e))
+            print('repr(e):\t', repr(e))
+            # Get information about the exception that is currently being handled
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            print('e.message:\t', exc_value)
+            print("Note, object e and exc of Class %s is %s the same." %
+                  (type(exc_value), ('not', '')[exc_value is e]))
+            print('traceback.print_exc(): ', traceback.print_exc())
+            print('traceback.format_exc():\n%s' % traceback.format_exc())
+            print('#' * 60)
+            return None
+
+    def select_stock_product_list(self, page_no):
+        try:
+            product_list = []
+            cnxn = pyodbc.connect(self._conn_str)
+            cursor = cnxn.cursor()
+            topN = page_no*10
+            sql = "select top 10 v2.* from (select top " + str(topN) + " v1.* from (select a.ProductID,b.SpecNo, a.GoodsEName,c.ImageGuid,c.ImageFmt,c.ModuleID,CONVERT(varchar, c.FileDate, 120 ) as FileDate,c.ThumbImage from product_info as a join product_spec as b on a.ProductID=b.ProductID join Product_Image as c on b.RecGUID = c.RecGuid) as v1 order by productID desc, SpecNo desc)  as v2 order by productID asc,SpecNO asc"
+            cursor.execute(sql)
+            for row in cursor:
+                product = dict()
+                product["ProductID"] = row[0]
+                product["SpecNo"] = row[1]
+                product["GoodsEName"] = row[2]
+                product["ImageGuid"] = row[3]
+                product["ModuleID"] = row[4]
+                product["FileDate"] = row[5]
+                product["ThumbImage"] = row[6]
+                thumbImage = product["ThumbImage"]
+                base64_bytes = base64.b64encode(thumbImage)
+                base64_image = base64_bytes.decode("utf8")
+                # bytes = io.BytesIO(ThumbImage)
+                # wrapper = io.TextIOWrapper(ThumbImage, encoding="utf-8")
+                product["imageBase64"] = base64_image
+                product["ThumbImage"] = None
+                product_list.append(product)
+            cursor.close()
+            cnxn.close()
+            return product_list
         except Exception as e:
             print('str(Exception):\t', str(Exception))
             print('str(e):\t\t', str(e))

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import hashlib
-import io
+import os
 import base64
 from Model.user import UserInfo
 from Service.user_dao import UserDao
@@ -57,3 +57,27 @@ class UserService(UserInfo):
                     print("imageBase64", base64_image)
                     product_image["ThumbImage"] = None
         return product_image
+
+    def getStockProduct(self, OpCode, timestamp, token, pageNo):
+        print("get stock product PageNo", OpCode, timestamp, token, pageNo)
+        product_list = None
+        user = self._dao.select_user(OpCode)
+        if user is not None:
+            # 加密算法，token，计算方法
+            decode_password = user.decode_password()
+            decode_token = self.getDecodeToken(OpCode, timestamp, decode_password)
+            if decode_token == token:
+                product_list = self._dao.select_stock_product_list(pageNo)
+        return product_list
+
+    def getProductImage(self, OpCode, timestamp, token, imageGuid, year, month, module):
+        print("get stock product big image", OpCode, timestamp, token, imageGuid)
+        file_path = None
+        user = self._dao.select_user(OpCode)
+        if user is not None:
+            # 加密算法，token，计算方法
+            decode_password = user.decode_password()
+            decode_token = self.getDecodeToken(OpCode, timestamp, decode_password)
+            if decode_token == token:
+                file_path = os.path.normpath(os.path.join("D:\ymcartphotos", year, month, module, imageGuid))
+        return file_path
