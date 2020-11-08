@@ -131,9 +131,11 @@ class UserDao(object):
                 product["SpecNo"] = row[1]
                 product["GoodsEName"] = row[2]
                 product["ImageGuid"] = row[3]
-                product["ModuleID"] = row[4]
-                product["FileDate"] = row[5]
-                product["ThumbImage"] = row[6]
+                product["ImageFmt"] = row[4]
+
+                product["ModuleID"] = row[5]
+                product["FileDate"] = row[6]
+                product["ThumbImage"] = row[7]
                 thumbImage = product["ThumbImage"]
                 base64_bytes = base64.b64encode(thumbImage)
                 base64_image = base64_bytes.decode("utf8")
