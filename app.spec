@@ -3,7 +3,7 @@
 block_cipher = None
 
 
-a = Analysis(['app.py', 'Model/user.py','Resource/user_resource.py','Service/user_dao.py','Service/user_service.py'],
+a = Analysis(['app.py', 'Model/user.py','Resource/user_resource.py','Resource/product_resource.py','Resource/image_resource.py','Service/user_dao.py','Service/user_service.py'],
              pathex=['C:\\Users\\wfg.langfang\\PycharmProjects\\shopyy_sync\\OrderAPI'],
              binaries=[],
              datas=[],
