@@ -74,10 +74,11 @@ class UserService(UserInfo):
         print("get stock product big image", OpCode, timestamp, token, imageGuid)
         file_path = None
         user = self._dao.select_user(OpCode)
+        disk_path = self._dao.disk_path
         if user is not None:
             # 加密算法，token，计算方法
             decode_password = user.decode_password()
             decode_token = self.getDecodeToken(OpCode, timestamp, decode_password)
             if decode_token == token:
-                file_path = os.path.normpath(os.path.join("D:\ymcartphotos", year, month, module, imageGuid))
+                file_path = os.path.normpath(os.path.join(disk_path, year, month, module, imageGuid))
         return file_path

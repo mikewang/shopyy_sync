@@ -26,6 +26,7 @@ class UserDao(object):
                     # print(each_key, each_val)
                     pass
             self._conn_str = config.get("db", "conn_str")
+            self.disk_path = config.get("db", "disk_path")
         except Exception as e:
             print('str(Exception):\t', str(Exception))
             print('str(e):\t\t', str(e))
