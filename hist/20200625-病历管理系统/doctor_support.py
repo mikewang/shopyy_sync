@@ -46,7 +46,7 @@ def set_Tk_var():
 def load_all_patient():
     try:
         conn = pymysql.connect(host = 'localhost', user = 'myuser', passwd = 'myuser', db = 'mydb',port = 3306)
-
+        conn2 = pymysql.connect()
         cur = conn.cursor()
         cur.execute('select patient_id,patient_name FROM patient order by input_time asc')
         r = cur.fetchall()
