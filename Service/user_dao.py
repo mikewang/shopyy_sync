@@ -125,7 +125,9 @@ class UserDao(object):
             cursor = cnxn.cursor()
             topN = page_no*10
             sql = "select top 10 v2.* from (select top " + str(topN) + " v1.* from (select a.ProductID,b.SpecNo, a.GoodsEName,c.ImageGuid,c.ImageFmt,c.ModuleID,CONVERT(varchar, c.FileDate, 120 ) as FileDate,c.ThumbImage from product_info as a join product_spec as b on a.ProductID=b.ProductID join Product_Image as c on b.RecGUID = c.RecGuid) as v1 order by productID desc, SpecNo desc)  as v2 order by productID asc,SpecNO asc"
+            sql = "select top 10 v2.* from (select top " + str(topN) + " v1.* from （select * from v_stock_product_app as v1 order by signdate desc,stockproductid desc） as v2 order by signdate asc,stockproductid asc"
             cursor.execute(sql)
+            # 采购人	StockProductID	ProductID	SignDate	GoodsCode	SpecNo	GoodsSpec	GoodsUnit	_ImageID	ImageGuid	ImageFmt	ModuleID	FileDate	ThumbImage	其它.供应商名称	其它.允采购量	其它.应采购价	其它.商品品牌
             for row in cursor:
                 product = dict()
                 product["ProductID"] = row[0]
