@@ -123,7 +123,7 @@ def sync_romm_client():
     for room_client_2 in target_list:
         clear_enable = True
         for room_client_1 in source_list:
-            if room_client_1["room"] == room_client_2["room"]:
+            if room_client_1["room"] == room_client_2["room"] or room_client_2["name"] == '':
                 clear_enable = False
                 break
         if clear_enable:
