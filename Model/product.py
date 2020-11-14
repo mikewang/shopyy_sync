@@ -25,7 +25,13 @@ class ProductInfo(object):
         self.SpecNo = ''
         self.GoodsSpec = ''
         self.GoodsUnit = ''
-        self._ImageID = ''
+        self.ImageID = 0
+        self.ImageGuid = ''
+        self.ImageFmt = ''
+        self.ModuleID = 0
+        self.FileDate = ''
+        self.imageBase64 = ''
+
 
         self.CreateDate = datetime.datetime.now()
         self.OrganizeID = 0
