@@ -119,10 +119,22 @@ def sync_romm_client():
                 print("更新数据", room_client_1["room"], room_client_1["name"])
                 update_client_mysql(room_client_1)
                 rows_updated = rows_updated + 1
+    rows_clear = 0
+    for room_client_2 in target_list:
+        clear_enable = True
+        for room_client_1 in source_list:
+            if room_client_1["room"] == room_client_2["room"]:
+                clear_enable = False
+                break
+        if clear_enable:
+            room_client = {"room": room_client_2["room"], "name": ''}
+            update_client_mysql(room_client)
+            rows_clear = rows_clear + 1
+
     run_time = datetime.datetime.now()
     run_time_str = run_time.strftime('%Y-%m-%d %H:%M:%S')
-    print("数据同步完成", run_time_str, "更新记录数", rows_updated, "条")
-    logging.warning("数据同步完成" + "更新记录数 " + str(rows_updated) + "条")
+    print("数据同步完成", run_time_str, "更新记录数", rows_updated, "条", "清理记录数", rows_clear, "条")
+    logging.warning("数据同步完成" + "更新记录数 " + str(rows_updated) + "条" + "; 清理记录数 " + str(rows_clear)+"条")
     print("-"*60)
 
 
@@ -135,8 +147,12 @@ if __name__ == '__main__':
     run_time_str = run_time.strftime('%Y-%m-%d %H:%M:%S')
     print("同步程序启动", run_time_str)
     logging.warning("同步程序启动")
+    config = configparser.ConfigParser()
+    config_file = os.path.normpath(os.path.join(os.curdir, "config.ini"))
+    config.read(config_file)
+    interval = int(config.get("sync", "interval"))
     default_scheduler = Scheduler.Scheduler()
-    default_scheduler.every(1).minutes.do(sync_romm_client)
+    default_scheduler.every(interval).seconds.do(sync_romm_client)
     default_scheduler.run_continuously(1)
 
     # the end
