@@ -584,7 +584,7 @@ class SyncWorker(QObject):
               datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
         print("-" * 100)
         # 前端界面显示
-        self.result.emit({"product": product_info})
+        self.result.emit({"product.py": product_info})
         time.sleep(1)
 
     def sync_all_product_erp_database(self):
@@ -725,7 +725,7 @@ class SyncWorker(QObject):
                     sync_page_no += 1
                 # 产品同步完成
             elif item_name == "recent_goods":
-                # modify product
+                # modify product.py
                 page_goods_count = 1
                 sync_page_no = 1
                 while page_goods_count > 0 and self._isRunning:
@@ -751,7 +751,7 @@ class SyncWorker(QObject):
                             print("最近更新", product_info)
                     page_goods_count = len(page_goods_list)
                     sync_page_no += 1
-                # create product
+                # create product.py
                 page_goods_count = 1
                 sync_page_no = 1
                 while page_goods_count > 0 and self._isRunning:

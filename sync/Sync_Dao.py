@@ -290,7 +290,7 @@ class SyncDao(QObject):
                 RecGuid = spec_image["RecGuid"]
                 CreateDate = spec_image["SysNoTime"]
                 EditDate = spec_image["LastEditTime"]
-            # print(product["image"])
+            # print(product.py["image"])
             # print("RecGuid", RecGuid)
             year = CreateDate.split('-')[0]
             month = CreateDate.split('-')[1]

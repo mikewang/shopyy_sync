@@ -629,7 +629,7 @@ class EtlDao(object):
                 RecGuid = spec_image["RecGuid"]
                 CreateDate = spec_image["SysNoTime"]
                 EditDate = spec_image["LastEditTime"]
-            # print(product["image"])
+            # print(product.py["image"])
             # print("RecGuid", RecGuid)
             year = CreateDate.split('-')[0]
             month = CreateDate.split('-')[1]
@@ -741,7 +741,7 @@ class EtlDao(object):
                         print("新增图片失败", e)
                 else:
                     pass
-                    # print("图片已经保存:", product["image"])
+                    # print("图片已经保存:", product.py["image"])
                 cursor.close()
                 cnxn.close()
             else:

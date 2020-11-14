@@ -27,7 +27,7 @@ class ProductResource(Resource):
                 result["data"] = prod_list
                 print(prod_list)
             else:
-                result = {"code": 201, "msg": "product is not existed."}
+                result = {"code": 201, "msg": "product.py is not existed."}
             return result, result["code"]
         except Exception as e:
             print('str(Exception):\t', str(Exception))
@@ -42,7 +42,7 @@ class ProductResource(Resource):
             print('#' * 60)
         finally:
             time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            print("get product", OpCode, time_str)
+            print("get product.py", OpCode, time_str)
 
     def post(self):
         parser = reqparse.RequestParser()

@@ -59,7 +59,7 @@ class UserService(UserInfo):
         return product_image
 
     def getStockProduct(self, OpCode, timestamp, token, pageNo):
-        print("get stock product PageNo", OpCode, timestamp, token, pageNo)
+        print("get stock product.py PageNo", OpCode, timestamp, token, pageNo)
         product_list = None
         user = self._dao.select_user(OpCode)
         if user is not None:
@@ -71,7 +71,7 @@ class UserService(UserInfo):
         return product_list
 
     def getProductImage(self, OpCode, timestamp, token, imageGuid, year, month, module):
-        print("get stock product big image", OpCode, timestamp, token, imageGuid)
+        print("get stock product.py big image", OpCode, timestamp, token, imageGuid)
         file_path = None
         user = self._dao.select_user(OpCode)
         disk_path = self._dao.disk_path

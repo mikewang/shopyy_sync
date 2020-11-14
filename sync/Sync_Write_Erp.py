@@ -57,8 +57,8 @@ class SyncWriteErp(QObject):
             # stock_nums = 0 , 则不同步到erp中，在erp反向操作时，将erp中的产品下架，因为已经是库存为1
             if int(stock_nums) > 0:
                 dao.merge_product_info(domain_name, product_info)
-                self.signal.emit({"product": product_info})
-                # write product image
+                self.signal.emit({"product.py": product_info})
+                # write product.py image
                 if domain_name == gl.pf_domain:
                     product_image = dao.generate_product_image(product_info, None)
                     if product_image is not None:
@@ -174,7 +174,7 @@ class SyncWriteErp(QObject):
                 message = "网站" + domain_name + "下架的产品数" + str(cc) + "个"
                 self.signal.emit({"message": message})
                 for product_info in erp_prod_list_offline:
-                    self.signal.emit({"product": product_info})
+                    self.signal.emit({"product.py": product_info})
                     productID = product_info["ProductID"]
                     dao.offline_product_info(productID, domain_name)
                     # GoodsCode
@@ -186,7 +186,7 @@ class SyncWriteErp(QObject):
             offline_cc = 0
             for product_info in offline_product_info_list:
                 if product_info["ProductActive"] == "1":
-                    self.signal.emit({"product": product_info})
+                    self.signal.emit({"product.py": product_info})
                     productID = product_info["ProductID"]
                     dao.offline_product_info(productID, domain_name)
                     # GoodsCode

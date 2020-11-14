@@ -120,17 +120,23 @@ def sync_romm_client():
         for room_client_2 in target_list:
             if room_client_1["room"] == room_client_2["room"] and room_client_1["name"] != room_client_2["name"]:
                 print("更新数据", room_client_1["room"], room_client_1["name"])
+                logging.warning("更新数据" + ' ' + room_client_1["room"] + ' ' + room_client_1["name"])
                 update_client_mysql(room_client_1)
                 rows_updated = rows_updated + 1
     rows_clear = 0
     for room_client_2 in target_list:
         clear_enable = True
-        for room_client_1 in source_list:
-            if room_client_1["room"] == room_client_2["room"] or room_client_2["name"] == '':
-                clear_enable = False
-                break
+        if room_client_2["name"] == '':
+            clear_enable = False
+        else:
+            for room_client_1 in source_list:
+                if room_client_1["room"] == room_client_2["room"]:
+                    clear_enable = False
+                    break
         if clear_enable:
             room_client = {"room": room_client_2["room"], "name": ''}
+            print("清理数据", room_client_2["room"], room_client_2["name"])
+            logging.warning("清理数据" + ' ' + room_client_2["room"] + ' ' + room_client_2["name"])
             update_client_mysql(room_client)
             rows_clear = rows_clear + 1
     run_time = datetime.datetime.now()
@@ -143,7 +149,7 @@ def sync_romm_client():
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s',
                         level=logging.WARNING,
-                        filename='hotel_sync.log',
+                        filename=os.path.join('log', 'hotel_sync.log'),
                         filemode='a')
     run_time = datetime.datetime.now()
     run_time_str = run_time.strftime('%Y-%m-%d %H:%M:%S')

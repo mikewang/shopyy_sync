@@ -538,7 +538,7 @@ class SyncWorker(QObject):
                   datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
             print("-" * 100)
             # 前端界面显示
-            self.result.emit({"product": product_info})
+            self.result.emit({"product.py": product_info})
             # time.sleep(1)
         except Exception as e:
             print('str(Exception):\t', str(Exception))

@@ -235,7 +235,7 @@ class EtlDao(object):
     def select_product_spec(self, product):
         try:
             prod_spec_list = []
-            # print("ProductID", product["ProductID"])
+            # print("ProductID", product.py["ProductID"])
             cnxn = pyodbc.connect(self._conn_str)
             cursor = cnxn.cursor()
             sql = "select ProductSpecID,GoodsSpec,OuterBulk,GrossWeight," \
@@ -712,7 +712,7 @@ class EtlDao(object):
                 RecGuid = spec_image["RecGuid"]
                 CreateDate = spec_image["SysNoTime"]
                 EditDate = spec_image["LastEditTime"]
-            # print(product["image"])
+            # print(product.py["image"])
             # print("RecGuid", RecGuid)
             year = CreateDate.split('-')[0]
             month = CreateDate.split('-')[1]
@@ -828,7 +828,7 @@ class EtlDao(object):
                     print("新增产品", product["GoodsCode"], "主图失败:", product["image"], e)
             else:
                 pass
-                # print("图片已经保存:", product["image"])
+                # print("图片已经保存:", product.py["image"])
             cursor.close()
             cnxn.close()
         else:

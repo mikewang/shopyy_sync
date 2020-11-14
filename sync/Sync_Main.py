@@ -298,8 +298,8 @@ class MainWindow(QMainWindow, MainForm):
             message = signal_emit["message"]
             self.listWidget.addItem(message)
             self.listWidget.scrollToBottom()
-        elif "product" in signal_emit:
-            prod = signal_emit["product"]
+        elif "product.py" in signal_emit:
+            prod = signal_emit["product.py"]
             ProductID = ''
             GoodsCode = ''
             GoodsEName = ''

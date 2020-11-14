@@ -29,12 +29,12 @@ class SyncWorker(QThread):
 
     def callback_write_erp(self, signal_message):
         # print("request callback", signal_message)
-        if "product" in signal_message:
-            product_info = signal_message["product"]
+        if "product.py" in signal_message:
+            product_info = signal_message["product.py"]
             self.signal.emit({"message": "产品：" + product_info["GoodsCode"]})
             self._product_info_list_write_erp.append(product_info)
             print("同步产品", "第 " + str(len(self._product_info_list_write_erp)) + "个", product_info["GoodsCode"])
-            signal_message["product"]["sync_no"] =  str(len(self._product_info_list_write_erp))
+            signal_message["product.py"]["sync_no"] =  str(len(self._product_info_list_write_erp))
         self.signal.emit(signal_message)
 
     def sync_product_type(self, domain_name, token):
@@ -347,7 +347,7 @@ class SyncWorker(QThread):
         self.signal.emit(signal_emit)
         write_erp = WriteErp()
         product_info = write_erp.query_product_info(GoodsCode)
-        signal_emit = {"product": product_info}
+        signal_emit = {"product.py": product_info}
         self.signal.emit(signal_emit)
         if product_info is None:
             message = "查询产品:" + GoodsCode + " 不存在。"

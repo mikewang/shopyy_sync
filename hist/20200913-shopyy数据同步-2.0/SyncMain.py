@@ -259,9 +259,9 @@ class MainWindow(QMainWindow):
                 self.worker.stop()
                 self.thread.quit()
                 self.thread.wait()
-            elif "product" in item:
-                product = item["product"]
-                # print("emit product", product)
+            elif "product.py" in item:
+                product = item["product.py"]
+                # print("emit product.py", product.py)
                 GoodsCode = product["GoodsCode"]
                 GoodsEName = product["GoodsEName"]
                 dao = SyncDao.EtlDao()
