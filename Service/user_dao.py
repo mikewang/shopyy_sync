@@ -7,6 +7,7 @@ import pyodbc
 import datetime
 import base64
 from Model.user import UserInfo
+from Model.product import ProductInfo
 
 
 class UserDao(object):
@@ -125,27 +126,32 @@ class UserDao(object):
             cursor = cnxn.cursor()
             topN = page_no*10
             sql = "select top 10 v2.* from (select top " + str(topN) + " v1.* from (select a.ProductID,b.SpecNo, a.GoodsEName,c.ImageGuid,c.ImageFmt,c.ModuleID,CONVERT(varchar, c.FileDate, 120 ) as FileDate,c.ThumbImage from product_info as a join product_spec as b on a.ProductID=b.ProductID join Product_Image as c on b.RecGUID = c.RecGuid) as v1 order by productID desc, SpecNo desc)  as v2 order by productID asc,SpecNO asc"
-            sql = "select top 10 v2.* from (select top " + str(topN) + " v1.* from （select * from v_stock_product_app as v1 order by signdate desc,stockproductid desc） as v2 order by signdate asc,stockproductid asc"
-            cursor.execute(sql)
             # 采购人	StockProductID	ProductID	SignDate	GoodsCode	SpecNo	GoodsSpec	GoodsUnit	_ImageID	ImageGuid	ImageFmt	ModuleID	FileDate	ThumbImage	其它.供应商名称	其它.允采购量	其它.应采购价	其它.商品品牌
+            sql = "select  top 10 * from (select top " + str(topN) + " e.[采购人], a.StockProductID,a.ProductID,CONVERT(varchar, d.SignDate, 120 ) as SignDate,a.GoodsCode,a.SpecNo,a.GoodsSpec, a.GoodsUnit, b._ImageID,c.ImageGuid,c.ImageFmt,c.ModuleID,CONVERT(varchar, c.FileDate, 120 ) as FileDate,c.ThumbImage,b.[其它.供应商名称],b.[其它.允采购量],b.[其它.应采购价],b.[其它.商品品牌]   FROM [FTTXRUN].[csidbo].[Stock_Product_Info] as a join  FTTXRUN.csidbo.FTPart_Stock_Product_Property_1 as b on a.StockProductID=b.MainID join csidbo.Product_Image as c on b._ImageID=c.ProductImageID join csidbo.stock_info d on d.ID=a.StockID join csidbo.[FTPart_Stock_Property_1] e on e.[MainID] = d.ID  order by d.signdate desc,a.stockproductid desc) as v1 order by v1.SignDate asc,v1.StockProductID asc"
+            cursor.execute(sql)
             for row in cursor:
-                product = dict()
-                product["ProductID"] = row[0]
-                product["SpecNo"] = row[1]
-                product["GoodsEName"] = row[2]
-                product["ImageGuid"] = row[3]
-                product["ImageFmt"] = row[4]
-
-                product["ModuleID"] = row[5]
-                product["FileDate"] = row[6]
-                product["ThumbImage"] = row[7]
-                thumbImage = product["ThumbImage"]
+                product = ProductInfo()
+                product.OpCode = row[0]
+                product.StockProductID = row[1]
+                product.ProductID = row[2]
+                product.SignDate = row[3]
+                product.GoodsCode = row[4]
+                product.SpecNo = row[5]
+                product.GoodsSpec = row[6]
+                product.GoodsUnit = row[7]
+                ImageID = row[8]
+                product.ImageGuid = row[9]
+                product.ImageFmt = row[10]
+                product.ModuleID = row[11]
+                product.FileDate = row[12]
+                thumbImage = row[13]
                 base64_bytes = base64.b64encode(thumbImage)
                 base64_image = base64_bytes.decode("utf8")
-                # bytes = io.BytesIO(ThumbImage)
-                # wrapper = io.TextIOWrapper(ThumbImage, encoding="utf-8")
-                product["imageBase64"] = base64_image
-                product["ThumbImage"] = None
+                product.imageBase64 = base64_image
+                product.supplier = row[14]
+                product.permittedNum = row[15]
+                product.shouldPrice = row[16]
+                product.brand = row[17]
                 product_list.append(product)
             cursor.close()
             cnxn.close()
