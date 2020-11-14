@@ -96,11 +96,14 @@ def update_client_mysql(room_client):
     conn = conn_mysql()
     cur = conn.cursor()
     values = [room_client["name"], room_client["room"]]
-    cur.execute("update client set clientname = %s  where room = %s", values)
-    if cur.rowcount == 1:
-        print("更新成功")
+    if room_client["name"] == '':
+        cur.execute("update client set clientname = %s ,status = 1 where room = %s", values)
     else:
-        print("更新失败")
+        cur.execute("update client set clientname = %s ,status = 0 where room = %s", values)
+    if cur.rowcount == 1:
+        print("更新成功", room_client)
+    else:
+        print("更新失败", room_client)
     conn.commit()
     cur.close()
     conn.close()
@@ -130,7 +133,6 @@ def sync_romm_client():
             room_client = {"room": room_client_2["room"], "name": ''}
             update_client_mysql(room_client)
             rows_clear = rows_clear + 1
-
     run_time = datetime.datetime.now()
     run_time_str = run_time.strftime('%Y-%m-%d %H:%M:%S')
     print("数据同步完成", run_time_str, "更新记录数", rows_updated, "条", "清理记录数", rows_clear, "条")
