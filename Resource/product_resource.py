@@ -2,9 +2,10 @@
 import traceback
 import sys
 import datetime
+import json
 from flask_restful import reqparse, Resource
 from Service.user_service import UserService
-
+from Model.product import ProductInfo
 
 class ProductResource(Resource):
 
@@ -23,10 +24,22 @@ class ProductResource(Resource):
             user_service = UserService()
             prod_list = user_service.getStockProduct(OpCode, timestamp, token, pageNo)
             result = {"code": 200, "msg": ""}
+            # data = ["DisneyPlus", "Netflix", "Peacock"]
+            # json_string = json.dumps(data)
+            # print(json_string)
+            # prod = ProductInfo()
+            # prod.StockProductID = 100
+            # json_list = json.dumps(prod.__dict__)
+            # print(json_list)
+            # print('-'*60)
             if prod_list is not None:
-                result["data"] = prod_list
-                print(prod_list)
+                json_list = []
+                for prod in prod_list:
+                    prod_json = json.dumps(prod.__dict__)
+                    json_list.append(prod_json)
+                result["data"] = json_list
             else:
+                result["data"] = []
                 result = {"code": 201, "msg": "product.py is not existed."}
             return result, result["code"]
         except Exception as e:

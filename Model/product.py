@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import datetime
 
 # 定义 采购产品 类
 # 采购人	StockProductID	ProductID	SignDate	GoodsCode	SpecNo	GoodsSpec	GoodsUnit	_ImageID	ImageGuid	ImageFmt	ModuleID	FileDate	ThumbImage	其它.供应商名称	其它.允采购量	其它.应采购价	其它.商品品牌
@@ -35,7 +34,6 @@ class ProductInfo(object):
         self.permittedNum = 0
         self.shouldPrice = 0.0
         self.brand = ''
-        self.CreateDate = datetime.datetime.now()
 
     def desc(self):
         product_dict = self.__dict__
