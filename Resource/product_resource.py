@@ -6,6 +6,8 @@ import json
 from flask_restful import reqparse, Resource
 from Service.user_service import UserService
 from Model.product import ProductInfo
+from Model.product import DecimalEncoder
+
 
 class ProductResource(Resource):
 
@@ -29,13 +31,15 @@ class ProductResource(Resource):
             # print(json_string)
             # prod = ProductInfo()
             # prod.StockProductID = 100
+            # prod.shouldPrice = 10.1
             # json_list = json.dumps(prod.__dict__)
             # print(json_list)
             # print('-'*60)
             if prod_list is not None:
                 json_list = []
                 for prod in prod_list:
-                    prod_json = json.dumps(prod.__dict__)
+                    print(prod.__dict__)
+                    prod_json = json.dumps(prod.__dict__,  cls=DecimalEncoder)
                     json_list.append(prod_json)
                 result["data"] = json_list
             else:
