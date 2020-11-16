@@ -150,7 +150,7 @@ class UserDao(object):
                 product.imageBase64 = base64_image
                 product.supplier = row[14]
                 product.permittedNum = row[15]
-                product.shouldPrice = row[16]
+                product.shouldPrice = str(row[16])
                 product.brand = row[17]
                 product_list.append(product)
             cursor.close()
