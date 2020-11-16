@@ -33,11 +33,12 @@ class ProductInfo(object):
         # 其它.供应商名称	其它.允采购量	其它.应采购价	其它.商品品牌
         self.supplier = ''
         self.permittedNum = 0
-        self.shouldPrice = '0.0'
+        self.shouldPrice = 0.0
         self.brand = ''
 
     def desc(self):
         product_dict = self.__dict__
+        product_dict["shouldPrice"] = str(self.shouldPrice)
         # product_dict["CreateDate"] = self.CreateDate.strftime('%Y-%m-%d %H:%M:%S')
         print(product_dict)
         return product_dict
