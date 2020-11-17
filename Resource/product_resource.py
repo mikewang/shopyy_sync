@@ -39,8 +39,8 @@ class ProductResource(Resource):
                 json_list = []
                 for prod in prod_list:
                     print(prod.__dict__)
-                    prod_json = json.dumps(prod.desc)
-                    json_list.append(prod_json)
+                    # prod_json = json.dumps(prod.desc())
+                    json_list.append(prod.desc())
                 result["data"] = json_list
             else:
                 result["data"] = []
