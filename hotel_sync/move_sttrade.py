@@ -6,7 +6,7 @@ import datetime
 
 
 def sync_data():
-    ss = os.system("/root/dump_tab.sh")
+    ss = os.system("/root/sync_tab.sh")
     print(ss)
 
 
@@ -72,11 +72,11 @@ def delete_source_db(source_ip, str_tab, str_col, ago_days):
         print('-' * 60)
 
 
-def clear_source_data(str_tab, str_col, days):
+def clear_source_data(str_tab, str_col, ago_days):
     source_ip = '192.168.212.8'
-    cc_source = check_db(source_ip, str_tab, str_col, days)
+    cc_source = check_db(source_ip, str_tab, str_col, ago_days)
     # print(cc_source)
-    cc_target = check_db('localhost', str_tab, str_col, days)
+    cc_target = check_db('localhost', str_tab, str_col, ago_days)
     # print(cc_target)
     time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     if cc_source == cc_target:
