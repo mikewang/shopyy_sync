@@ -22,7 +22,7 @@ class ProductInfo(object):
         self.SignDate = ''
         self.GoodsCode = ''
         self.SpecNo = ''
-        self.GoodsSpec = ''
+        self.GoodsCDesc = ''
         self.GoodsUnit = ''
         self.ImageID = 0
         self.ImageGuid = ''

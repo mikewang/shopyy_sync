@@ -127,7 +127,7 @@ class UserDao(object):
             topN = page_no*10
             sql = "select top 10 v2.* from (select top " + str(topN) + " v1.* from (select a.ProductID,b.SpecNo, a.GoodsEName,c.ImageGuid,c.ImageFmt,c.ModuleID,CONVERT(varchar, c.FileDate, 120 ) as FileDate,c.ThumbImage from product_info as a join product_spec as b on a.ProductID=b.ProductID join Product_Image as c on b.RecGUID = c.RecGuid) as v1 order by productID desc, SpecNo desc)  as v2 order by productID asc,SpecNO asc"
             # 采购人	StockProductID	ProductID	SignDate	GoodsCode	SpecNo	GoodsSpec	GoodsUnit	_ImageID	ImageGuid	ImageFmt	ModuleID	FileDate	ThumbImage	其它.供应商名称	其它.允采购量	其它.应采购价	其它.商品品牌
-            sql = "select  top 10 * from (select top " + str(topN) + " e.[采购人], a.StockProductID,a.ProductID,CONVERT(varchar, d.SignDate, 120 ) as SignDate,a.GoodsCode,a.SpecNo,a.GoodsSpec, a.GoodsUnit, b._ImageID,c.ImageGuid,c.ImageFmt,c.ModuleID,CONVERT(varchar, c.FileDate, 120 ) as FileDate,c.ThumbImage,b.[其它.供应商名称],b.[其它.允采购量],b.[其它.应采购价],b.[其它.商品品牌]   FROM [FTTXRUN].[csidbo].[Stock_Product_Info] as a join  FTTXRUN.csidbo.FTPart_Stock_Product_Property_1 as b on a.StockProductID=b.MainID join csidbo.Product_Image as c on b._ImageID=c.ProductImageID join csidbo.stock_info d on d.ID=a.StockID join csidbo.[FTPart_Stock_Property_1] e on e.[MainID] = d.ID  order by d.signdate desc,a.stockproductid desc) as v1 order by v1.SignDate asc,v1.StockProductID asc"
+            sql = "select  top 10 * from (select top " + str(topN) + " e.[采购人], a.StockProductID,a.ProductID,CONVERT(varchar, d.SignDate, 120 ) as SignDate,a.GoodsCode,a.SpecNo,f.GoodsCDesc, a.GoodsUnit, b._ImageID,c.ImageGuid,c.ImageFmt,c.ModuleID,CONVERT(varchar, c.FileDate, 120 ) as FileDate,c.ThumbImage,b.[其它.供应商名称],b.[其它.允采购量],b.[其它.应采购价],b.[其它.商品品牌]   FROM [FTTXRUN].[csidbo].[Stock_Product_Info] as a join  FTTXRUN.csidbo.FTPart_Stock_Product_Property_1 as b on a.StockProductID=b.MainID join csidbo.Product_Image as c on b._ImageID=c.ProductImageID join csidbo.stock_info d on d.ID=a.StockID join csidbo.[FTPart_Stock_Property_1] e on e.[MainID] = d.ID lef join csidbo.[Stock_Product_Info_Desc] f on a.StockProductID=f.StockProductID order by d.signdate desc,a.stockproductid desc) as v1 order by v1.SignDate asc,v1.StockProductID asc"
             cursor.execute(sql)
             for row in cursor:
                 product = ProductInfo()
@@ -137,7 +137,7 @@ class UserDao(object):
                 product.SignDate = row[3]
                 product.GoodsCode = row[4]
                 product.SpecNo = row[5]
-                product.GoodsSpec = row[6]
+                product.GoodsCDesc = row[6]
                 product.GoodsUnit = row[7]
                 ImageID = row[8]
                 product.ImageGuid = row[9]
@@ -169,3 +169,11 @@ class UserDao(object):
             print('traceback.format_exc():\n%s' % traceback.format_exc())
             print('#' * 60)
             return None
+
+    def select_brand_list(self):
+        # SELECT *--[DictValue] 商品品牌
+        # FROM [FTTXRUN].[csidbo].[CustomDict] where DictType=501027 and status=0
+        pass
+
+    def select_supplier_list(self):
+        pass

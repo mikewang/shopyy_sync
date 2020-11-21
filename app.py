@@ -7,7 +7,7 @@ from Resource.image_resource import ImageResource
 from Resource.wow_resource import WOWResource
 from Model.product import ProductInfo
 import decimal
-
+from Service.wow_service import WOWService
 
 app = Flask(__name__)
 api = Api(app)
@@ -15,9 +15,9 @@ api = Api(app)
 
 @app.route('/', methods=['GET'])
 def index():
-
+    ss = WOWService.testInfo('xx')
     my_int = 18
-    my_str = 'curry'
+    my_str = 'curry:' + ss
     my_list = [1, 5, 4, 3, 2]
     my_dict = {
         'name': 'durant',
