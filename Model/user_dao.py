@@ -170,10 +170,35 @@ class UserDao(object):
             print('#' * 60)
             return None
 
-    def select_brand_list(self):
-        # SELECT *--[DictValue] 商品品牌
-        # FROM [FTTXRUN].[csidbo].[CustomDict] where DictType=501027 and status=0
-        pass
-
-    def select_supplier_list(self):
-        pass
+    def select_dict_item_list(self, item_type):
+        # select ID, DictValue from [csidbo].CustomDict where DictType=501027 and status = 0
+        try:
+            item_list = []
+            cnxn = pyodbc.connect(self._conn_str)
+            cursor = cnxn.cursor()
+            if item_type == "brand":
+                sql = "select ID, DictValue from [csidbo].CustomDict where DictType=501027 and status = 0"
+            else:
+                sql = "Select ID, cust_name from [csidbo].Cust_Info where grouptype=9 and status=0"
+            cursor.execute(sql)
+            for row in cursor:
+                item = dict()
+                item["code"] = row[0]
+                item["name"] = row[1]
+                cursor.close()
+                cnxn.close()
+                item_list.append(item)
+            return item_list
+        except Exception as e:
+            print('str(Exception):\t', str(Exception))
+            print('str(e):\t\t', str(e))
+            print('repr(e):\t', repr(e))
+            # Get information about the exception that is currently being handled
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            print('e.message:\t', exc_value)
+            print("Note, object e and exc of Class %s is %s the same." %
+                  (type(exc_value), ('not', '')[exc_value is e]))
+            print('traceback.print_exc(): ', traceback.print_exc())
+            print('traceback.format_exc():\n%s' % traceback.format_exc())
+            print('#' * 60)
+            return None

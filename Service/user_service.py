@@ -58,6 +58,18 @@ class UserService(UserInfo):
                     product_image["ThumbImage"] = None
         return product_image
 
+    def getDictItem(self, OpCode, timestamp, token, item_type):
+        print("get stock product.py PageNo", OpCode, timestamp, token, item_type)
+        item_list = None
+        user = self._dao.select_user(OpCode)
+        if user is not None:
+            # 加密算法，token，计算方法
+            decode_password = user.decode_password()
+            decode_token = self.getDecodeToken(OpCode, timestamp, decode_password)
+            if decode_token == token:
+                item_list = self._dao.select_dict_item_list(item_type)
+        return item_list
+
     def getStockProduct(self, OpCode, timestamp, token, pageNo):
         print("get stock product.py PageNo", OpCode, timestamp, token, pageNo)
         product_list = None
