@@ -16,7 +16,7 @@ def check_db(source_ip, str_tab, str_col, ago_days):
         if source_ip == '192.168.212.8':
             conn = pymysql.connect(host=source_ip, user='csswebmysql', passwd='gzwwzf@189', db='sttrade_hist', port=3306)
         else:
-            conn = pymysql.connect(host='localhost', user='root', passwd='gzcssweb', db='sttrade_212_8', port=3306)
+            conn = pymysql.connect(host='localhost', user='csswebmysql', passwd='gzwwzf@189', db='sttrade_212_8', port=3306)
         cur = conn.cursor()
         str_sql = 'select count(*) from ' + str_tab
         str_sql = str_sql + ' where ' + str_col + ' >= DATE_ADD(CAST(now() AS DATE),INTERVAL -' + str(ago_days) + ' DAY) '
@@ -82,7 +82,7 @@ def clear_source_data(str_tab, str_col, ago_days):
     if cc_source == cc_target:
         msg = time_str + str_tab + ':' + 'source=' + str(cc_source) + ' target=' + str(cc_target)
         print(msg)
-        delete_source_db(source_ip, str_tab, str_col)
+        delete_source_db(source_ip, str_tab, str_col, ago_days)
         time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         msg = time_str + str_tab + ':' + 'source=' + str(cc_source) + ' deleted successful.'
         print(msg)

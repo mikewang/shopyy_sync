@@ -3,7 +3,7 @@ import hashlib
 import os
 import base64
 from Model.user import UserInfo
-from Service.user_dao import UserDao
+from Model.user_dao import UserDao
 
 
 class UserService(UserInfo):
