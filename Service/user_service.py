@@ -56,10 +56,12 @@ class UserService(UserInfo):
                     product_image["imageBase64"] = base64_image
                     print("imageBase64", base64_image)
                     product_image["ThumbImage"] = None
+                else:
+                    print("Error token:", "get image", GoodsCode)
         return product_image
 
     def getDictItem(self, OpCode, timestamp, token, item_type):
-        print("get stock product.py PageNo", OpCode, timestamp, token, item_type)
+        print("get data dictionary of type", OpCode, timestamp, token, item_type)
         item_list = None
         user = self._dao.select_user(OpCode)
         if user is not None:
@@ -68,10 +70,12 @@ class UserService(UserInfo):
             decode_token = self.getDecodeToken(OpCode, timestamp, decode_password)
             if decode_token == token:
                 item_list = self._dao.select_dict_item_list(item_type)
+            else:
+                print("Error token:", "get data dictionary of type", item_type)
         return item_list
 
     def getStockProduct(self, OpCode, timestamp, token, pageNo):
-        print("get stock product.py PageNo", OpCode, timestamp, token, pageNo)
+        print("get stock product of PageNo", OpCode, timestamp, token, pageNo)
         product_list = None
         user = self._dao.select_user(OpCode)
         if user is not None:
@@ -80,6 +84,8 @@ class UserService(UserInfo):
             decode_token = self.getDecodeToken(OpCode, timestamp, decode_password)
             if decode_token == token:
                 product_list = self._dao.select_stock_product_list(pageNo)
+            else:
+                print("Error token:", "get stock product of pageNo", pageNo)
         return product_list
 
     def getProductImage(self, OpCode, timestamp, token, imageGuid, year, month, module):
