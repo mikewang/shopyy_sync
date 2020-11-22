@@ -40,7 +40,6 @@ class DictResource(Resource):
             if item_list is not None:
                 json_list = []
                 for item in item_list:
-                    print(item.__dict__)
                     # prod_json = json.dumps(prod.desc())
                     # json_list.append(prod.desc())
                     json_list.append(item)
