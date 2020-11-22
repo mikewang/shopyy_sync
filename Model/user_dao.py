@@ -185,8 +185,6 @@ class UserDao(object):
                 item = dict()
                 item["code"] = row[0]
                 item["name"] = row[1]
-                cursor.close()
-                cnxn.close()
                 item_list.append(item)
             cursor.close()
             cnxn.close()
