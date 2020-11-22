@@ -177,7 +177,7 @@ class UserDao(object):
             cnxn = pyodbc.connect(self._conn_str)
             cursor = cnxn.cursor()
             if item_type == "brand":
-                sql = "select ID, DictValue from [csidbo].CustomDict where DictType=501027 and status = 0"
+                sql = "select ID, DictValue from [csidbo].CustomDict where DictType=501027 and status=0"
             else:
                 sql = "Select ID, cust_name from [csidbo].Cust_Info where grouptype=9 and status=0"
             cursor.execute(sql)

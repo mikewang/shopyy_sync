@@ -39,7 +39,7 @@ def index():
 api.add_resource(UserResource, '/User', '/User/<string:OpCode>')
 api.add_resource(ProductResource, '/Product', '/Product/<int:pageNo>')
 api.add_resource(ImageResource, '/Image', '/Image/<string:guid>')
-api.add_resource(DictResource, '/Dict', resource_class_kwargs=('item_type', 'brand'))
+api.add_resource(DictResource, '/Dict', '/Dict/<string:item_type>')
 
 
 

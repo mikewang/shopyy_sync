@@ -19,7 +19,7 @@ class DictResource(Resource):
     def __del__(self):
         pass
 
-    def get(self):
+    def get(self, item_type):
         try:
             # 增加请求解析参数
             parser = reqparse.RequestParser()
@@ -32,7 +32,10 @@ class DictResource(Resource):
             token = args["token"]
             timestamp = args["timestamp"]
             user_service = UserService()
-            item_list = user_service.getDictItem(OpCode, timestamp, token, self.item_type)
+            if item_type is None:
+                item_list = user_service.getDictItem(OpCode, timestamp, token, self.item_type)
+            else:
+                item_list = user_service.getDictItem(OpCode, timestamp, token, item_type)
             result = {"code": 200, "msg": ""}
             if item_list is not None:
                 json_list = []
@@ -44,7 +47,7 @@ class DictResource(Resource):
                 result["data"] = json_list
             else:
                 result["data"] = []
-                result = {"code": 201, "msg": "product.py is not existed."}
+                result = {"code": 201, "msg": "dict is not existed."}
             return result, result["code"]
         except Exception as e:
             print('str(Exception):\t', str(Exception))
