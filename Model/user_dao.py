@@ -179,7 +179,7 @@ class UserDao(object):
             if item_type == "brand":
                 sql = "select ID, DictValue from [csidbo].CustomDict where DictType=501027 and status=0"
             else:
-                sql = "Select ID, cust_name from [csidbo].Cust_Info where grouptype=9 and status=0"
+                sql = "Select ID, custname from [csidbo].Cust_Info where grouptype=9 and status=0"
             cursor.execute(sql)
             for row in cursor:
                 item = dict()
@@ -188,6 +188,8 @@ class UserDao(object):
                 cursor.close()
                 cnxn.close()
                 item_list.append(item)
+            cursor.close()
+            cnxn.close()
             return item_list
         except Exception as e:
             print('str(Exception):\t', str(Exception))
