@@ -2,11 +2,16 @@
 
 block_cipher = None
 
+py_files = ['app.py', 'Model/user.py',
+'Resource/user_resource.py','Resource/product_resource.py',
+'Resource/image_resource.py','Model/user_dao.py','Service/user_service.py']
 
-a = Analysis(['app.py', 'Model/user.py','Resource/user_resource.py','Resource/product_resource.py','Resource/image_resource.py','Model/user_dao.py','Service/user_service.py','templates/*'],
-             pathex=['C:\\Users\\wfg.langfang\\PycharmProjects\\shopyy_sync\\OrderAPI'],
+add_files = [('templates\\*.html', templates')]
+
+a = Analysis(py_files,
+             pathex=['C:\\Users\\wfg.langfang\\PycharmProjects\\shopyy_sync\\StockAPI'],
              binaries=[],
-             datas=[],
+             datas=add_files,
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
