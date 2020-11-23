@@ -31,7 +31,7 @@ class ProductEnquiryResource(Resource):
                 result["data"] = []
                 result = {"code": 202, "msg": "prod list json is error."}
                 return result, result["code"]
-            result = user_service.addStockProductEnquiryPrice(OpCode, timestamp, token, prod_dict_list)
+            result_status = user_service.addStockProductEnquiryPrice(OpCode, timestamp, token, prod_dict_list)
             # data = ["DisneyPlus", "Netflix", "Peacock"]
             # json_string = json.dumps(data)
             # print(json_string)
@@ -41,13 +41,8 @@ class ProductEnquiryResource(Resource):
             # json_list = json.dumps(prod.__dict__)
             # print(json_list)
             # print('-'*60)
-            if prod_list is not None:
-                json_list = []
-                for prod in prod_list:
-                    print(prod.__dict__)
-                    # prod_json = json.dumps(prod.desc())
-                    json_list.append(prod.desc())
-                result["data"] = json_list
+            if result_status is not None:
+                result["data"] = result_status
             else:
                 result["data"] = []
                 result = {"code": 201, "msg": "product.py is not existed."}
