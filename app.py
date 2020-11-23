@@ -9,6 +9,7 @@ from Resource.wow_resource import WOWResource
 from Model.product import ProductInfo
 import decimal
 from Service.wow_service import WOWService
+import json
 
 app = Flask(__name__)
 api = Api(app)
@@ -50,7 +51,14 @@ if __name__ == '__main__':
     # prod.shouldPrice = decimal.Decimal('11.98')
     # print(prod.__dict__)
     # print(prod.desc())
+    # jsonstr = "[{\"name\":\"test\"},{\"name\":\"abcd\"}]"
+    # print(jsonstr)
+    # jsondict = json.loads(jsonstr)
+    # for dd in jsondict:
+    #     print(dd["name"])
+    # print(jsondict)
     serve(app, host="0.0.0.0", port=8998)
+
 
 
 # # 'app.py', 'Model/user.py','Resource/user_resource.py','Service/user_dao.py','Service/user_service.py'

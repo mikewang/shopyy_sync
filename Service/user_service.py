@@ -29,9 +29,9 @@ class UserService(UserInfo):
             decode_token = self.getDecodeToken(OpCode, timestamp, decode_password)
             if decode_token != token:
                 self._loginUser = None
-                print("-"*10, OpCode, 'login failure', '-'*10)
+                print("-" * 10, OpCode, 'login failure', '-' * 10)
         if self._loginUser is not None:
-            return {"ID":  self._loginUser.ID, "OpCode": self._loginUser.OpCode, "OpName": self._loginUser.OpName,
+            return {"ID": self._loginUser.ID, "OpCode": self._loginUser.OpCode, "OpName": self._loginUser.OpName,
                     "Position": self._loginUser.Position, "PositionName": self._loginUser.PositionName}
         else:
             return None
@@ -100,3 +100,16 @@ class UserService(UserInfo):
             if decode_token == token:
                 file_path = os.path.normpath(os.path.join(disk_path, year, month, module, imageGuid))
         return file_path
+
+    def addStockProductEnquiryPrice(self, OpCode, timestamp, token, prod_dict_list):
+        result = None
+        user = self._dao.select_user(OpCode)
+        if user is not None:
+            # 加密算法，token，计算方法
+            decode_password = user.decode_password()
+            decode_token = self.getDecodeToken(OpCode, timestamp, decode_password)
+            if decode_token == token:
+                result = self._dao.add_stock_product_enquiry_price(prod_dict_list)
+            else:
+                print("Error token:", "get stock product of enquiry price", prod_dict_list)
+        return result

@@ -44,6 +44,32 @@ class ProductInfo(object):
         return product_dict
 
 
+class ProductEnquiryPrice(object):
+
+    def __init__(self):
+        super(ProductEnquiryPrice, self).__init__()
+        print("initial class", self)
+        self.__setup_product()
+
+    def __del__(self):
+        pass
+
+    def __setup_product(self):
+        self.ID = 0
+        self.OpCode = ''
+        self.StockProductID = 0
+        self.ActivityType = ''
+        self.What = ''
+        self.CreateTime = ''
+
+    def desc(self):
+        product_dict = self.__dict__
+        #product_dict["shouldPrice"] = str(self.shouldPrice)
+        # product_dict["CreateDate"] = self.CreateDate.strftime('%Y-%m-%d %H:%M:%S')
+        print(product_dict)
+        return product_dict
+
+
 class DecimalEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, decimal.Decimal):
