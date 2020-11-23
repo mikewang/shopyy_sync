@@ -8,7 +8,6 @@ from Service.user_service import UserService
 
 class UserResource(Resource):
 
-    @staticmethod
     def get(self, OpCode):
         try:
             parser = reqparse.RequestParser()
@@ -42,7 +41,6 @@ class UserResource(Resource):
             time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             print("get user", OpCode, time_str)
 
-    @staticmethod
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('token')
