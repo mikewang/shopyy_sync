@@ -130,7 +130,7 @@ class UserDao(object):
             v_sql ="select " + topN + " e.[采购人], a.StockProductID,a.ProductID,CONVERT(varchar, d.SignDate, 120 ) as SignDate,a.GoodsCode,a.SpecNo,f.GoodsCDesc, a.GoodsUnit, b._ImageID,c.ImageGuid,c.ImageFmt,c.ModuleID,CONVERT(varchar, c.FileDate, 120 ) as FileDate,c.ThumbImage,b.[其它.供应商名称],b.[其它.允采购量],b.[其它.应采购价],b.[其它.商品品牌]   FROM [FTTXRUN].[csidbo].[Stock_Product_Info] as a join  FTTXRUN.csidbo.FTPart_Stock_Product_Property_1 as b on a.StockProductID=b.MainID join csidbo.Product_Image as c on b._ImageID=c.ProductImageID join csidbo.stock_info d on d.ID=a.StockID join csidbo.[FTPart_Stock_Property_1] e on e.[MainID] = d.ID left join csidbo.[Stock_Product_Info_Desc] f on a.StockProductID=f.StockProductID "
             v_sql = v_sql + " where a.StockProductID not in (select distinct StockProductID from [Stock_Product_EnquiryPrice_App]) "
             v_sql = v_sql + " order by d.signdate desc,a.stockproductid desc"
-            sql = "select  top 10 * from (" + v_sql + " order by d.signdate desc,a.stockproductid desc ) as v1 order by v1.SignDate asc,v1.StockProductID asc"
+            sql = "select  top 10 * from (" + v_sql + " ) as v1 order by v1.SignDate asc,v1.StockProductID asc"
             cursor.execute(sql)
             for row in cursor:
                 product = ProductInfo()
