@@ -11,6 +11,7 @@ from Model.product import DecimalEncoder
 
 class ProductResource(Resource):
 
+    @staticmethod
     def get(self, pageNo):
         try:
             # 增加请求解析参数
@@ -61,6 +62,7 @@ class ProductResource(Resource):
             time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             print("get product.py", OpCode, time_str)
 
+    @staticmethod
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('token')
