@@ -11,26 +11,29 @@ from Model.product import DecimalEncoder
 
 class ProductEnquiryResource(Resource):
 
-    def post(self, prod_str):
+    def post(self):
         try:
             # 增加请求解析参数
             parser = reqparse.RequestParser()
             parser.add_argument('OpCode')
             parser.add_argument('token')
             parser.add_argument('timestamp')
+            parser.add_argument('prods', type=str)
             # 分析请求
             args = parser.parse_args()
             OpCode = args["OpCode"]
             token = args["token"]
             timestamp = args["timestamp"]
+            prod_str = args["prods"]
+            print("post pramaters", prod_str, args)
             user_service = UserService()
-            print(prod_str)
-            result = {"code": 200, "msg": ""}
-            prod_dict_list = json.loads(prod_str)
-            if prod_dict_list is None:
+            result = {"code": 201, "msg": ""}
+
+            if prod_str is None:
                 result["data"] = []
-                result = {"code": 202, "msg": "prod list json is error."}
+                result = {"code": 500, "msg": "Error, prods parameter is null."}
                 return result, result["code"]
+            prod_dict_list = json.loads(prod_str)
             result_status = user_service.addStockProductEnquiryPrice(OpCode, timestamp, token, prod_dict_list)
             # data = ["DisneyPlus", "Netflix", "Peacock"]
             # json_string = json.dumps(data)
@@ -45,7 +48,7 @@ class ProductEnquiryResource(Resource):
                 result["data"] = result_status
             else:
                 result["data"] = []
-                result = {"code": 201, "msg": "product.py is not existed."}
+                result = {"code": 500, "msg": "product.py is not existed."}
             return result, result["code"]
         except Exception as e:
             print('str(Exception):\t', str(Exception))

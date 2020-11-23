@@ -5,6 +5,8 @@ from Resource.user_resource import UserResource
 from Resource.product_resource import ProductResource
 from Resource.image_resource import ImageResource
 from Resource.dict_resource import DictResource
+from Resource.product_enquiry_resource import ProductEnquiryResource as EnquiryResource
+
 from Resource.wow_resource import WOWResource
 from Model.product import ProductInfo
 import decimal
@@ -41,6 +43,7 @@ api.add_resource(UserResource, '/User', '/User/<string:OpCode>')
 api.add_resource(ProductResource, '/Product', '/Product/<int:pageNo>')
 api.add_resource(ImageResource, '/Image', '/Image/<string:guid>')
 api.add_resource(DictResource, '/Dict', '/Dict/<string:item_type>')
+api.add_resource(EnquiryResource, '/Enquiry')
 
 
 
