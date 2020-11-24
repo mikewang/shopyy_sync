@@ -60,6 +60,11 @@ if __name__ == '__main__':
     # for dd in jsondict:
     #     print(dd["name"])
     # print(jsondict)
+    # p1 = float('1.0')
+    # p2 = eval('1e-3')
+    # p3 = p1*p2
+    # print("p3", p3)
+
     serve(app, host="0.0.0.0", port=8998)
 
 

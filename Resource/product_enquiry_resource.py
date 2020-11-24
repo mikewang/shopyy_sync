@@ -26,9 +26,10 @@ class ProductEnquiryResource(Resource):
             timestamp = args["timestamp"]
             prod_list = args["prod_list"]
             user_service = UserService()
-            print("form data is ", prod_list)
+            print("json data is ", prod_list)
             result = {"code": 201, "msg": ""}
-            prod_dict_list = json.loads(prod_list)
+            # prod_dict_list = json.loads(prod_list)
+            prod_dict_list = prod_list
             if prod_dict_list is None:
                 result["data"] = []
                 result = {"code": 500, "msg": "prod list json is error."}

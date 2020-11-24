@@ -48,6 +48,7 @@ def get_q(file_name):
         for line in file:
             N_atoms = N_atoms + 1
     # get N_atoms = 19
+    print("q size ", N_atoms)
     q = np.zeros([N_atoms, N_atoms], dtype=np.float64)
     with open(file_name_q) as file:
         j = 0
@@ -108,6 +109,7 @@ def make_mace(file_first, gamma, tolerance):
         else:
             current_file = file_next
             q1 = q2
+        print(current_file)
 
 
 def compute_MACE_step(q,gradient,gamma,tolerance):
@@ -115,6 +117,7 @@ def compute_MACE_step(q,gradient,gamma,tolerance):
     print(gradient)
     N_agents = q.shape[1]
     weights = np.ones(N_agents)/N_agents
+    print("gamma*gradient", gamma*gradient)
     Fx = q - gamma*gradient
     v = 2*Fx - q
     Gx = np.average(q,axis=1,weights=weights).reshape((len(q),1))
