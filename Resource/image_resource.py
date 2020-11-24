@@ -16,9 +16,9 @@ class ImageResource(Resource):
         try:
             # 增加请求解析参数
             parser = reqparse.RequestParser()
-            parser.add_argument('OpCode')
-            parser.add_argument('token')
-            parser.add_argument('timestamp')
+            parser.add_argument('OpCode', location='headers')
+            parser.add_argument('token', location='headers')
+            parser.add_argument('timestamp', location='headers')
             parser.add_argument('year')
             parser.add_argument('month')
             parser.add_argument('module')

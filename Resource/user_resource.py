@@ -11,8 +11,8 @@ class UserResource(Resource):
     def get(self, OpCode):
         try:
             parser = reqparse.RequestParser()
-            parser.add_argument('token')
-            parser.add_argument('timestamp')
+            parser.add_argument('token', location='headers')
+            parser.add_argument('timestamp', location='headers')
             args = parser.parse_args()
             print("request paramter:", args, OpCode)
             token = args["token"]

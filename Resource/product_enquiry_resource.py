@@ -11,25 +11,27 @@ from Model.product import DecimalEncoder
 
 class ProductEnquiryResource(Resource):
 
-    def post(self, prod_str):
+    def post(self):
         try:
             # 增加请求解析参数
             parser = reqparse.RequestParser()
-            parser.add_argument('OpCode')
-            parser.add_argument('token')
-            parser.add_argument('timestamp')
+            parser.add_argument('OpCode', location='headers')
+            parser.add_argument('token', location='headers')
+            parser.add_argument('timestamp', location='headers')
+            parser.add_argument('prod_list', location='form')
             # 分析请求
             args = parser.parse_args()
             OpCode = args["OpCode"]
             token = args["token"]
             timestamp = args["timestamp"]
+            prod_list = args["prod_list"]
             user_service = UserService()
-            print(prod_str)
-            result = {"code": 200, "msg": ""}
-            prod_dict_list = json.loads(prod_str)
+            print(prod_list)
+            result = {"code": 201, "msg": ""}
+            prod_dict_list = json.loads(prod_list)
             if prod_dict_list is None:
                 result["data"] = []
-                result = {"code": 202, "msg": "prod list json is error."}
+                result = {"code": 500, "msg": "prod list json is error."}
                 return result, result["code"]
             result_status = user_service.addStockProductEnquiryPrice(OpCode, timestamp, token, prod_dict_list)
             # data = ["DisneyPlus", "Netflix", "Peacock"]
