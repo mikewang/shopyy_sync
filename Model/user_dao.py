@@ -179,8 +179,10 @@ class UserDao(object):
             cursor = cnxn.cursor()
             # {\"stockProductID\":10705,\"ID\":0,\"opCode\":\"delong\",\"createTime\":\"2020-11-23 14:21:54\"
             for prod in prod_dict_list:
+                print("enquiried product is ", prod["stockProductID"], prod)
                 ID = prod["ID"]
                 stockProductID = prod["stockProductID"]
+
                 opCode = prod["opCode"]
                 createTime = prod["createTime"]
                 sql = "insert into Stock_Product_EnquiryPrice_App(stockProductID,opCode,createTime) values(?,?,?)"

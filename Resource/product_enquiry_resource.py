@@ -15,9 +15,9 @@ class ProductEnquiryResource(Resource):
         try:
             # 增加请求解析参数
             parser = reqparse.RequestParser()
-            parser.add_argument('OpCode', location='headers')
-            parser.add_argument('token', location='headers')
-            parser.add_argument('timestamp', location='headers')
+            parser.add_argument('OpCode', location=['headers', 'args'])
+            parser.add_argument('token', location=['headers', 'args'])
+            parser.add_argument('timestamp', location=['headers', 'args'])
             parser.add_argument('prod_list', location='form')
             # 分析请求
             args = parser.parse_args()
@@ -26,7 +26,7 @@ class ProductEnquiryResource(Resource):
             timestamp = args["timestamp"]
             prod_list = args["prod_list"]
             user_service = UserService()
-            print(prod_list)
+            print("form data is ", prod_list)
             result = {"code": 201, "msg": ""}
             prod_dict_list = json.loads(prod_list)
             if prod_dict_list is None:
