@@ -28,8 +28,10 @@ class ProductEnquiryResource(Resource):
             user_service = UserService()
             print("json data is ", prod_list)
             result = {"code": 201, "msg": ""}
-            # prod_dict_list = json.loads(prod_list)
-            prod_dict_list = prod_list
+            temp_prod_list = "[{'stockProductID': 10703, 'createTime': '2020-11-24 18:00:54', 'opCode': 'delong', 'ID': 0}, {'createTime': '2020-11-24 18:00:54', 'ID': 0, 'stockProductID': 10704, 'opCode': 'delong'}, {'opCode': 'delong', 'stockProductID':10708, 'ID': 0, 'createTime': '2020-11-24 18:00:54'}, {'createTime': '2020-11-24 18:00:54', 'stockProductID': 10709, 'opCode': 'delong', 'ID': 0}]"
+            #prod_dict_list = prod_list
+            print("temp_prod_list is ", temp_prod_list)
+            prod_dict_list = json.loads(prod_list)
             if prod_dict_list is None:
                 result["data"] = []
                 result = {"code": 500, "msg": "prod list json is error."}

@@ -60,10 +60,15 @@ if __name__ == '__main__':
     # for dd in jsondict:
     #     print(dd["name"])
     # print(jsondict)
-    # p1 = float('1.0')
+    # p1 = float(\"1.0')
     # p2 = eval('1e-3')
     # p3 = p1*p2
     # print("p3", p3)
+
+    temp_prod_list = "[{\"stockProductID\": 10703, \"createTime\": \"2020-11-24 18:00:54\", \"opCode\": \"delong\", \"ID\": 0}, {\"createTime\": \"2020-11-24 18:00:54\", \"ID\": 0, \"stockProductID\": 10704, \"opCode\": \"delong\"}, {\"opCode\": \"delong\", \"stockProductID\":10708, \"ID\": 0, \"createTime\": \"2020-11-24 18:00:54\"}, {\"createTime\": \"2020-11-24 18:00:54\", \"stockProductID\": 10709, \"opCode\": \"delong\", \"ID\": 0}]"
+    # prod_dict_list = prod_list
+    print("temp_prod_list is ", temp_prod_list)
+    prod_dict_list = json.loads(temp_prod_list)
 
     serve(app, host="0.0.0.0", port=8998)
 
