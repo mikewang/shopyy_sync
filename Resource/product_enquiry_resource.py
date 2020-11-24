@@ -18,7 +18,7 @@ class ProductEnquiryResource(Resource):
             parser.add_argument('OpCode', location=['headers', 'args'])
             parser.add_argument('token', location=['headers', 'args'])
             parser.add_argument('timestamp', location=['headers', 'args'])
-            parser.add_argument('prod_list', location='form')
+            parser.add_argument('prod_list', location='json')
             # 分析请求
             args = parser.parse_args()
             OpCode = args["OpCode"]
