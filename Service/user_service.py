@@ -74,7 +74,7 @@ class UserService(UserInfo):
                 print("Error token:", "get data dictionary of type", item_type)
         return item_list
 
-    def getStockProduct(self, OpCode, timestamp, token, pageNo):
+    def getStockProduct(self, OpCode, timestamp, token, pageNo, filter_stock):
         print("get stock product of PageNo", OpCode, timestamp, token, pageNo)
         product_list = None
         user = self._dao.select_user(OpCode)
@@ -83,7 +83,7 @@ class UserService(UserInfo):
             decode_password = user.decode_password()
             decode_token = self.getDecodeToken(OpCode, timestamp, decode_password)
             if decode_token == token:
-                product_list = self._dao.select_stock_product_list(pageNo)
+                product_list = self._dao.select_stock_product_list(pageNo, filter_stock)
             else:
                 print("Error token:", "get stock product of pageNo", pageNo)
         return product_list
