@@ -7,6 +7,7 @@ from flask_restful import reqparse, Resource
 from Service.user_service import UserService
 from Model.product import ProductInfo
 from Model.product import DecimalEncoder
+import base64
 
 
 class ProductEnquiryResource(Resource):
@@ -24,12 +25,13 @@ class ProductEnquiryResource(Resource):
             OpCode = args["OpCode"]
             token = args["token"]
             timestamp = args["timestamp"]
-            prod_list = args["prod_list"]
+            prod_list_json_base64 = args["prod_list"]
+            prod_list_json = base64.b64decode(prod_list_json_base64).decode('utf-8')
             user_service = UserService()
-            print("json data is ", prod_list)
+            print("prod list json data is ", prod_list_json)
             result = {"code": 201, "msg": ""}
-            prod_dict_list = json.loads(prod_list)
             # prod_dict_list = prod_list
+            prod_dict_list = json.loads(prod_list_json)
             if prod_dict_list is None:
                 result["data"] = []
                 result = {"code": 500, "msg": "prod list json is error."}
