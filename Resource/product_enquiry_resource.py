@@ -16,9 +16,12 @@ class ProductEnquiryResource(Resource):
         try:
             # 增加请求解析参数
             parser = reqparse.RequestParser()
-            parser.add_argument('OpCode', location=['headers', 'args'])
-            parser.add_argument('token', location=['headers', 'args'])
-            parser.add_argument('timestamp', location=['headers', 'args'])
+            # parser.add_argument('OpCode', location=['headers', 'args'])
+            # parser.add_argument('token', location=['headers', 'args'])
+            # parser.add_argument('timestamp', location=['headers', 'args'])
+            parser.add_argument('OpCode', location='headers')
+            parser.add_argument('token', location='headers')
+            parser.add_argument('timestamp', location='headers')
             parser.add_argument('prod_list', location='json')
             # 分析请求
             args = parser.parse_args()
