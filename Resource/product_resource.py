@@ -2,11 +2,16 @@
 import traceback
 import sys
 import datetime
+import base64
 import json
 from flask_restful import reqparse, Resource
 from Service.user_service import UserService
 from Model.product import ProductInfo
 from Model.product import DecimalEncoder
+
+
+def base64Replace(base64_str):
+    return base64_str.replace('*', '+').replace('-', '/').replace('.', '=')
 
 
 class ProductResource(Resource):
@@ -18,23 +23,51 @@ class ProductResource(Resource):
             parser.add_argument('OpCode', location='headers')
             parser.add_argument('token', location='headers')
             parser.add_argument('timestamp', location='headers')
+            # parser.add_argument('OpCode', location=['headers', 'args'])
+            # parser.add_argument('token', location=['headers', 'args'])
+            # parser.add_argument('timestamp', location=['headers', 'args'])
+            parser.add_argument('t')
+            parser.add_argument('brand')
+            parser.add_argument('enquiry')
+            parser.add_argument('begin')
+            parser.add_argument('end')
             # 分析请求
             args = parser.parse_args()
             OpCode = args["OpCode"]
             token = args["token"]
             timestamp = args["timestamp"]
+            print("request args is ", args)
+            filter_stock = {}
+            brand_base64 = args["brand"]
+            if brand_base64 is not None:
+                brand_base64 = base64Replace(brand_base64)
+                brands = base64.b64decode(brand_base64).decode('utf-8')
+                brand_list = brands.split(';')
+                filter_stock['brand'] = brand_list
+                print("brand key is ", args["brand"], brand_list)
+            enquiry_base64 = args["enquiry"]
+            if enquiry_base64 is not None:
+                enquiry_base64 = base64Replace(enquiry_base64)
+                print("enquiry_base64 is ", enquiry_base64)
+                enquiry = base64.b64decode(enquiry_base64).decode('utf-8')
+                filter_stock['enquiry'] = enquiry
+                print("enquiry key is ", args["enquiry"], enquiry)
+            begin_base64 = args["begin"]
+            if begin_base64 is not None:
+                begin_base64 = base64Replace(begin_base64)
+                begin_date = base64.b64decode(begin_base64).decode('utf-8')
+                filter_stock['begin'] = begin_date
+                print("begin_date key is ", args["begin"], begin_date)
+            end_base64 = args["end"]
+            if end_base64 is not None:
+                end_base64 = base64Replace(end_base64)
+                end_date = base64.b64decode(end_base64).decode('utf-8')
+                filter_stock['end'] = end_date
+                print("end_date key is ", args["end"], end_date)
+            print("filter_stock is ", filter_stock)
             user_service = UserService()
-            prod_list = user_service.getStockProduct(OpCode, timestamp, token, pageNo)
+            prod_list = user_service.getStockProduct(OpCode, timestamp, token, pageNo, filter_stock)
             result = {"code": 200, "msg": ""}
-            # data = ["DisneyPlus", "Netflix", "Peacock"]
-            # json_string = json.dumps(data)
-            # print(json_string)
-            # prod = ProductInfo()
-            # prod.StockProductID = 100
-            # prod.shouldPrice = 10.1
-            # json_list = json.dumps(prod.__dict__)
-            # print(json_list)
-            # print('-'*60)
             if prod_list is not None:
                 json_list = []
                 for prod in prod_list:

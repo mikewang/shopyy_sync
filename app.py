@@ -78,7 +78,14 @@ if __name__ == '__main__':
     jsondict = json.loads(jsonstr)
     print(len(jsondict))
 
-    print("base64 is ", str)
+    base64_str = "5pyq6K+i5Lu3"
+    jsonstr = base64.b64decode(base64_str).decode('utf-8')
+    print(jsonstr)
+    ss_bytes = bytes(jsonstr, 'utf-8')
+    ss = base64.b64encode(ss_bytes).decode()
+    print(base64_str)
+    print(ss)
+
     serve(app, host="0.0.0.0", port=8998)
 
 

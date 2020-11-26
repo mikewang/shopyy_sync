@@ -119,7 +119,7 @@ class UserDao(object):
             print('#' * 60)
             return None
 
-    def select_stock_product_list(self, page_no):
+    def select_stock_product_list(self, page_no, filter_stock):
         try:
             product_list = []
             cnxn = pyodbc.connect(self._conn_str)
@@ -128,9 +128,29 @@ class UserDao(object):
             # 采购人	StockProductID	ProductID	SignDate	GoodsCode	SpecNo	GoodsSpec	GoodsUnit	_ImageID	ImageGuid	ImageFmt	ModuleID	FileDate	ThumbImage	其它.供应商名称	其它.允采购量	其它.应采购价	其它.商品品牌
             # 数据源
             v_sql ="select " + topN + " e.[采购人], a.StockProductID,a.ProductID,CONVERT(varchar, d.SignDate, 120 ) as SignDate,a.GoodsCode,a.SpecNo,f.GoodsCDesc, a.GoodsUnit, b._ImageID,c.ImageGuid,c.ImageFmt,c.ModuleID,CONVERT(varchar, c.FileDate, 120 ) as FileDate,c.ThumbImage,b.[其它.供应商名称],b.[其它.允采购量],b.[其它.应采购价],b.[其它.商品品牌]   FROM [FTTXRUN].[csidbo].[Stock_Product_Info] as a join  FTTXRUN.csidbo.FTPart_Stock_Product_Property_1 as b on a.StockProductID=b.MainID join csidbo.Product_Image as c on b._ImageID=c.ProductImageID join csidbo.stock_info d on d.ID=a.StockID join csidbo.[FTPart_Stock_Property_1] e on e.[MainID] = d.ID left join csidbo.[Stock_Product_Info_Desc] f on a.StockProductID=f.StockProductID "
-            v_sql = v_sql + " where a.StockProductID not in (select distinct StockProductID from [Stock_Product_EnquiryPrice_App]) "
+            v_sql = v_sql + " where 0=0 "
+            filter_brand = filter_stock["brand"]
+            if filter_brand is not None:
+                filter_sql = ''
+                for b in filter_brand:
+                    filter_sql = filter_sql + "'" + b + "',"
+                filter_sql = filter_sql.rstrip(',')
+                v_sql = v_sql + " and b.[其它.商品品牌] in (" + filter_sql + ")"
+            filter_enquriy = filter_stock["enquiry"]
+            if filter_enquriy is not None:
+                if filter_enquriy == '未查询':
+                    v_sql = v_sql + " and a.StockProductID not in (select distinct StockProductID from csidbo.[Stock_Product_EnquiryPrice_App]) "
+                else:
+                    v_sql = v_sql + " and a.StockProductID in (select distinct StockProductID from csidbo.[Stock_Product_EnquiryPrice_App]) "
+            filter_begin = filter_stock["begin"]
+            if filter_begin is not None:
+                v_sql = v_sql + " and d.SignDate >= '" + filter_begin + "'"
+            filter_end = filter_stock["end"]
+            if filter_end is not None:
+                v_sql = v_sql + " and d.SignDate <= '" + filter_end + " 23:59:59'"
             v_sql = v_sql + " order by d.signdate desc,a.stockproductid desc"
             sql = "select  top 10 * from (" + v_sql + " ) as v1 order by v1.SignDate asc,v1.StockProductID asc"
+            print("sql is ", sql)
             cursor.execute(sql)
             for row in cursor:
                 product = ProductInfo()
