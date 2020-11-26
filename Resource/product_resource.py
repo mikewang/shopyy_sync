@@ -10,10 +10,8 @@ from Model.product import ProductInfo
 from Model.product import DecimalEncoder
 
 
-
 def base64Replace(base64_str):
     return base64_str.replace('*', '+').replace('-', '/').replace('.', '=')
-
 
 
 class ProductResource(Resource):

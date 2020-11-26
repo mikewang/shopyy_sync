@@ -139,9 +139,9 @@ class UserDao(object):
             filter_enquriy = filter_stock["enquiry"]
             if filter_enquriy is not None:
                 if filter_enquriy == '未查询':
-                    v_sql = v_sql + " and a.StockProductID not in (select distinct StockProductID from [Stock_Product_EnquiryPrice_App]) "
+                    v_sql = v_sql + " and a.StockProductID not in (select distinct StockProductID from csidbo.[Stock_Product_EnquiryPrice_App]) "
                 else:
-                    v_sql = v_sql + " and a.StockProductID in (select distinct StockProductID from [Stock_Product_EnquiryPrice_App]) "
+                    v_sql = v_sql + " and a.StockProductID in (select distinct StockProductID from csidbo.[Stock_Product_EnquiryPrice_App]) "
             filter_begin = filter_stock["begin"]
             if filter_begin is not None:
                 v_sql = v_sql + " and d.SignDate >= '" + filter_begin + "'"
