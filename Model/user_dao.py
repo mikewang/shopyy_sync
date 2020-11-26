@@ -232,8 +232,14 @@ class UserDao(object):
                 print("enquiried product is ", prod["stockProductID"], prod)
                 stockProductID = prod["stockProductID"]
                 opCode = prod["opCode"]
-                sql = "insert into Stock_Product_EnquiryPrice_App(stockProductID,opCode) values(?,?)"
-                cursor.execute(sql, stockProductID, opCode)
+                purchaseNum = prod["purchaseNum"]
+                purchasePrice = prod["purchasePrice"]
+                orderStat = prod["orderStat"]
+                supplier = prod["supplier"]
+
+                sql = "insert into Stock_Product_Order_App(stockProductID,opCode, OrderNum, OrderPrice,orderStat,supplier) values(?,?,?,?,?,?)"
+                print("insert Stock_Product_Order_App ", sql)
+                cursor.execute(sql, stockProductID, opCode, purchaseNum, purchasePrice, orderStat, supplier)
                 cursor.commit()
             cursor.close
             cnxn.close
