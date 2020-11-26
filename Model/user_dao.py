@@ -127,8 +127,8 @@ class UserDao(object):
             topN = " top " + str(page_no*10)
             # 采购人	StockProductID	ProductID	SignDate	GoodsCode	SpecNo	GoodsSpec	GoodsUnit	_ImageID	ImageGuid	ImageFmt	ModuleID	FileDate	ThumbImage	其它.供应商名称	其它.允采购量	其它.应采购价	其它.商品品牌
             # 数据源
-            v_sql ="select " + topN + " e.[采购人], a.StockProductID,a.ProductID,CONVERT(varchar, d.SignDate, 120 ) as SignDate,a.GoodsCode,a.SpecNo,f.GoodsCDesc, a.GoodsUnit, b._ImageID,c.ImageGuid,c.ImageFmt,c.ModuleID,CONVERT(varchar, c.FileDate, 120 ) as FileDate,c.ThumbImage,b.[其它.供应商名称],b.[其它.允采购量],b.[其它.应采购价],b.[其它.商品品牌]   FROM [FTTXRUN].[csidbo].[Stock_Product_Info] as a join  FTTXRUN.csidbo.FTPart_Stock_Product_Property_1 as b on a.StockProductID=b.MainID join csidbo.Product_Image as c on b._ImageID=c.ProductImageID join csidbo.stock_info d on d.ID=a.StockID join csidbo.[FTPart_Stock_Property_1] e on e.[MainID] = d.ID left join csidbo.[Stock_Product_Info_Desc] f on a.StockProductID=f.StockProductID "
-            v_sql = v_sql + " where 0=0 "
+            v_sql ="select " + topN + " e.[采购人], a.StockProductID,a.ProductID,CONVERT(varchar, d.SignDate, 120 ) as SignDate,a.GoodsCode,a.SpecNo,f.GoodsCDesc, a.GoodsUnit, b._ImageID,c.ImageGuid,c.ImageFmt,c.ModuleID,CONVERT(varchar, c.FileDate, 120 ) as FileDate,c.ThumbImage,b.[其它.供应商名称],b.[其它.允采购量],b.[其它.应采购价],b.[其它.商品品牌], coalesce(g.ordernum,0) as ordernum    FROM [FTTXRUN].[csidbo].[Stock_Product_Info] as a join  FTTXRUN.csidbo.FTPart_Stock_Product_Property_1 as b on a.StockProductID=b.MainID join csidbo.Product_Image as c on b._ImageID=c.ProductImageID join csidbo.stock_info d on d.ID=a.StockID join csidbo.[FTPart_Stock_Property_1] e on e.[MainID] = d.ID left join csidbo.[Stock_Product_Info_Desc] f on a.StockProductID=f.StockProductID left join (select [StockProductID], sum([OrderNum]*[OrderStat]) as ordernum from [csidbo].[Stock_Product_Order_App] group by [StockProductID]) g on a.StockProductID=g.StockProductID  "
+            v_sql = v_sql + "  where b.[其它.允采购量] > coalesce(g.ordernum,0) "
 
             filter_brand = filter_stock["brand"]
             if filter_brand is not None:
@@ -139,7 +139,7 @@ class UserDao(object):
                 v_sql = v_sql + " and b.[其它.商品品牌] in (" + filter_sql + ")"
             filter_enquriy = filter_stock["enquiry"]
             if filter_enquriy is not None:
-                if filter_enquriy == '未查询':
+                if filter_enquriy == '未询价':
                     v_sql = v_sql + " and a.StockProductID not in (select distinct StockProductID from csidbo.[Stock_Product_EnquiryPrice_App]) "
                 else:
                     v_sql = v_sql + " and a.StockProductID in (select distinct StockProductID from csidbo.[Stock_Product_EnquiryPrice_App]) "
@@ -176,6 +176,7 @@ class UserDao(object):
                 product.permittedNum = row[15]
                 product.shouldPrice = row[16]
                 product.brand = row[17]
+                product.orderNum = row[18]
                 product_list.append(product)
             cursor.close()
             cnxn.close()
@@ -201,13 +202,10 @@ class UserDao(object):
             # {\"stockProductID\":10705,\"ID\":0,\"opCode\":\"delong\",\"createTime\":\"2020-11-23 14:21:54\"
             for prod in prod_dict_list:
                 print("enquiried product is ", prod["stockProductID"], prod)
-                ID = prod["ID"]
                 stockProductID = prod["stockProductID"]
-
                 opCode = prod["opCode"]
-                createTime = prod["createTime"]
-                sql = "insert into Stock_Product_EnquiryPrice_App(stockProductID,opCode,createTime) values(?,?,?)"
-                cursor.execute(sql, stockProductID, opCode, datetime.datetime.strptime(createTime, '%Y-%m-%d %H:%M:%S'))
+                sql = "insert into Stock_Product_EnquiryPrice_App(stockProductID,opCode) values(?,?)"
+                cursor.execute(sql, stockProductID, opCode)
                 cursor.commit()
             cursor.close
             cnxn.close
@@ -226,6 +224,39 @@ class UserDao(object):
             print('#' * 60)
             return None
 
+    def add_stock_product_order(self, prod_dict_list):
+        try:
+            cnxn = pyodbc.connect(self._conn_str)
+            cursor = cnxn.cursor()
+            for prod in prod_dict_list:
+                print("enquiried product is ", prod["stockProductID"], prod)
+                stockProductID = prod["stockProductID"]
+                opCode = prod["opCode"]
+                purchaseNum = prod["purchaseNum"]
+                purchasePrice = prod["purchasePrice"]
+                orderStat = prod["orderStat"]
+                supplier = prod["supplier"]
+
+                sql = "insert into Stock_Product_Order_App(stockProductID,opCode, OrderNum, OrderPrice,orderStat,supplier) values(?,?,?,?,?,?)"
+                print("insert Stock_Product_Order_App ", sql)
+                cursor.execute(sql, stockProductID, opCode, purchaseNum, purchasePrice, orderStat, supplier)
+                cursor.commit()
+            cursor.close
+            cnxn.close
+            return "1"
+        except Exception as e:
+            print('str(Exception):\t', str(Exception))
+            print('str(e):\t\t', str(e))
+            print('repr(e):\t', repr(e))
+            # Get information about the exception that is currently being handled
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            print('e.message:\t', exc_value)
+            print("Note, object e and exc of Class %s is %s the same." %
+                  (type(exc_value), ('not', '')[exc_value is e]))
+            print('traceback.print_exc(): ', traceback.print_exc())
+            print('traceback.format_exc():\n%s' % traceback.format_exc())
+            print('#' * 60)
+            return None
 
     def select_dict_item_list(self, item_type):
         # select ID, DictValue from [csidbo].CustomDict where DictType=501027 and status = 0

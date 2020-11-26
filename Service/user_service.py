@@ -113,3 +113,17 @@ class UserService(UserInfo):
             else:
                 print("Error token:", "get stock product of enquiry price", prod_dict_list)
         return result
+
+    def addStockProductOrder(self, OpCode, timestamp, token, prod_dict_list):
+        result = None
+        user = self._dao.select_user(OpCode)
+        if user is not None:
+            # 加密算法，token，计算方法
+            decode_password = user.decode_password()
+            decode_token = self.getDecodeToken(OpCode, timestamp, decode_password)
+            if decode_token == token:
+                result = self._dao.add_stock_product_order(prod_dict_list)
+            else:
+                print("Error token:", "get stock product of order", prod_dict_list)
+        return result
+
