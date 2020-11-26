@@ -14,15 +14,12 @@ def base64Replace(base64_str):
     return base64_str.replace('*', '+').replace('-', '/').replace('.', '=')
 
 
-class ProductEnquiryResource(Resource):
+class ProductOrderResource(Resource):
 
     def post(self):
         try:
             # 增加请求解析参数
             parser = reqparse.RequestParser()
-            # parser.add_argument('OpCode', location=['headers', 'args'])
-            # parser.add_argument('token', location=['headers', 'args'])
-            # parser.add_argument('timestamp', location=['headers', 'args'])
             parser.add_argument('OpCode', location='headers')
             parser.add_argument('token', location='headers')
             parser.add_argument('timestamp', location='headers')
@@ -44,16 +41,7 @@ class ProductEnquiryResource(Resource):
                 result["data"] = []
                 result = {"code": 500, "msg": "prod list json is error."}
                 return result, result["code"]
-            result_status = user_service.addStockProductEnquiryPrice(OpCode, timestamp, token, prod_dict_list)
-            # data = ["DisneyPlus", "Netflix", "Peacock"]
-            # json_string = json.dumps(data)
-            # print(json_string)
-            # prod = ProductInfo()
-            # prod.StockProductID = 100
-            # prod.shouldPrice = 10.1
-            # json_list = json.dumps(prod.__dict__)
-            # print(json_list)
-            # print('-'*60)
+            result_status = user_service.addStockProductOrder(OpCode, timestamp, token, prod_dict_list)
             if result_status is not None:
                 result["data"] = result_status
             else:
@@ -73,7 +61,7 @@ class ProductEnquiryResource(Resource):
             print('#' * 60)
         finally:
             time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            print("enquiry price product.py", OpCode, time_str)
+            print("order product.py", OpCode, time_str)
 
     def get(self):
         parser = reqparse.RequestParser()

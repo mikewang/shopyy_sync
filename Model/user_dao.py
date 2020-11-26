@@ -202,11 +202,8 @@ class UserDao(object):
             # {\"stockProductID\":10705,\"ID\":0,\"opCode\":\"delong\",\"createTime\":\"2020-11-23 14:21:54\"
             for prod in prod_dict_list:
                 print("enquiried product is ", prod["stockProductID"], prod)
-                ID = prod["ID"]
                 stockProductID = prod["stockProductID"]
-
                 opCode = prod["opCode"]
-                createTime = prod["createTime"]
                 sql = "insert into Stock_Product_EnquiryPrice_App(stockProductID,opCode) values(?,?)"
                 cursor.execute(sql, stockProductID, opCode)
                 cursor.commit()
@@ -227,6 +224,33 @@ class UserDao(object):
             print('#' * 60)
             return None
 
+    def add_stock_product_order(self, prod_dict_list):
+        try:
+            cnxn = pyodbc.connect(self._conn_str)
+            cursor = cnxn.cursor()
+            for prod in prod_dict_list:
+                print("enquiried product is ", prod["stockProductID"], prod)
+                stockProductID = prod["stockProductID"]
+                opCode = prod["opCode"]
+                sql = "insert into Stock_Product_EnquiryPrice_App(stockProductID,opCode) values(?,?)"
+                cursor.execute(sql, stockProductID, opCode)
+                cursor.commit()
+            cursor.close
+            cnxn.close
+            return "1"
+        except Exception as e:
+            print('str(Exception):\t', str(Exception))
+            print('str(e):\t\t', str(e))
+            print('repr(e):\t', repr(e))
+            # Get information about the exception that is currently being handled
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            print('e.message:\t', exc_value)
+            print("Note, object e and exc of Class %s is %s the same." %
+                  (type(exc_value), ('not', '')[exc_value is e]))
+            print('traceback.print_exc(): ', traceback.print_exc())
+            print('traceback.format_exc():\n%s' % traceback.format_exc())
+            print('#' * 60)
+            return None
 
     def select_dict_item_list(self, item_type):
         # select ID, DictValue from [csidbo].CustomDict where DictType=501027 and status = 0
