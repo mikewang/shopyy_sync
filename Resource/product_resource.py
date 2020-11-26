@@ -45,6 +45,8 @@ class ProductResource(Resource):
                 brand_list = brands.split(';')
                 filter_stock['brand'] = brand_list
                 print("brand key is ", args["brand"], brand_list)
+            else:
+                filter_stock['brand'] = None
             enquiry_base64 = args["enquiry"]
             if enquiry_base64 is not None:
                 enquiry_base64 = base64Replace(enquiry_base64)
@@ -52,18 +54,24 @@ class ProductResource(Resource):
                 enquiry = base64.b64decode(enquiry_base64).decode('utf-8')
                 filter_stock['enquiry'] = enquiry
                 print("enquiry key is ", args["enquiry"], enquiry)
+            else:
+                filter_stock['enquiry'] = None
             begin_base64 = args["begin"]
             if begin_base64 is not None:
                 begin_base64 = base64Replace(begin_base64)
                 begin_date = base64.b64decode(begin_base64).decode('utf-8')
                 filter_stock['begin'] = begin_date
                 print("begin_date key is ", args["begin"], begin_date)
+            else:
+                filter_stock['begin'] = None
             end_base64 = args["end"]
             if end_base64 is not None:
                 end_base64 = base64Replace(end_base64)
                 end_date = base64.b64decode(end_base64).decode('utf-8')
                 filter_stock['end'] = end_date
                 print("end_date key is ", args["end"], end_date)
+            else:
+                filter_stock['end'] = None
             print("filter_stock is ", filter_stock)
             user_service = UserService()
             prod_list = user_service.getStockProduct(OpCode, timestamp, token, pageNo, filter_stock)
