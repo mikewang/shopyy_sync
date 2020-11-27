@@ -41,6 +41,7 @@ class ProductInfo(object):
     def desc(self):
         product_dict = self.__dict__
         product_dict["shouldPrice"] = str(self.shouldPrice)
+        product_dict["orderPrice"] = str(self.orderPrice)
         # product_dict["CreateDate"] = self.CreateDate.strftime('%Y-%m-%d %H:%M:%S')
         print(product_dict)
         return product_dict
