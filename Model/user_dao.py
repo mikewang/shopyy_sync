@@ -151,8 +151,8 @@ class UserDao(object):
             filter_end = filter_stock["end"]
             if filter_end is not None:
                 v_sql = v_sql + " and d.SignDate <= '" + filter_end + " 23:59:59'"
-            v_sql = v_sql + " order by d.signdate desc,a.stockproductid desc"
-            sql = "select  top 10 * from (" + v_sql + " ) as v1 order by v1.SignDate asc,v1.StockProductID asc"
+            v_sql = v_sql + " order by d.signdate asc,a.stockproductid asc"
+            sql = "select  top 10 * from (" + v_sql + " ) as v1 order by v1.SignDate desc,v1.StockProductID desc"
             print("sql is ", sql)
             cursor.execute(sql)
             for row in cursor:
@@ -205,7 +205,7 @@ class UserDao(object):
             topN = " top " + str(page_no * 10)
             # 采购人	StockProductID	ProductID	SignDate	GoodsCode	SpecNo	GoodsSpec	GoodsUnit	_ImageID	ImageGuid	ImageFmt	ModuleID	FileDate	ThumbImage	其它.供应商名称	其它.允采购量	其它.应采购价	其它.商品品牌
             # 数据源
-            v_sql = "select " + topN + " e.[采购人], a.StockProductID,a.ProductID,CONVERT(varchar, d.SignDate, 120 ) as SignDate,a.GoodsCode,a.SpecNo,f.GoodsCDesc, a.GoodsUnit, b._ImageID,c.ImageGuid,c.ImageFmt,c.ModuleID,CONVERT(varchar, c.FileDate, 120 ) as FileDate,c.ThumbImage,g.supplier as supplier,b.[其它.允采购量],b.[其它.应采购价],b.[其它.商品品牌], coalesce(g.[OrderNum]*g.[OrderStat],0) as ordernum , g.orderprice    " \
+            v_sql = "select " + topN + " e.[采购人], a.StockProductID,a.ProductID,CONVERT(varchar, g.CreateTime, 120 ) as CreateTime,a.GoodsCode,a.SpecNo,f.GoodsCDesc, a.GoodsUnit, b._ImageID,c.ImageGuid,c.ImageFmt,c.ModuleID,CONVERT(varchar, c.FileDate, 120 ) as FileDate,c.ThumbImage,g.supplier as supplier,b.[其它.允采购量],b.[其它.应采购价],b.[其它.商品品牌], coalesce(g.[OrderNum]*g.[OrderStat],0) as ordernum , g.orderprice    " \
                                        "FROM [csidbo].[Stock_Product_Info] as a join  csidbo.FTPart_Stock_Product_Property_1 as b on a.StockProductID=b.MainID join csidbo.Product_Image as c on b._ImageID=c.ProductImageID join csidbo.stock_info d on d.ID=a.StockID join csidbo.[FTPart_Stock_Property_1] e on e.[MainID] = d.ID left join csidbo.[Stock_Product_Info_Desc] f on a.StockProductID=f.StockProductID " \
                                        " join [csidbo].[Stock_Product_Order_App] as g on a.StockProductID=g.StockProductID  "
             v_sql = v_sql + "  where 1=1  "
@@ -225,10 +225,10 @@ class UserDao(object):
                     v_sql = v_sql + " and a.StockProductID in (select distinct StockProductID from csidbo.[Stock_Product_EnquiryPrice_App]) "
             filter_begin = filter_stock["begin"]
             if filter_begin is not None:
-                v_sql = v_sql + " and d.SignDate >= '" + filter_begin + "'"
+                v_sql = v_sql + " and g.CreateTime >= '" + filter_begin + "'"
             filter_end = filter_stock["end"]
             if filter_end is not None:
-                v_sql = v_sql + " and d.SignDate <= '" + filter_end + " 23:59:59'"
+                v_sql = v_sql + " and g.CreateTime <= '" + filter_end + " 23:59:59'"
             filter_supplier = filter_stock["supplier"]
             if filter_supplier is not None:
                 filter_sql = ''
@@ -236,8 +236,8 @@ class UserDao(object):
                     filter_sql = filter_sql + "'" + b + "',"
                 filter_sql = filter_sql.rstrip(',')
                 v_sql = v_sql + " and g.supplier in (" + filter_sql + ")"
-            v_sql = v_sql + " order by d.signdate desc,a.stockproductid desc"
-            sql = "select  top 10 * from (" + v_sql + " ) as v1 order by v1.SignDate asc,v1.StockProductID asc"
+            v_sql = v_sql + " order by g.CreateTime asc,a.stockproductid asc"
+            sql = "select  top 10 * from (" + v_sql + " ) as v1 order by v1.CreateTime desc,v1.StockProductID desc"
             print("sql is ", sql)
             cursor.execute(sql)
             for row in cursor:
