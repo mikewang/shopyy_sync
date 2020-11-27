@@ -88,6 +88,20 @@ class UserService(UserInfo):
                 print("Error token:", "get stock product of pageNo", pageNo)
         return product_list
 
+    def getStockProductOrder(self, OpCode, timestamp, token, pageNo, filter_stock):
+        print("get stock product order of PageNo", OpCode, timestamp, token, pageNo)
+        product_list = None
+        user = self._dao.select_user(OpCode)
+        if user is not None:
+            # 加密算法，token，计算方法
+            decode_password = user.decode_password()
+            decode_token = self.getDecodeToken(OpCode, timestamp, decode_password)
+            if decode_token == token:
+                product_list = self._dao.select_stock_product_order_list(pageNo, filter_stock)
+            else:
+                print("Error token:", "get stock product order of pageNo", pageNo)
+        return product_list
+
     def getProductImage(self, OpCode, timestamp, token, imageGuid, year, month, module):
         print("get stock product.py big image", OpCode, timestamp, token, imageGuid)
         file_path = None
