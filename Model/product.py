@@ -36,6 +36,7 @@ class ProductInfo(object):
         self.shouldPrice = 0.0
         self.brand = ''
         self.orderNum = 0
+        self.orderPrice = 0.0
 
     def desc(self):
         product_dict = self.__dict__
