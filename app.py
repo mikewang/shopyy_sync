@@ -8,33 +8,13 @@ from Resource.dict_resource import DictResource
 from Resource.product_enquiry_resource import ProductEnquiryResource as EnquiryResource
 from Resource.product_order_resource import ProductOrderResource as OrderResource
 
-from WOW.wow_service import WOWService
-
 app = Flask(__name__)
 api = Api(app)
 
 
 @app.route('/', methods=['GET'])
 def index():
-    ss = WOWService.testInfo('xx')
-    my_int = 18
-    my_str = 'curry:' + ss
-    my_list = [1, 5, 4, 3, 2]
-    my_dict = {
-        'name': 'durant',
-        'age': 28
-    }
-
-    # render_template方法:渲染模板
-    # 参数1: 模板名称  参数n: 传到模板里的数据
-    return render_template('hello.html',
-                           my_int=my_int,
-                           my_str=my_str,
-                           my_list=my_list,
-                           my_dict=my_dict)
-    return render_template('hello.html')
-    # return "Hello API."
-
+    return "Hello API."
 
 api.add_resource(UserResource, '/User', '/User/<string:OpCode>')
 api.add_resource(ProductResource, '/Product', '/Product/<int:pageNo>')

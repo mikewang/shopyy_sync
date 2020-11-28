@@ -10,6 +10,7 @@ from WOW.wow_model import UserInfo
 from Model.product import ProductInfo, ProductEnquiryPrice
 import pymysql
 
+
 class WowDao(object):
 
     def __init__(self):
@@ -34,9 +35,10 @@ class WowDao(object):
             print('traceback.format_exc():\n%s' % traceback.format_exc())
             print('-' * 60)
 
+
     def conn_mysql(self):
         config = configparser.ConfigParser()
-        config_file = os.path.normpath(os.path.join(os.curdir, "config.ini"))
+        config_file = os.path.normpath(os.path.join(os.curdir, "wow_config.ini"))
         config.read(config_file)
         mysql_host = config.get("mysql_db", "host")
         mysql_user = config.get("mysql_db", "user")
@@ -97,8 +99,8 @@ class WowDao(object):
                 values = [userInfo.UserName, userInfo.UserType, userInfo.Password]
                 cursor.execute(sql, values)
                 userInfo.UserID = cursor.lastrowid
-                cursor.commit()
                 cursor.close()
+            conn.commit()
             conn.close()
         except Exception as e:
             print('str(Exception):\t', str(Exception))
@@ -114,6 +116,6 @@ class WowDao(object):
             print('#' * 60)
             userInfo = None
         else:
-            print("add user done, userinfo is ", userInfo)
+            print("add user done, userinfo is ", userInfo.desc())
         finally:
             return userInfo

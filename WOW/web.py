@@ -21,12 +21,14 @@ def index():
 
     # render_template方法:渲染模板
     # 参数1: 模板名称  参数n: 传到模板里的数据
+    return render_template('index.html')
+
     return render_template('hello.html',
                            my_int=my_int,
                            my_str=my_str,
                            my_list=my_list,
                            my_dict=my_dict)
-    return render_template('hello.html')
+
     # return "Hello API."
 
 
