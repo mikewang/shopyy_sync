@@ -10,7 +10,7 @@ api = Api(app)
 
 @app.route('/', methods=['GET'])
 def index():
-    ss = WOWService.registerUser('xx')
+    ss = WowService.registerUser('xx')
     my_int = 18
     my_str = 'curry:' + ss
     my_list = [1, 5, 4, 3, 2]
