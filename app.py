@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, url_for
 from flask_restful import Api
 from waitress import serve
 from Resource.user_resource import UserResource

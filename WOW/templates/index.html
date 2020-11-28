@@ -1,49 +1,45 @@
-{% extends "layout.html" %}
-{% block body %}
+<html>
+<head>
+<title>Purple_loginform Website Template | Home :: w3layouts</title>
+<link href="/static/css/style.css" rel="stylesheet" type="text/css" media="all" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
-  <!-- Page Header -->
-  <header class="masthead" style="background-image: url('{{ url_for('static', filename='img/home-bg.jpg' ) }}')" >
-    <div class="overlay"></div>
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-8 col-md-10 mx-auto">
-          <div class="site-heading">
-            <h1> Data Analytics</h1>
-            <span class="subheading">A website liked for stunnig data visualization and analytics</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </header>
+</head>
+<body>
+<!-- contact-form -->
+<div class="message warning">
+<div class="inset">
+	<div class="login-head">
+		<h1>Login Form</h1>
+		 <div class="alert-close"> </div>
+	</div>
+		<form action="" method="post">
+			<li>
+				<input type="text" name="email" class="text" value="Username" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'Username';}"><a href="#" class=" icon user"></a>
+			</li>
+				<div class="clear"> </div>
+			<li>
+				<input type="password" name="password" value="Password" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'Password';}"> <a href="#" class="icon lock"></a>
+			</li>
+			<div class="clear"> </div>
+			<div class="submit">
+				<input type="submit" value="Sign in" >
+				<h4><a href="#">Lost your Password ?</a></h4>
+						  <div class="clear">  </div>
+			</div>
 
-  <!-- Main Content -->
-  <div class="container">
-    <div class="row">
-      <div class="col-lg-8 col-md-10 mx-auto">
-       
+		</form>
+		</div>
+	</div>
+	</div>
+	<div class="clear"> </div>
+<!--- footer --->
+<div class="footer">
+	<p>Copyright &copy; 2020.</p>
 
-       <!--Todo: Fetch it using for loop from the Database -->
-        <div class="post-preview">
-          <a href="post.html">
-            <h2 class="post-title">
-              Man must explore, and this is exploration at its greatest
-            </h2>
-            <h3 class="post-subtitle">
-              Problems look mighty small from 150 miles up
-            </h3>
-          </a>
-          <p class="post-meta">Posted by
-            <a href="#">Start Bootstrap</a>
-            on September 24, 2019</p>
-        </div>
-        <hr>
-        
-        <!-- Pager -->
-        <div class="clearfix">
-          <a class="btn btn-primary float-right" href="#">Older Posts &rarr;</a>
-        </div>
-      </div>
-    </div>
-  </div>
+</div>
 
-{% endblock %}
+</body>
+</html>

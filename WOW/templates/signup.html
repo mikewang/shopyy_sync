@@ -1,0 +1,64 @@
+{% extends "layout.html" %}
+{% block body %}
+<!-- Page Header -->
+<header class="masthead" style="background-image: url('{{ url_for('static', filename='img/write.jpg' ) }}')" >
+	<div class="overlay"></div>
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-8 col-md-10 mx-auto">
+				<div class="site-heading">
+					<h1> Your Article</h1>
+					<span class="subheading">write something below</span>
+				</div>
+			</div>
+		</div>
+	</div>
+</header>
+
+<!-- Main Content -->
+<div class="container">
+	<div class="row">
+		<div class="col-lg-8 col-md-10 mx-auto">
+			<form name="sentMessage" id="contactForm" action = "#" method = "post" novalidate>
+				<div class="control-group">
+					<div class="form-group floating-label-form-group controls">
+						<label><cite><strong>Username</strong></cite></label>
+						<input type="text" class="form-control" placeholder="Username" id="username" name='username' required data-validation-required-message="Please enter the username.">
+						<p class="help-block text-danger"></p>
+					</div>
+				</div>
+
+				<div class="control-group">
+					<div class="form-group floating-label-form-group controls">
+						<label><cite>Password</cite></label>
+						<input type="password" class="form-control" placeholder="Password" name="password" id="password" required data-validation-required-message="Please enter a password."></input>
+						<p class="help-block text-danger"></p>
+					</div>
+				</div>
+				<p class="help-block text-danger"></p>
+				<div id="success"> <button type="submit" class="btn btn-primary" id="sendMessageButton">Sign up</button> </div>
+
+			</form>
+		</div>
+	</div>
+</div>
+<script>
+$("#sendMessageButton").click(function() {
+	authorizationToken = 12330099
+$.ajax({
+  type: "POST",
+  beforeSend: function(request) {
+    request.setRequestHeader("Authority", authorizationToken);
+  },
+  url: "/signup",
+  processData: false,
+  success: function(msg) {
+
+  }
+});
+
+}
+</script>
+
+
+{% endblock %}
