@@ -39,6 +39,7 @@ class ProductEnquiryResource(Resource):
             user_service = UserService()
             print("prod list json data is ", prod_list_json)
             result = {"code": 201, "msg": ""}
+            # prod_dict_list = prod_list
             prod_dict_list = json.loads(prod_list_json)
             if prod_dict_list is None:
                 result["data"] = []
