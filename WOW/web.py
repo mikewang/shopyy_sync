@@ -1,14 +1,8 @@
 from flask import Flask, render_template
 from flask_restful import Api
 from waitress import serve
-from Resource.user_resource import UserResource
-from Resource.product_resource import ProductResource
-from Resource.image_resource import ImageResource
-from Resource.dict_resource import DictResource
-from Resource.product_enquiry_resource import ProductEnquiryResource as EnquiryResource
-from Resource.product_order_resource import ProductOrderResource as OrderResource
 
-from WOW.wow_service import WOWService
+from WOW.wow_service import WowService
 
 app = Flask(__name__)
 api = Api(app)
@@ -16,7 +10,7 @@ api = Api(app)
 
 @app.route('/', methods=['GET'])
 def index():
-    ss = WOWService.testInfo('xx')
+    ss = WOWService.registerUser('xx')
     my_int = 18
     my_str = 'curry:' + ss
     my_list = [1, 5, 4, 3, 2]
@@ -35,18 +29,6 @@ def index():
     return render_template('hello.html')
     # return "Hello API."
 
-
-api.add_resource(UserResource, '/User', '/User/<string:OpCode>')
-api.add_resource(ProductResource, '/Product', '/Product/<int:pageNo>')
-api.add_resource(ImageResource, '/Image', '/Image/<string:guid>')
-api.add_resource(DictResource, '/Dict', '/Dict/<string:item_type>')
-api.add_resource(EnquiryResource, '/Enquiry')
-api.add_resource(OrderResource, '/Order', '/Order/<int:pageNo>')
-
-
-
-
-#http://127.0.0.1:8997/Product/1?token=014987a60ada732c43262e4fa6d0a119&timestamp=1604754897&OpCode=delong
 
 if __name__ == '__main__':
     # prod = ProductInfo()
