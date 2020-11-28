@@ -151,8 +151,8 @@ class UserDao(object):
             filter_end = filter_stock["end"]
             if filter_end is not None:
                 v_sql = v_sql + " and d.SignDate <= '" + filter_end + " 23:59:59'"
-            v_sql = v_sql + " order by d.signdate asc,a.stockproductid asc"
-            sql = "select  top 10 * from (" + v_sql + " ) as v1 order by v1.SignDate desc,v1.StockProductID desc"
+            v_sql = v_sql + " order by d.signdate desc,a.stockproductid desc"
+            sql = "select  top 10 * from (" + v_sql + " ) as v1 order by v1.SignDate asc,v1.StockProductID asc"
             print("sql is ", sql)
             cursor.execute(sql)
             for row in cursor:
@@ -236,8 +236,8 @@ class UserDao(object):
                     filter_sql = filter_sql + "'" + b + "',"
                 filter_sql = filter_sql.rstrip(',')
                 v_sql = v_sql + " and g.supplier in (" + filter_sql + ")"
-            v_sql = v_sql + " order by g.CreateTime asc,a.stockproductid asc"
-            sql = "select  top 10 * from (" + v_sql + " ) as v1 order by v1.CreateTime desc,v1.StockProductID desc"
+            v_sql = v_sql + " order by g.CreateTime desc,a.stockproductid desc"
+            sql = "select  top 10 * from (" + v_sql + " ) as v1 order by v1.CreateTime asc,v1.StockProductID asc"
             print("sql is ", sql)
             cursor.execute(sql)
             for row in cursor:
