@@ -23,14 +23,16 @@ def signin():
     if request.method == 'GET':
         return render_template('signup.html')
     if request.method == 'POST':
+        print("Authority is ", request.headers.get("Authority"))
         username = request.form["username"]
         password = request.form["password"]
 
         print("-"*60)
-        print("Authority is ", request.headers.get("Authority"))
+
         print("signup", username, password)
-        return render_template('/index2.html')
+        return render_template('signup.html')
 
 
 if __name__ == '__main__':
-    serve(app, host="0.0.0.0", port=8998)
+    app.run()
+    # serve(app, host="0.0.0.0", port=8998)

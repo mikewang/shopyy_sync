@@ -1,5 +1,28 @@
 {% extends "layout.html" %}
 {% block body %}
+<script>
+
+$(document).ready(function() {
+    $("#signupBtn").click(function() {
+        alert("click event begin");
+        token = "1223"
+		$.base64.
+        $.ajax({
+            type: "POST",
+            beforeSend: function(request) {
+                request.setRequestHeader("Authority", "12330099");
+            },
+            url: "/signup",
+            processData: false,
+            success: function(msg) {
+			}
+        });
+        alert("ok");
+	});
+   });
+
+
+</script>
 <!-- Page Header -->
 <header class="masthead" style="background-image: url('{{ url_for('static', filename='img/write.jpg' ) }}')" >
 	<div class="overlay"></div>
@@ -36,29 +59,13 @@
 					</div>
 				</div>
 				<p class="help-block text-danger"></p>
-				<div id="success"> <button type="submit" class="btn btn-primary" id="sendMessageButton">Sign up</button> </div>
+				<div id="success"> <button type="button" class="btn btn-primary" id="signupBtn">Sign up</button> </div>
 
 			</form>
 		</div>
 	</div>
 </div>
-<script>
-$("#sendMessageButton").click(function() {
-	authorizationToken = 12330099
-$.ajax({
-  type: "POST",
-  beforeSend: function(request) {
-    request.setRequestHeader("Authority", authorizationToken);
-  },
-  url: "/signup",
-  processData: false,
-  success: function(msg) {
 
-  }
-});
-
-}
-</script>
 
 
 {% endblock %}
