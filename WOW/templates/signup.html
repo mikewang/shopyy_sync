@@ -3,21 +3,30 @@
 <script>
 
 $(document).ready(function() {
+
     $("#signupBtn").click(function() {
-        alert("click event begin");
-        token = "1223"
-		$.base64.
+		p_username = $("#username").val()
+
+		p_password = $("#password").val()
+		// alert("username is " + p_username + " password is " + p_password)
+
+		p_password = $.md5(p_password)
+
+        //alert("click event begin " + username + ":" + password);
         $.ajax({
             type: "POST",
             beforeSend: function(request) {
-                request.setRequestHeader("Authority", "12330099");
+                request.setRequestHeader("token", "12330099");
             },
             url: "/signup",
-            processData: false,
+			contentType: 'application/json; charset=utf-8',
+			data:{"username":p_username, "password": p_password},
+			dataType:"json",
             success: function(msg) {
+            	alert("ok");
 			}
         });
-        alert("ok");
+
 	});
    });
 

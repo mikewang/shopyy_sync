@@ -9,38 +9,24 @@ from flask import send_file, render_template
 from flask_restful import reqparse, Resource
 
 
-class WOWResource(Resource):
+class UserResource(Resource):
 
     def get(self):
         try:
-            # 增加请求解析参数
-            # parser = reqparse.RequestParser()
-            # parser.add_argument('OpCode')
-            # parser.add_argument('token')
-            # parser.add_argument('timestamp')
-            # parser.add_argument('year')
-            # parser.add_argument('month')
-            # parser.add_argument('module')
-            # # 分析请求
-            # args = parser.parse_args()
-            # OpCode = args["OpCode"]
-            # token = args["token"]
-            # timestamp = args["timestamp"]
-            # year = args["year"]
-            # month = args["month"]
-            # module = args["module"]
-            # print(args)
-            my_int = 18
-            my_str = 'curry'
-            my_list = [1, 5, 4, 3, 2]
-            my_dict = {
-                'name': 'durant',
-                'age': 28
-            }
+            parser = reqparse.RequestParser()
+            parser.add_argument('UserID', location='headers')
+            parser.add_argument('token', location='headers')
+            parser.add_argument('timestamp', location='headers')
+            # 分析请求
+            args = parser.parse_args()
+            UserID = args["UserID"]
+            token = args["token"]
+            timestamp = args["timestamp"]
+
 
             # render_template方法:渲染模板
             # 参数1: 模板名称  参数n: 传到模板里的数据
-            return render_template('hello.html', my_int=my_int, my_str=my_str, my_list=my_list, my_dict=my_dict)
+            return render_template('signup.html')
         except Exception as e:
             print('str(Exception):\t', str(Exception))
             print('str(e):\t\t', str(e))
@@ -57,9 +43,33 @@ class WOWResource(Resource):
         #     #print("get image", OpCode, time_str)
 
     def post(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('token')
-        args = parser.parse_args()
-        print("request paramter:", args)
-        result = args
-        return args
+        print("user resource is ", self)
+        try:
+            parser = reqparse.RequestParser()
+            parser.add_argument('UserID', location='headers')
+            parser.add_argument('token', location='headers')
+            parser.add_argument('timestamp', location='headers')
+            parser.add_argument('username', location='json')
+            parser.add_argument('password', location='json')
+
+            # 分析请求
+            args = parser.parse_args()
+            UserID = args["UserID"]
+            token = args["token"]
+            timestamp = args["timestamp"]
+
+            print("parser is ", args)
+
+            return '{"code": "201"}'
+        except Exception as e:
+            print('str(Exception):\t', str(Exception))
+            print('str(e):\t\t', str(e))
+            print('repr(e):\t', repr(e))
+            # Get information about the exception that is currently being handled
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            print('e.message:\t', exc_value)
+            print("Note, object e and exc of Class %s is %s the same." % (type(exc_value), ('not', '')[exc_value is e]))
+            print('traceback.print_exc(): ', traceback.print_exc())
+            print('traceback.format_exc():\n%s' % traceback.format_exc())
+            print('#' * 60)
+
