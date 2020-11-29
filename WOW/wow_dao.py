@@ -96,7 +96,7 @@ class WowDao(object):
             conn = self.conn_mysql()
             with conn.cursor() as cursor:
                 sql = "insert into user_info(USER_NAME, USER_TYPE, PASSWORD, created) values(%s, %s, %s, now()) "
-                values = [userInfo.UserName, userInfo.UserType, userInfo.Password]
+                values = (userInfo.UserName, userInfo.UserType, userInfo.Password)
                 cursor.execute(sql, values)
                 userInfo.UserID = cursor.lastrowid
                 cursor.close()
@@ -164,9 +164,93 @@ class WowDao(object):
                     if row is not None:
                         userProfile.CorporateName = row[1]
                         userProfile.CorporateRegNo = row[2]
+                        userProfile.CorporateEmployeeID = row[3]
                     cursor.close()
             conn.close()
             return userProfile
+        except Exception as e:
+            print('str(Exception):\t', str(Exception))
+            print('str(e):\t\t', str(e))
+            print('repr(e):\t', repr(e))
+            # Get information about the exception that is currently being handled
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            print('e.message:\t', exc_value)
+            print("Note, object e and exc of Class %s is %s the same." %
+                  (type(exc_value), ('not', '')[exc_value is e]))
+            print('traceback.print_exc(): ', traceback.print_exc())
+            print('traceback.format_exc():\n%s' % traceback.format_exc())
+            print('#' * 60)
+            return None
+
+    def insert_user_profile(self, p_userProfile):
+        try:
+            customer = p_userProfile
+            conn = self.conn_mysql()
+            with conn.cursor() as cursor:
+                sql = "insert into customer_info(CUST_TYPE,STREET,CITY,STATE,COUNTRY,ZIP,EMAIL,TEL,USER_ID) " \
+                      "values(%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+                values = (customer.CustType, customer.Street, customer.City,customer.State, customer.Country, customer.Zip,customer.Email, customer.Tel, customer.UserID)
+                cursor.execute(sql, values)
+                customer.CustID = cursor.lastrowid
+                cursor.close()
+            if customer.CustType == 'I':
+                with conn.cursor() as cursor:
+                    sql = "insert into customer_individual(CUST_ID,FIRST_NAME,LAST_NAME,DRIVER_LICENSE_NUMBER,INSURANCE_COMPANY_NAME,INSURANCE_POLICY_NUMBER) " \
+                          "values(%s,%s,%s,%s,%s,%s)"
+                    values = [customer.CustID, customer.FirstName, customer.LastName,customer.DriverLicenseNumber, customer.InsuranceCompanyName, customer.InsurancePolicyNumber]
+                    cursor.execute(sql, values)
+                    cursor.close()
+            if customer.CustType == 'C':
+                with conn.cursor() as cursor:
+                    sql = "insert into customer_individual(CUST_ID,NAME,REG_NO,EMPLOYEE_ID) " \
+                          "values(%s,%s,%s,%s)"
+                    values = [customer.CustID, customer.CorporateName, customer.CorporateRegNo,customer.CorporateEmployeeID]
+                    cursor.execute(sql, values)
+                    cursor.close()
+            conn.commit()
+            conn.close()
+            return customer
+        except Exception as e:
+            print('str(Exception):\t', str(Exception))
+            print('str(e):\t\t', str(e))
+            print('repr(e):\t', repr(e))
+            # Get information about the exception that is currently being handled
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            print('e.message:\t', exc_value)
+            print("Note, object e and exc of Class %s is %s the same." %
+                  (type(exc_value), ('not', '')[exc_value is e]))
+            print('traceback.print_exc(): ', traceback.print_exc())
+            print('traceback.format_exc():\n%s' % traceback.format_exc())
+            print('#' * 60)
+            return None
+
+    def update_user_profile(self, p_userProfile):
+        try:
+            customer = p_userProfile
+            conn = self.conn_mysql()
+            print("update_user_profile", customer)
+            with conn.cursor() as cursor:
+                sql = "update customer_info set CUST_TYPE = %s, STREET = %s,City = %s, State = %s, Country=%s, Zip=%s,Email=%s, Tel=%s,USER_ID=%s where cust_id=%s"
+                values = (customer.CustType, customer.Street, customer.City, customer.State, customer.Country, customer.Zip, customer.Email, customer.Tel, customer.UserID, customer.CustID)
+                cursor.execute(sql, values)
+                cursor.close()
+            if customer.CustType == 'I':
+                with conn.cursor() as cursor:
+                    sql = "update customer_individual set FIRST_NAME = %s, LAST_NAME = %s, DRIVER_LICENSE_NUMBER = %s, INSURANCE_COMPANY_NAME = %s, INSURANCE_POLICY_NUMBER = %s where CUST_ID=%s"
+                    values = (customer.FirstName, customer.LastName, customer.DriverLicenseNumber,
+                              customer.InsuranceCompanyName, customer.InsurancePolicyNumber, customer.CustID)
+                    cursor.execute(sql, values)
+                    cursor.close()
+            if customer.CustType == 'C':
+                with conn.cursor() as cursor:
+                    sql = "update customer_individual set NAME=%s, REG_NO=%s, EMPLOYEE_ID=%s where CUST_ID =%s"
+                    values = ( customer.CorporateName, customer.CorporateRegNo,
+                              customer.CorporateEmployeeID, customer.CustID)
+                    cursor.execute(sql, values)
+                    cursor.close()
+            conn.commit()
+            conn.close()
+            return customer
         except Exception as e:
             print('str(Exception):\t', str(Exception))
             print('str(e):\t\t', str(e))

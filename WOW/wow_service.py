@@ -84,6 +84,7 @@ class WowService(object):
                    userpfile.InsurancePolicyNumber = args["InsurancePolicyNumber"]
                    userpfile.CorporateName = args["CorporateName"]
                    userpfile.CorporateRegNo = args["CorporateRegNo"]
+                   userpfile.CorporateEmployeeID = args["CorporateEmployeeID"]
                    userpfile.Street = args["Street"]
                    userpfile.City = args["City"]
                    userpfile.State = args["State"]
@@ -92,6 +93,7 @@ class WowService(object):
                    userpfile.Email = args["Email"]
                    userpfile.Tel = args["Tel"]
                    print("userpfile update is ", userpfile.desc())
+                   userpfile = dao.update_user_profile(userpfile)
 
                else:
                    # insert
@@ -103,6 +105,7 @@ class WowService(object):
                    userpfile.InsurancePolicyNumber = args["InsurancePolicyNumber"]
                    userpfile.CorporateName = args["CorporateName"]
                    userpfile.CorporateRegNo = args["CorporateRegNo"]
+                   userpfile.CorporateEmployeeID = args["CorporateEmployeeID"]
                    userpfile.Street = args["Street"]
                    userpfile.City = args["City"]
                    userpfile.State = args["State"]
@@ -111,7 +114,7 @@ class WowService(object):
                    userpfile.Email = args["Email"]
                    userpfile.Tel = args["Tel"]
                    print("userpfile add is ", userpfile.desc())
-                   pass
+                   userpfile = dao.insert_user_profile(userpfile)
             else:
                userpfile = None
         return userpfile

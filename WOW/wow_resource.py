@@ -142,16 +142,19 @@ class ProfileResource(Resource):
             parser.add_argument('Email', location=['json', 'form'])
             parser.add_argument('Tel', location=['json', 'form'])
 
-
             # 分析请求
             args = parser.parse_args()
             timestamp = args["timestamp"]
             username = args["username"]
             token = args["token"]
             print("ProfileResource post is ", args)
-
-            result = {"stat": 1}
-            return json.dumps(result)
+            userprofile = WowService.mergeUserProfile(username, token, timestamp, args)
+            if userprofile is not None:
+                result = {"stat": 1, "customer": userprofile.desc()}
+                return json.dumps(result)
+            else:
+                result = {"stat": 0}
+                return json.dumps(result)
         except Exception as e:
             print('str(Exception):\t', str(Exception))
             print('str(e):\t\t', str(e))
