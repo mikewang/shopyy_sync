@@ -1,0 +1,353 @@
+{% extends "layout.html" %}
+{% block body %}
+<script>
+   $(document).ready(function() {
+    var d = new Date();
+    var t = d.getTime();
+    var timestamp = Math.round(d / 1000);
+    var username = $.cookie("username");
+    var password = $.cookie("password");
+    var token = $.md5(username + password + timestamp);
+    if (username != null && password != null) {
+        $.ajax({
+            type: "GET",
+            url: "/user/" + username,
+            beforeSend: function(request) {
+                request.setRequestHeader("token", token);
+                request.setRequestHeader("timestamp", timestamp);
+            },
+            data: {},
+            dataType: 'json',
+            success: function(result) {
+                var r = JSON.parse(result);
+                var stat = r["stat"];
+                if (stat == 1) {
+                    // login success.
+                    $("#corporatename").parent().parent().hide();
+                    $("#regno").parent().parent().hide();
+                    $("#employeeid").parent().parent().hide();
+                    $.ajax({
+                        type: "GET",
+                        url: "/customer/" + username,
+                        beforeSend: function(request) {
+                            request.setRequestHeader("token", token);
+                            request.setRequestHeader("timestamp", timestamp);
+                        },
+                        dataType: "json",
+                        success: function(result) {
+                            var r = JSON.parse(result);
+                            var stat = r["stat"];
+                            if (stat == 1) {
+                                var customer = r["customer"];
+                                var cust_id = customer["CustID"];
+                                 var cust_type = customer["CustType"];
+                                    if (cust_type == "I") {
+                                        $("#corporatename").parent().parent().hide();
+                                        $("#regno").parent().parent().hide();
+                                        $("#employeeid").parent().parent().hide();
+                                        $("#firstname").parent().parent().show();
+                                        $("#lastname").parent().parent().show();
+                                        $("#driver_license_number").parent().parent().show();
+                                        $("#insurance_company_name").parent().parent().show();
+                                        $("#insurance_policy_number").parent().parent().show();
+                                    } else {
+                                        $("#corporatename").parent().parent().show();
+                                        $("#regno").parent().parent().show();
+                                        $("#employeeid").parent().parent().show();
+
+                                        $("#firstname").parent().parent().hide();
+                                        $("#lastname").parent().parent().hide();
+                                        $("#driver_license_number").parent().parent().hide();
+                                        $("#insurance_company_name").parent().parent().hide();
+                                        $("#insurance_policy_number").parent().parent().hide();
+                                    }
+                                    if (cust_type == "I") {
+                                      $("#cust_type").val("I");
+
+                                    }
+                                    else {
+                                      $("#cust_type").val("C");
+                                    }
+                                if (cust_id == 0) {
+                                    alert("Please input customer infomation.");
+                                }
+                                else {
+                                  // difference columns
+                                  if (cust_type == "I") {
+                                    $("#firstname").val(customer["FirstName"]);
+                                    $("#lastname").val(customer["LastName"]);
+                                    $("#driver_license_number").val(customer["DriverLicenseNumber"]);
+                                    $("#insurance_company_name").val(customer["InsuranceCompanyName"]);
+                                    $("#insurance_policy_number").val(customer["InsurancePolicyNumber"]);
+
+                                  } else {
+                                    $("#corporatename").val(customer["CorporateName"]);
+                                    $("#regno").val(customer["CorporateRegNo"]);
+                                    $("#employeeid").val(customer["CorporateEmployeeID"]);
+                                  }
+                                  // same columns
+                                  $("#street").val(customer["Street"]);
+                                  $("#city").val(customer["City"]);
+                                  $("#state").val(customer["State"]);
+                                  $("#country").val(customer["Country"]);
+                                  $("#zip").val(customer["Zip"]);
+                                  $("#email").val(customer["Email"]);
+                                  $("#tel").val(customer["Tel"]);
+
+                                }
+
+                            } else {
+                              alert("token is error.")
+
+                            }
+                        }
+                    });
+                } else {
+                    $(location).attr('href', '/');
+                }
+            }
+        });
+
+    } else {
+        $(location).attr('href', '/');
+    }
+
+    $("#cust_type").on('change',
+    function() {
+        var cust_type = $(this).val();
+        if (cust_type == "I") {
+            $("#corporatename").parent().parent().hide();
+            $("#regno").parent().parent().hide();
+            $("#employeeid").parent().parent().hide();
+            $("#firstname").parent().parent().show();
+            $("#lastname").parent().parent().show();
+            $("#driver_license_number").parent().parent().show();
+            $("#insurance_company_name").parent().parent().show();
+            $("#insurance_policy_number").parent().parent().show();
+        } else {
+            $("#corporatename").parent().parent().show();
+            $("#regno").parent().parent().show();
+            $("#employeeid").parent().parent().show();
+
+            $("#firstname").parent().parent().hide();
+            $("#lastname").parent().parent().hide();
+            $("#driver_license_number").parent().parent().hide();
+            $("#insurance_company_name").parent().parent().hide();
+            $("#insurance_policy_number").parent().parent().hide();
+        }
+    });
+
+
+$("#saveCustomerButton").click(function() {
+
+    var data = {
+        "CustType": $("#cust_type").val(),
+        "FirstName": $("#firstname").val(),
+        "LastName": $("#lastname").val(),
+        "DriverLicenseNumber": $("#driver_license_number").val(),
+        "InsuranceCompanyName": $("#insurance_company_name").val(),
+        "InsurancePolicyNumber": $("#insurance_policy_number").val(),
+        "CorporateName": $("#corporatename").val(),
+        "CorporateRegNo": $("#regno").val(),
+        "CorporateEmployeeID": $("#employeeid").val(),
+        "Street": $("#street").val(),
+        "City": $("#city").val(),
+        "State": $("#state").val(),
+        "Country": $("#country").val(),
+        "Zip": $("#zip").val(),
+        "Email": $("#email").val(),
+        "Tel": $("#tel").val()
+    };
+
+    $.ajax({
+        type: "POST",
+        url: "/customer",
+        beforeSend: function(request) {
+            request.setRequestHeader("username", username);
+            request.setRequestHeader("token", token);
+            request.setRequestHeader("timestamp", timestamp);
+        },
+        data: data,
+        dataType: 'json',
+        success: function(result) {
+            var r = JSON.parse(result);
+            var stat = r["stat"];
+            if (stat == 1) {
+                alert("save success.");
+
+            } else {
+                alert("save failure.");
+            }
+        }
+    });
+
+});
+
+});
+</script>
+  <!-- Page Header -->
+  <header style="background-color: burlywood">
+    <div class="overlay"></div>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+          <div class="page-heading">
+            <h1 style="color: burlywood">. </h1>
+            <span class="subheading" style="color: burlywood">.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-md-10 mx-auto">
+        <p></p>
+        <!-- Contact Form - Enter your email address on line 19 of the mail/contact_me.php file to make this form work. -->
+        <!-- WARNING: Some web hosts do not allow emails to be sent through forms to common mail hosts like Gmail or Yahoo. It's recommended that you use a private domain email address! -->
+        <!-- To use the contact form, your site must be on a live web host with PHP! The form will not work locally! -->
+        <form name="saveProfile" id="profileForm" action = "#" method = "post" novalidate>
+          <div class="control-group">
+            <div class="form-group floating-label-form-group controls">
+              <label>Type</label>
+              <select class="form-control" id="cust_type" name="cust_type" required data-validation-required-message="Please enter your name."><option value="I" selected>Individual</option><option value="C">Corporate</option></select>
+               <p class="help-block text-danger"></p>
+            </div>
+          </div>
+          <div class="control-group">
+            <div class="form-group floating-label-form-group controls">
+              <label>First Name </label>
+              <input type="text" class="form-control" placeholder="First Name" id="firstname"
+              name="firstname" required data-validation-required-message="Please enter your first name.">
+              <p class="help-block text-danger"></p>
+            </div>
+          </div>
+          <div class="control-group">
+            <div class="form-group floating-label-form-group controls">
+              <label>Last Name </label>
+              <input type="text" class="form-control" placeholder="Last Name" id="lastname"
+              name="lastname" required data-validation-required-message="Please enter your last name.">
+              <p class="help-block text-danger"></p>
+            </div>
+          </div>
+          <div class="control-group">
+            <div class="form-group floating-label-form-group controls">
+              <label>Corporate Name </label>
+              <input type="text" class="form-control" placeholder="Driver License Number" id="driver_license_number"
+              name="driver_license_number" required data-validation-required-message="Please enter your Driver License Number.">
+              <p class="help-block text-danger"></p>
+            </div>
+          </div>
+          <div class="control-group">
+            <div class="form-group floating-label-form-group controls">
+              <label>Corporate Name </label>
+              <input type="text" class="form-control" placeholder="Insurance Company Name" id="insurance_company_name"
+              name="insurance_company_name" required data-validation-required-message="Please enter your Insurance Company Name.">
+              <p class="help-block text-danger"></p>
+            </div>
+          </div>
+          <div class="control-group">
+            <div class="form-group floating-label-form-group controls">
+              <label>Corporate Name </label>
+              <input type="text" class="form-control" placeholder="Insurance Policy Number" id="insurance_policy_number"
+              name="insurance_policy_number" required data-validation-required-message="Please enter your Insurance Policy Number.">
+              <p class="help-block text-danger"></p>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <div class="form-group floating-label-form-group controls">
+              <label>Corporate Name </label>
+              <input type="text" class="form-control" placeholder="Corporate Name" id="corporatename"
+              name="corporatename" required data-validation-required-message="Please enter your corporate name.">
+              <p class="help-block text-danger"></p>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <div class="form-group floating-label-form-group controls">
+              <label>Corporate Name </label>
+              <input type="text" class="form-control" placeholder="Corporate Reg No" id="regno"
+              name="regno" required data-validation-required-message="Please enter your corporate reg no.">
+              <p class="help-block text-danger"></p>
+            </div>
+          </div>
+          <div class="control-group">
+            <div class="form-group floating-label-form-group controls">
+              <label>Corporate Name </label>
+              <input type="text" class="form-control" placeholder="corporate employee ID" id="employeeid"
+              name="employeeid" required data-validation-required-message="Please enter your corporate employee ID.">
+              <p class="help-block text-danger"></p>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <div class="form-group floating-label-form-group controls">
+              <label>Corporate Name </label>
+              <input type="text" class="form-control" placeholder="Street" id="street"
+              name="street" required data-validation-required-message="Please enter your street.">
+              <p class="help-block text-danger"></p>
+            </div>
+          </div>
+                    <div class="control-group">
+            <div class="form-group floating-label-form-group controls">
+              <label>Corporate Name </label>
+              <input type="text" class="form-control" placeholder="City" id="city"
+              name="city" required data-validation-required-message="Please enter your City.">
+              <p class="help-block text-danger"></p>
+            </div>
+          </div>
+                    <div class="control-group">
+            <div class="form-group floating-label-form-group controls">
+              <label>Corporate Name </label>
+              <input type="text" class="form-control" placeholder="State" id="state"
+              name="state" required data-validation-required-message="Please enter your state.">
+              <p class="help-block text-danger"></p>
+            </div>
+          </div>
+          <div class="control-group">
+            <div class="form-group floating-label-form-group controls">
+              <label>Corporate Name </label>
+              <input type="text" class="form-control" placeholder="Country" id="country"
+              Tname="country" required data-validation-required-message="Please enter your country.">
+              <p class="help-block text-danger"></p>
+            </div>
+          </div>
+          <div class="control-group">
+            <div class="form-group floating-label-form-group controls">
+              <label>Corporate Name </label>
+              <input type="text" class="form-control" placeholder="Zip" id="zip"
+              name="zip" required data-validation-required-message="Please enter your Zip.">
+              <p class="help-block text-danger"></p>
+            </div>
+          </div>
+          <div class="control-group">
+            <div class="form-group floating-label-form-group controls">
+              <label>Corporate Name </label>
+              <input type="text" class="form-control" placeholder="Email" id="email"
+              name="email" required data-validation-required-message="Please enter your email.">
+              <p class="help-block text-danger"></p>
+            </div>
+          </div>
+          <div class="control-group">
+            <div class="form-group floating-label-form-group controls">
+              <label>Corporate Name </label>
+              <input type="text" class="form-control" placeholder="Tel" id="tel"
+              name="tel" required data-validation-required-message="Please enter your Tel.">
+              <p class="help-block text-danger"></p>
+            </div>
+          </div>
+          <br>
+          <div id="success"></div>
+          <button type="submit" class="btn btn-primary" id="saveCustomerButton">Save</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+ 
+
+  
+{% endblock %}

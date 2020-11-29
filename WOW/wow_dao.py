@@ -6,7 +6,7 @@ import os
 import pyodbc
 import datetime
 import base64
-from WOW.wow_model import UserInfo
+from WOW.wow_model import UserInfo, UserProfile
 from Model.product import ProductInfo, ProductEnquiryPrice
 import pymysql
 
@@ -55,10 +55,10 @@ class WowDao(object):
             conn = self.conn_mysql()
             cursor = conn.cursor()
             if p_userID is not None:
-                sql = "SELECT USER_ID,USER_NAME, USER_TYPE, PASSWORD, DATE_FORMAT(CREATED,'%Y-%m-%d %H:%i:%s') as CREATED FROM User_Info where User_ID=?"
+                sql = "SELECT USER_ID,USER_NAME, USER_TYPE, PASSWORD, DATE_FORMAT(CREATED,'%%Y-%%m-%%d %%H:%%i:%%s') as CREATED FROM User_Info where User_ID=%s"
                 cursor.execute(sql, p_userID)
             elif p_userName is not None:
-                sql = "SELECT USER_ID,USER_NAME, USER_TYPE, PASSWORD, DATE_FORMAT(CREATED,'%Y-%m-%d %H:%i:%s') as CREATED FROM User_Info where User_Name=?"
+                sql = "SELECT USER_ID,USER_NAME, USER_TYPE, PASSWORD, DATE_FORMAT(CREATED,'%%Y-%%m-%%d %%H:%%i:%%s') as CREATED FROM User_Info where User_Name=%s"
                 cursor.execute(sql, p_userName)
             row = cursor.fetchone()
             if row is not None:
@@ -70,7 +70,7 @@ class WowDao(object):
                 userInfo.Created = row[4]
                 #userInfo.Created = datetime.datetime.strptime(row[4], '%Y-%m-%d %H:%M:%S')
             else:
-                print("User: " + p_userID + " Not Existed.")
+                print("User:  Not Existed.")
             cursor.close()
             conn.close()
         except Exception as e:
@@ -119,3 +119,64 @@ class WowDao(object):
             print("add user done, userinfo is ", userInfo.desc())
         finally:
             return userInfo
+
+    def select_user_profile(self, p_userID):
+        try:
+            userProfile = None
+            conn = self.conn_mysql()
+            cursor = conn.cursor()
+            sql = "SELECT CUST_ID,CUST_TYPE,STREET,CITY,STATE,COUNTRY,ZIP,EMAIL,TEL,USER_ID FROM customer_info where User_ID=%s"
+            cursor.execute(sql, p_userID)
+            row = cursor.fetchone()
+            if row is not None:
+                userProfile = UserProfile()
+                userProfile.CustID = row[0]
+                userProfile.CustType = row[1]
+                userProfile.Street = row[2]
+                userProfile.City = row[3]
+                userProfile.State = row[4]
+                userProfile.Country = row[5]
+                userProfile.Zip = row[6]
+                userProfile.Email = row[7]
+                userProfile.Tel = row[8]
+                userProfile.UserID = row[9]
+            else:
+                print("User Profile:  Not Existed.")
+            cursor.close()
+            if userProfile is not None:
+                if userProfile.CustType == 'I':
+                    cursor = conn.cursor()
+                    sql = "SELECT CUST_ID,FIRST_NAME,LAST_NAME,DRIVER_LICENSE_NUMBER,INSURANCE_COMPANY_NAME,INSURANCE_POLICY_NUMBER FROM customer_individual where CUST_ID=%s"
+                    cursor.execute(sql, userProfile.CustID)
+                    row = cursor.fetchone()
+                    if row is not None:
+                        userProfile.FirstName = row[1]
+                        userProfile.LastName = row[2]
+                        userProfile.DriverLicenseNumber = row[3]
+                        userProfile.InsuranceCompanyName = row[4]
+                        userProfile.InsurancePolicyNumber = row[5]
+                    cursor.close()
+                elif userProfile.CustType == 'C':
+                    cursor = conn.cursor()
+                    sql = "SELECT CUST_ID,NAME,REG_NO,EMPLOYEE_ID FROM customer_corporate where CUST_ID=%s"
+                    cursor.execute(sql, userProfile.CustID)
+                    row = cursor.fetchone()
+                    if row is not None:
+                        userProfile.CorporateName = row[1]
+                        userProfile.CorporateRegNo = row[2]
+                    cursor.close()
+            conn.close()
+            return userProfile
+        except Exception as e:
+            print('str(Exception):\t', str(Exception))
+            print('str(e):\t\t', str(e))
+            print('repr(e):\t', repr(e))
+            # Get information about the exception that is currently being handled
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            print('e.message:\t', exc_value)
+            print("Note, object e and exc of Class %s is %s the same." %
+                  (type(exc_value), ('not', '')[exc_value is e]))
+            print('traceback.print_exc(): ', traceback.print_exc())
+            print('traceback.format_exc():\n%s' % traceback.format_exc())
+            print('#' * 60)
+            return None

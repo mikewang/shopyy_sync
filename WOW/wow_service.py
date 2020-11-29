@@ -3,8 +3,10 @@ import hashlib
 import os
 import base64
 import datetime
-from WOW.wow_model import UserInfo
+import hashlib
+from WOW.wow_model import UserInfo, UserProfile
 from WOW.wow_dao import WowDao
+
 
 
 class WowService(object):
@@ -19,9 +21,8 @@ class WowService(object):
         return time_str
 
     @staticmethod
-    def registerUser(p_user_dict):
-        p1 = {"UserName": "Test1", "UserType": "Customer", "Password": "abcd"}
-
+    def addUser(p_user_dict):
+        p1 = p_user_dict
         userInfo = UserInfo()
         userInfo.UserName = p1["UserName"]
         userInfo.UserType = p1["UserType"]
@@ -30,4 +31,87 @@ class WowService(object):
         dao = WowDao()
         add_user = dao.add_user(userInfo)
         print("registerUser service done , register user i s", add_user)
-        return time_str
+        return add_user
+
+    def getUser(p_username, p_token, p_timestamp):
+        dao = WowDao()
+        userinfo = dao.select_user(None, p_username)
+        if userinfo is not None:
+            decode_token = userinfo.UserName + userinfo.Password + str(p_timestamp)
+            token = hashlib.md5(decode_token.encode(encoding='UTF-8')).hexdigest()
+            print("userinfo name is ", p_token, userinfo.UserName, userinfo.Password, p_timestamp)
+            print("userinfo name is ", token, userinfo.UserName, userinfo.Password, p_timestamp)
+            if token == p_token:
+               print("token checked ok , username is ", p_username)
+            else:
+                userinfo = None
+        return userinfo
+
+    def getUserProfile(p_username, p_token, p_timestamp):
+        userpfile = UserProfile()
+        dao = WowDao()
+        userinfo = dao.select_user(None, p_username)
+        if userinfo is not None:
+            decode_token = userinfo.UserName + userinfo.Password + str(p_timestamp)
+            token = hashlib.md5(decode_token.encode(encoding='UTF-8')).hexdigest()
+            if token == p_token:
+               userpfile.UserID = userinfo.UserID
+               temp_userpfile = dao.select_user_profile(userinfo.UserID)
+               if temp_userpfile is not None:
+                   userpfile = temp_userpfile
+            else:
+               userpfile = None
+        return userpfile
+
+    def mergeUserProfile(p_username, p_token, p_timestamp, args):
+        userpfile = UserProfile()
+        dao = WowDao()
+        userinfo = dao.select_user(None, p_username)
+        if userinfo is not None:
+            decode_token = userinfo.UserName + userinfo.Password + str(p_timestamp)
+            token = hashlib.md5(decode_token.encode(encoding='UTF-8')).hexdigest()
+            if token == p_token:
+               userpfile.UserID = userinfo.UserID
+               temp_userpfile = dao.select_user_profile(userinfo.UserID)
+               if temp_userpfile is not None:
+                   # update
+                   userpfile = temp_userpfile
+                   userpfile.CustType = args["CustType"]
+                   userpfile.FirstName = args["FirstName"]
+                   userpfile.LastName = args["LastName"]
+                   userpfile.DriverLicenseNumber = args["DriverLicenseNumber"]
+                   userpfile.InsuranceCompanyName = args["InsuranceCompanyName"]
+                   userpfile.InsurancePolicyNumber = args["InsurancePolicyNumber"]
+                   userpfile.CorporateName = args["CorporateName"]
+                   userpfile.CorporateRegNo = args["CorporateRegNo"]
+                   userpfile.Street = args["Street"]
+                   userpfile.City = args["City"]
+                   userpfile.State = args["State"]
+                   userpfile.Country = args["Country"]
+                   userpfile.Zip = args["Zip"]
+                   userpfile.Email = args["Email"]
+                   userpfile.Tel = args["Tel"]
+                   print("userpfile update is ", userpfile.desc())
+
+               else:
+                   # insert
+                   userpfile.CustType = args["CustType"]
+                   userpfile.FirstName = args["FirstName"]
+                   userpfile.LastName = args["LastName"]
+                   userpfile.DriverLicenseNumber = args["DriverLicenseNumber"]
+                   userpfile.InsuranceCompanyName = args["InsuranceCompanyName"]
+                   userpfile.InsurancePolicyNumber = args["InsurancePolicyNumber"]
+                   userpfile.CorporateName = args["CorporateName"]
+                   userpfile.CorporateRegNo = args["CorporateRegNo"]
+                   userpfile.Street = args["Street"]
+                   userpfile.City = args["City"]
+                   userpfile.State = args["State"]
+                   userpfile.Country = args["Country"]
+                   userpfile.Zip = args["Zip"]
+                   userpfile.Email = args["Email"]
+                   userpfile.Tel = args["Tel"]
+                   print("userpfile add is ", userpfile.desc())
+                   pass
+            else:
+               userpfile = None
+        return userpfile

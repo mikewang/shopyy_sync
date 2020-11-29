@@ -1,45 +1,120 @@
-<html>
-<head>
-<title>Purple_loginform Website Template | Home :: w3layouts</title>
-<link href="/static/css/style.css" rel="stylesheet" type="text/css" media="all" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+{% extends "layout.html" %}
+{% block body %}
+<script>
+    $(document).ready(function () {
+        var d = new Date();
+        var t = d.getTime();
+        var timestamp = Math.round(d / 1000);
+        var username = $.cookie("username");
+        var password = $.cookie("password");
+        var token = $.md5(username + password + timestamp);
+        if (username != null && password != null) {
+            $("#signinDiv").hide();
+            $.ajax({
+                type: "GET",
+                url: "/user/"+username,
+                beforeSend: function (request) {
+                    request.setRequestHeader("token", token);
+                    request.setRequestHeader("timestamp", timestamp);
+                },
+                data: {
+                },
+                dataType: 'json',
+                success: function (result) {
+                    var r = JSON.parse(result);
+                    var stat = r["stat"];
+                    if (stat == 1) {
+                        // login success.
+                        $("#signinDiv").hide();
+                    } else {
+                        $("#signinDiv").show();
+                    }
+                }
+            });
 
-</head>
-<body>
-<!-- contact-form -->
-<div class="message warning">
-<div class="inset">
-	<div class="login-head">
-		<h1>Login Form</h1>
-		 <div class="alert-close"> </div>
-	</div>
-		<form action="" method="post">
-			<li>
-				<input type="text" name="email" class="text" value="Username" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'Username';}"><a href="#" class=" icon user"></a>
-			</li>
-				<div class="clear"> </div>
-			<li>
-				<input type="password" name="password" value="Password" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'Password';}"> <a href="#" class="icon lock"></a>
-			</li>
-			<div class="clear"> </div>
-			<div class="submit">
-				<input type="submit" value="Sign in" >
-				<h4><a href="#">Lost your Password ?</a></h4>
-						  <div class="clear">  </div>
-			</div>
+        } else {
 
-		</form>
-		</div>
-	</div>
-	</div>
-	<div class="clear"> </div>
-<!--- footer --->
-<div class="footer">
-	<p>Copyright &copy; 2020.</p>
+            $("#signinDiv").show();
 
+        }
+        $("#signinButton").click(function () {
+
+                       $.ajax({
+                type: "GET",
+                url: "/user",
+                beforeSend: function (request) {
+                    request.setRequestHeader("username", username);
+                    request.setRequestHeader("token", token);
+                    request.setRequestHeader("timestamp", timestamp);
+                },
+                data: {
+                    "username": username
+                },
+                dataType: 'json',
+                success: function (result) {
+                    var stat = result["stat"];
+                    if (stat == 1) {
+                        // login success.
+                        $("#signinDiv").hide();
+                    } else {
+                        $("#signinDiv").show();
+                    }
+                }
+            });
+
+        });
+
+    });
+</script>
+<!-- Page Header -->
+<header style="background-color: #0085A1 " >
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-md-10 mx-auto">
+                <div class="site-heading">
+                    <h1 style="color: #0085A1">. </h1>
+                    <span class="subheading" style="color: #0085A1">. </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Main Content -->
+<div class="container">
+    <div class="row" id="signinDiv">
+        <div class="col-lg-8 col-md-10 mx-auto">
+            <form name="sentMessage" id="contactForm" action="#" method="post" novalidate>
+                <div class="control-group">
+                    <div class="form-group floating-label-form-group controls">
+                        <label><cite><strong>Username</strong></cite></label>
+                        <input type="text" class="form-control" placeholder="Username" id="username" name='username'
+                               required data-validation-required-message="Please enter the username.">
+                        <p class="help-block text-danger"></p>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <div class="form-group floating-label-form-group controls">
+                        <label><cite>Password</cite></label>
+                        <input type="password" class="form-control" placeholder="Password" name="password" id="password"
+                               required data-validation-required-message="Please enter a password."></input>
+                        <p class="help-block text-danger"></p>
+                    </div>
+                </div>
+                <p class="help-block text-danger"></p>
+                <div id="success">
+                    <button type="submit" class="btn btn-primary" id="signinButton">Sign in</button>
+                </div>
+                <p class="help-block text-danger"><a href="#">Lost your Password ?</a></p>
+
+            </form>
+        </div>
+        <div class="col-lg-8 col-md-10 mx-auto">
+            <h5><a href="/signup">Sign up</a></h5>
+        </div>
+    </div>
 </div>
 
-</body>
-</html>
+{% endblock %}

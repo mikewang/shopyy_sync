@@ -1,46 +1,56 @@
 {% extends "layout.html" %}
 {% block body %}
 <script>
-
 $(document).ready(function() {
 
     $("#signupBtn").click(function() {
-		p_username = $("#username").val()
+    	var d = new Date();
+        var t = d.getTime();
+        var timestamp = Math.round(d / 1000);
 
-		p_password = $("#password").val()
-		// alert("username is " + p_username + " password is " + p_password)
+        p_username = $("#username").val()
+        p_password = $("#password").val()
+        // alert("username is " + p_username + " password is " + p_password)
+        p_password = $.md5(p_password)
 
-		p_password = $.md5(p_password)
-
-        //alert("click event begin " + username + ":" + password);
         $.ajax({
             type: "POST",
+            url: "/user",
             beforeSend: function(request) {
-                request.setRequestHeader("token", "12330099");
+                request.setRequestHeader("timestamp", timestamp)
             },
-            url: "/signup",
-			contentType: 'application/json; charset=utf-8',
-			data:{"username":p_username, "password": p_password},
-			dataType:"json",
-            success: function(msg) {
-            	alert("ok");
+            data: {
+                "username": p_username,
+                "password": p_password
+            },
+            dataType: 'json',
+            success: function(result) {
+            	var r = JSON.parse(result)
+            	var stat = r["stat"];
+                    if (stat == 1) {
+						$.cookie("username", p_username);
+						$.cookie("password", p_password);
+						alert("sign up successful.");
+						$(location).attr('href', '/');
+                    } else {
+                    	alert("sign up failure");
+                    }
 			}
         });
 
-	});
-   });
-
-
+    });
+});
 </script>
 <!-- Page Header -->
-<header class="masthead" style="background-image: url('{{ url_for('static', filename='img/write.jpg' ) }}')" >
+<!--<header class="masthead" style="background-image: url('{{ url_for('static', filename='img/write.jpg' ) }}')" >-->
+<header style="background-color: #868e96">
 	<div class="overlay"></div>
 	<div class="container">
 		<div class="row">
 			<div class="col-lg-8 col-md-10 mx-auto">
 				<div class="site-heading">
-					<h1> Your Article</h1>
-					<span class="subheading">write something below</span>
+            <h1 style="color: #868e96">. </h1>
+            <span class="subheading" style="color: #868e96">.</span>
 				</div>
 			</div>
 		</div>
