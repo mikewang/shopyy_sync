@@ -150,9 +150,9 @@
                 var stat = r["stat"];
                 if (stat == 1) {
                     // login success.
-                    $("#corporatename").parent().parent().hide();
-                    $("#regno").parent().parent().hide();
-                    $("#employeeid").parent().parent().hide();
+                    $("#corporatename").parent().hide();
+                    $("#regno").parent().hide();
+                    $("#employeeid").parent().hide();
                     $.ajax({
                         type: "GET",
                         url: "/customer/" + username,
@@ -169,24 +169,24 @@
                                 var cust_id = customer["CustID"];
                                  var cust_type = customer["CustType"];
                                     if (cust_type == "I") {
-                                        $("#corporatename").parent().parent().hide();
-                                        $("#regno").parent().parent().hide();
-                                        $("#employeeid").parent().parent().hide();
-                                        $("#firstname").parent().parent().show();
-                                        $("#lastname").parent().parent().show();
-                                        $("#driver_license_number").parent().parent().show();
-                                        $("#insurance_company_name").parent().parent().show();
-                                        $("#insurance_policy_number").parent().parent().show();
+                                        $("#corporatename").parent().hide();
+                                        $("#regno").parent().hide();
+                                        $("#employeeid").parent().hide();
+                                        $("#firstname").parent().show();
+                                        $("#lastname").parent().show();
+                                        $("#driver_license_number").parent().show();
+                                        $("#insurance_company_name").parent().show();
+                                        $("#insurance_policy_number").parent().show();
                                     } else {
-                                        $("#corporatename").parent().parent().show();
-                                        $("#regno").parent().parent().show();
-                                        $("#employeeid").parent().parent().show();
+                                        $("#corporatename").parent().show();
+                                        $("#regno").parent().show();
+                                        $("#employeeid").parent().show();
 
-                                        $("#firstname").parent().parent().hide();
-                                        $("#lastname").parent().parent().hide();
-                                        $("#driver_license_number").parent().parent().hide();
-                                        $("#insurance_company_name").parent().parent().hide();
-                                        $("#insurance_policy_number").parent().parent().hide();
+                                        $("#firstname").parent().hide();
+                                        $("#lastname").parent().hide();
+                                        $("#driver_license_number").parent().hide();
+                                        $("#insurance_company_name").parent().hide();
+                                        $("#insurance_policy_number").parent().hide();
                                     }
                                     if (cust_type == "I") {
                                       $("#cust_type").val("I");
@@ -243,24 +243,24 @@
     function() {
         var cust_type = $(this).val();
         if (cust_type == "I") {
-            $("#corporatename").parent().parent().hide();
-            $("#regno").parent().parent().hide();
-            $("#employeeid").parent().parent().hide();
-            $("#firstname").parent().parent().show();
-            $("#lastname").parent().parent().show();
-            $("#driver_license_number").parent().parent().show();
-            $("#insurance_company_name").parent().parent().show();
-            $("#insurance_policy_number").parent().parent().show();
+            $("#corporatename").parent().hide();
+            $("#regno").parent().hide();
+            $("#employeeid").parent().hide();
+            $("#firstname").parent().show();
+            $("#lastname").parent().show();
+            $("#driver_license_number").parent().show();
+            $("#insurance_company_name").parent().show();
+            $("#insurance_policy_number").parent().show();
         } else {
-            $("#corporatename").parent().parent().show();
-            $("#regno").parent().parent().show();
-            $("#employeeid").parent().parent().show();
+            $("#corporatename").parent().show();
+            $("#regno").parent().show();
+            $("#employeeid").parent().show();
 
-            $("#firstname").parent().parent().hide();
-            $("#lastname").parent().parent().hide();
-            $("#driver_license_number").parent().parent().hide();
-            $("#insurance_company_name").parent().parent().hide();
-            $("#insurance_policy_number").parent().parent().hide();
+            $("#firstname").parent().hide();
+            $("#lastname").parent().hide();
+            $("#driver_license_number").parent().hide();
+            $("#insurance_company_name").parent().hide();
+            $("#insurance_policy_number").parent().hide();
         }
     });
 
