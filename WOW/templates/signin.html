@@ -10,51 +10,9 @@
 	  <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/css/bootstrap-theme.min.css" rel="stylesheet">
 		<link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/css/bootstrap.min.css" rel="stylesheet">
 
-    <title>Sign up</title>
+    <title>Sign in</title>
   </head>
   <body>
-  <script>
-$(document).ready(function() {
-
-    $("#signupBtn").click(function() {
-    	var d = new Date();
-        var t = d.getTime();
-        var timestamp = Math.round(d / 1000);
-
-        p_username = $("#username").val()
-        p_password = $("#password").val()
-        // alert("username is " + p_username + " password is " + p_password)
-        p_password = $.md5(p_password)
-
-        $.ajax({
-            type: "POST",
-            url: "/user",
-            beforeSend: function(request) {
-                request.setRequestHeader("timestamp", timestamp)
-            },
-            data: {
-                "username": p_username,
-                "password": p_password
-            },
-            dataType: 'json',
-            success: function(result) {
-            	var r = JSON.parse(result)
-            	var stat = r["stat"];
-                    if (stat == 1) {
-						$.cookie("username", p_username);
-						$.cookie("password", p_password);
-						alert("sign up successful.");
-						$(location).attr('href', '/');
-                    } else {
-                    	alert("sign up failure");
-                    }
-			}
-        });
-
-    });
-});
-</script>
-
 <div class="container">
 	<div class="row clearfix">
 		<div class="col-md-12 column">
@@ -89,7 +47,7 @@ $(document).ready(function() {
 				</li>
 			</ul>
 			<h3>
-			 WOW - Customer Info
+			 WOW - Sign in
 			</h3>
 					</div>
 	 <div class="col-md-12 column">
@@ -100,13 +58,16 @@ $(document).ready(function() {
 				<div class="form-group">
 					 <label for="password">Password</label><input type="password" class="form-control" id="password" />
 				</div>
-
 				<div class="form-group">
-					<button type="submit" class="btn btn-default" id="saveCustomerButton">Submit</button>
+					<button type="submit" class="btn btn-default">Submit</button>
 				</div>
 
 			</form>
 		</div>
+	 <div class="col-md-12 column">
+            <p class="help-block text-danger"><a href="#">Lost your Password ?</a></p>
+            <h5><a href="/signup">Sign up</a></h5>
+        </div>
 	</div>
 </div>
 

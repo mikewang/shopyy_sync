@@ -244,7 +244,7 @@ class WowDao(object):
             if customer.CustType == 'C':
                 with conn.cursor() as cursor:
                     sql = "update customer_individual set NAME=%s, REG_NO=%s, EMPLOYEE_ID=%s where CUST_ID =%s"
-                    values = ( customer.CorporateName, customer.CorporateRegNo,
+                    values = (customer.CorporateName, customer.CorporateRegNo,
                               customer.CorporateEmployeeID, customer.CustID)
                     cursor.execute(sql, values)
                     cursor.close()

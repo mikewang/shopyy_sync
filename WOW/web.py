@@ -12,8 +12,12 @@ api = Api(app)
 
 @app.route('/', methods=['GET'])
 def index():
-    return render_template('index.html')
+    return render_template('signin.html')
 
+
+@app.route('/signin', methods=['GET'])
+def signin():
+    return render_template('signin.html')
 
 @app.route('/signup', methods=['GET'])
 def signup():
@@ -22,6 +26,10 @@ def signup():
 @app.route('/profile', methods=['GET'])
 def profile():
     return render_template('profile.html')
+
+@app.route('/customer', methods=['GET'])
+def customer():
+    return render_template('customer.html')
 
 
 

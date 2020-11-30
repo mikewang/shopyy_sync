@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/css/bootstrap-theme.css" rel="stylesheet" />
+  <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/css/bootstrap-theme.min.css" rel="stylesheet" />
+  <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/css/bootstrap.min.css" rel="stylesheet" />
+  <title>Sign up</title>
+ </head>
+ <body>
+  <script>
+$(document).ready(function() {
+
+    $("#signupBtn").click(function() {
+    	var d = new Date();
+        var t = d.getTime();
+        var timestamp = Math.round(d / 1000);
+
+        p_username = $("#username").val()
+        p_password = $("#password").val()
+        // alert("username is " + p_username + " password is " + p_password)
+        p_password = $.md5(p_password)
+
+        $.ajax({
+            type: "POST",
+            url: "/user",
+            beforeSend: function(request) {
+                request.setRequestHeader("timestamp", timestamp)
+            },
+            data: {
+                "username": p_username,
+                "password": p_password
+            },
+            dataType: 'json',
+            success: function(result) {
+            	var r = JSON.parse(result)
+            	var stat = r["stat"];
+                    if (stat == 1) {
+						$.cookie("username", p_username);
+						$.cookie("password", p_password);
+						alert("sign up successful.");
+						$(location).attr('href', '/');
+                    } else {
+                    	alert("sign up failure");
+                    }
+			}
+        });
+
+    });
+});
+</script>
+  <div class="container">
+   <div class="row clearfix">
+    <div class="col-md-12 column">
+     <ul class="nav nav-tabs">
+      <li class="active"> <a href="#">首页</a> </li>
+      <li> <a href="#">简介</a> </li>
+      <li class="disabled"> <a href="#">信息</a> </li>
+      <li class="dropdown pull-right"> <a href="#" data-toggle="dropdown" class="dropdown-toggle">下拉<strong class="caret"></strong></a>
+       <ul class="dropdown-menu">
+        <li> <a href="#">操作</a> </li>
+        <li> <a href="#">设置栏目</a> </li>
+        <li> <a href="#">更多设置</a> </li>
+        <li class="divider"> </li>
+        <li> <a href="#">分割线</a> </li>
+       </ul> </li>
+     </ul>
+     <h3> WOW - Sign up </h3>
+    </div>
+    <div class="col-md-12 column">
+     <form role="form">
+      <div class="form-group">
+       <label for="cust_type">Type</label>
+       <select type="text" class="form-control" id="cust_type"> <option value="I" selected="">Individual</option><option value="C">Corporate</option></select>
+      </div>
+      <div class="form-group">
+       <label for="firstname">First Name</label>
+       <input type="text" class="form-control" id="firstname" />
+      </div>
+      <div class="form-group">
+       <label for="lastname">Last Name</label>
+       <input type="text" class="form-control" id="lastname" />
+      </div>
+      <div class="form-group">
+       <label for="driver_license_number">Driver License Number</label>
+       <input type="text" class="form-control" id="driver_license_number" />
+      </div>
+            <div class="form-group">
+       <label for="insurance_company_name">Insurance Company Name</label>
+       <input type="text" class="form-control" id="insurance_company_name" />
+      </div>
+                  <div class="form-group">
+       <label for="insurance_policy_number">Insurance Policy Number</label>
+       <input type="text" class="form-control" id="insurance_policy_number" />
+      </div>
+
+                  <div class="form-group">
+       <label for="corporatename">Corporate Name</label>
+       <input type="text" class="form-control" id="corporatename" />
+      </div>
+                  <div class="form-group">
+       <label for="regno">Corporate Reg No</label>
+       <input type="text" class="form-control" id="regno" />
+      </div>
+
+
+                  <div class="form-group">
+       <label for="employeeid">Corporate Employee ID</label>
+       <input type="text" class="form-control" id="employeeid" />
+      </div>
+
+                        <div class="form-group">
+       <label for="street">Street</label>
+       <input type="text" class="form-control" id="street" />
+      </div>
+
+                        <div class="form-group">
+       <label for="city">City</label>
+       <input type="text" class="form-control" id="city" />
+      </div>
+
+### another
+      <div class="control-group">
+       <div class="form-group floating-label-form-group controls">
+        <label>Corporate Name </label>
+        <input type="text" class="form-control" placeholder="State" id="state" name="state" required="" data-validation-required-message="Please enter your state." />
+        <p class="help-block text-danger"></p>
+       </div>
+      </div>
+      <div class="control-group">
+       <div class="form-group floating-label-form-group controls">
+        <label>Corporate Name </label>
+        <input type="text" class="form-control" placeholder="Country" id="country" tname="country" required="" data-validation-required-message="Please enter your country." />
+        <p class="help-block text-danger"></p>
+       </div>
+      </div>
+      <div class="control-group">
+       <div class="form-group floating-label-form-group controls">
+        <label>Corporate Name </label>
+        <input type="text" class="form-control" placeholder="Zip" id="zip" name="zip" required="" data-validation-required-message="Please enter your Zip." />
+        <p class="help-block text-danger"></p>
+       </div>
+      </div>
+      <div class="control-group">
+       <div class="form-group floating-label-form-group controls">
+        <label>Corporate Name </label>
+        <input type="email" class="form-control" placeholder="Email" id="email" name="email" required="" data-validation-required-message="Please enter your email." />
+        <p class="help-block text-danger"></p>
+       </div>
+      </div>
+      <div class="control-group">
+       <div class="form-group floating-label-form-group controls">
+        <label>Corporate Name </label>
+        <input type="tel" class="form-control" placeholder="Tel" id="tel" name="tel" required="" data-validation-required-message="Please enter your Tel." />
+        <p class="help-block text-danger"></p>
+       </div>
+      </div>
+      <br />
+      <div id="success"></div>
+      <button type="button" class="btn btn-primary" id="saveCustomerButton">Save</button>
+     </form>
+    </div>
+   </div>
+  </div>
+  <hr />
+  <!-- Footer -->
+  <footer>
+   <div class="container">
+    <div class="row clearfix">
+     <p class="copyright text-muted">Copyright &copy; WOW</p>
+    </div>
+   </div>
+  </footer>
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/js/affix.js"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/js/alert.js"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/js/alert.min.js"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/js/bootstrap.js"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/js/button.js"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static', filename='js/jquery.md5.js') }}"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+ </body>
+</html>
