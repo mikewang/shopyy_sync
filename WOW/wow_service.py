@@ -20,6 +20,7 @@ class WowService(object):
         time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         return time_str
 
+
     def addUser(self, p_user_dict):
         p1 = p_user_dict
         userInfo = UserInfo()

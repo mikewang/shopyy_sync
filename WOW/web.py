@@ -12,7 +12,7 @@ api = Api(app)
 
 @app.route('/', methods=['GET'])
 def index():
-    return render_template('index.html')
+    return render_template('signup.html')
 
 
 @app.route('/signin', methods=['GET'])
@@ -35,5 +35,5 @@ api.add_resource(ProfileResource, '/customer', '/customer/<string:username>')
 api.add_resource(RentalResource, '/rental', '/rental/<string:username>')
 
 if __name__ == '__main__':
-    app.run()
-    #serve(app, host="0.0.0.0", port=8998)
+    #app.run()
+    serve(app, host="0.0.0.0", port=8998)

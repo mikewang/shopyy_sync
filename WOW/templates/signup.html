@@ -27,50 +27,7 @@
   <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/js/button.js"></script>
   </head>
   <body>
-  <script>
-$(document).ready(function() {
 
-    $("#signupBtn").click(function() {
-    	var d = new Date();
-        var t = d.getTime();
-        var timestamp = Math.round(d / 1000);
-
-        p_username = $("#username").val();
-        p_password = $("#password").val();
-        //alert("username is " + p_username + " ,password is " + p_password);
-        p_password = $.md5(p_password);
-        var data = {
-                "username": p_username,
-                "password": p_password
-            };
-
-        $.ajax({
-        type: "POST",
-        url: "/user",
-        beforeSend: function(request) {
-            request.setRequestHeader("timestamp", timestamp);
-        },
-        data: data,
-        dataType: 'json',
-        success: function(result) {
-            var r = JSON.parse(result);
-            var stat = r["stat"];
-            alert("stat is " + stat);
-            if (stat == 1) {
-               $.cookie("username", username);
-               $.cookie("password", password);
-               $(location).attr('href', '/');
-
-            } else {
-                alert("sign in failure.");
-            }
-        }
-    });
-
-
-    });
-});
-</script>
 
 <div class="container">
 	<div class="row clearfix">
@@ -108,6 +65,90 @@ $(document).ready(function() {
   </footer>
 
 
+
+    <script>
+$(document).ready(function() {
+
+    $("#signupBtn").on('click', function () {
+            	var d = new Date();
+        var t = d.getTime();
+        var timestamp = Math.round(d / 1000);
+
+        p_username = $("#username").val();
+        p_password = $("#password").val();
+        //alert("username is " + p_username + " ,password is " + p_password);
+        p_password = $.md5(p_password);
+        var data = {
+                "username": p_username,
+                "password": p_password
+            };
+
+        $.ajax({
+            type: "POST",
+            url: "/user",
+            data: data,
+            beforeSend: function(request) {
+            request.setRequestHeader("timestamp", timestamp);
+            },
+            success: function (result) {
+                alert("result is " + result);
+            var r = JSON.parse(result);
+            var stat = r["stat"];
+            if (stat == 1) {
+               alert("sign up success.");
+                $.cookie("username", username);
+               $.cookie("password", password);
+
+               $(location).attr('href', '/');
+
+            } else {
+                alert("sign up failure.");
+            }
+
+            }
+        });
+
+    });
+
+    $("#signupBtn").click2(function() {
+    	var d = new Date();
+        var t = d.getTime();
+        var timestamp = Math.round(d / 1000);
+
+        p_username = $("#username").val();
+        p_password = $("#password").val();
+        //alert("username is " + p_username + " ,password is " + p_password);
+        p_password = $.md5(p_password);
+        var data = {
+                "username": p_username,
+                "password": p_password
+            };
+
+        $.ajax({
+        type: "POST",
+        url: "/user",
+        beforeSend: function(request) {
+            request.setRequestHeader("timestamp", timestamp);
+        },
+        data: data,
+        dataType: 'json',
+        success: function(result) {
+            var r = JSON.parse(result);
+            var stat = r["stat"];
+            alert("stat is " + stat);
+            if (stat == 1) {
+               $.cookie("username", username);
+               $.cookie("password", password);
+               $(location).attr('href', '/');
+
+            } else {
+                alert("sign up failure.");
+            }
+        }
+        });
+    });
+});
+</script>
 
 
 

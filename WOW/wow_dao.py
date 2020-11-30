@@ -100,8 +100,9 @@ class WowDao(object):
                 cursor.execute(sql, values)
                 userInfo.UserID = cursor.lastrowid
                 cursor.close()
-            conn.commit()
+                conn.commit()
             conn.close()
+            return userInfo
         except Exception as e:
             print('str(Exception):\t', str(Exception))
             print('str(e):\t\t', str(e))
@@ -115,10 +116,6 @@ class WowDao(object):
             print('traceback.format_exc():\n%s' % traceback.format_exc())
             print('#' * 60)
             userInfo = None
-        else:
-            print("add user done, userinfo is ", userInfo.desc())
-        finally:
-            return userInfo
 
     def select_user_profile(self, p_userID):
         try:

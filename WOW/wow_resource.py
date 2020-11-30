@@ -63,13 +63,12 @@ class UserResource(Resource):
 
             print("parser is ", args)
             p_user_info = {"UserName": username, "UserType": "Customer", "Password": password}
-            userinfo = WowService().addUser(p_user_info)
-            if userinfo is not None:
+            add_userinfo = WowService().addUser(p_user_info)
+            result = json.dumps('{"stat": 0}')
+            if add_userinfo is not None:
                 result = {"stat": 1}
-                return json.dumps(result)
-            else:
-                result = {"stat": 0}
-                return json.dumps(result)
+                result = json.dumps(result)
+            return result
         except Exception as e:
             print('str(Exception):\t', str(Exception))
             print('str(e):\t\t', str(e))
