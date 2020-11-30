@@ -4,7 +4,7 @@ import os
 import base64
 import datetime
 import hashlib
-from WOW.wow_model import UserInfo, UserProfile
+from WOW.wow_model import UserInfo, UserProfile, RentalService
 from WOW.wow_dao import WowDao
 
 
@@ -29,7 +29,7 @@ class WowService(object):
         time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         dao = WowDao()
         add_user = dao.add_user(userInfo)
-        print("registerUser service done , register user i s", add_user)
+        print("add user service done ,  user is ", add_user)
         return add_user
 
     def getUser(self, p_username, p_token, p_timestamp):
@@ -118,7 +118,27 @@ class WowService(object):
                userpfile = None
         return userpfile
 
-    def getRentalService(self, p_username, p_token, p_timestamp, p_rs_id, p_cust_id):
+
+    def getRentalService(self, p_username, p_token, p_timestamp, p_rs_id):
+        rs_list = []
+        dao = WowDao()
+        userinfo = dao.select_user(None, p_username)
+        if userinfo is not None:
+            decode_token = userinfo.UserName + userinfo.Password + str(p_timestamp)
+            token = hashlib.md5(decode_token.encode(encoding='UTF-8')).hexdigest()
+            if token == p_token:
+                temp_userpfile = dao.select_user_profile(userinfo.UserID)
+                if temp_userpfile is None:
+                    rs_list = None
+                else:
+                    temp_cust_id = temp_userpfile.CustID
+                    rs_list = dao.select_rental_service(p_rs_id, temp_cust_id)
+            else:
+                rs_list = None
+        return rs_list
+
+
+    def getAdminRentalService(self, p_username, p_token, p_timestamp, p_rs_id, p_cust_id):
         rs_list = []
         dao = WowDao()
         userinfo = dao.select_user(None, p_username)

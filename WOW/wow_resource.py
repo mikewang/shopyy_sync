@@ -24,7 +24,8 @@ class UserResource(Resource):
             token = args["token"]
             timestamp = args["timestamp"]
             print("UserResource get is ", args)
-            userinfo = WowService.getUser(username, token, timestamp)
+
+            userinfo = WowService().getUser(username, token, timestamp)
             print("get userinfo is ", userinfo)
             if userinfo is not None:
                 result = {"stat": 1}
@@ -48,7 +49,6 @@ class UserResource(Resource):
 
 
     def post(self):
-        print("user resource is ", self)
         try:
             parser = reqparse.RequestParser()
             parser.add_argument('timestamp', location='headers')
@@ -63,13 +63,13 @@ class UserResource(Resource):
 
             print("parser is ", args)
             p_user_info = {"UserName": username, "UserType": "Customer", "Password": password}
-            userinfo = WowService.addUser(p_user_info)
+            userinfo = WowService().addUser(p_user_info)
             if userinfo is not None:
                 result = {"stat": 1}
-                return json.dumps(result), 201
+                return json.dumps(result)
             else:
                 result = {"stat": 0}
-                return json.dumps(result), 201
+                return json.dumps(result)
         except Exception as e:
             print('str(Exception):\t', str(Exception))
             print('str(e):\t\t', str(e))
@@ -96,7 +96,7 @@ class ProfileResource(Resource):
             args = parser.parse_args()
             token = args["token"]
             timestamp = args["timestamp"]
-            userprofile = WowService.getUserProfile(username, token, timestamp)
+            userprofile = WowService().getUserProfile(username, token, timestamp)
             if userprofile is not None:
                 result = {"stat": 1, "customer": userprofile.desc()}
                 return json.dumps(result)
@@ -148,7 +148,7 @@ class ProfileResource(Resource):
             username = args["username"]
             token = args["token"]
             print("ProfileResource post is ", args)
-            userprofile = WowService.mergeUserProfile(username, token, timestamp, args)
+            userprofile = WowService().mergeUserProfile(username, token, timestamp, args)
             if userprofile is not None:
                 result = {"stat": 1, "customer": userprofile.desc()}
                 return json.dumps(result)
@@ -178,16 +178,14 @@ class RentalResource(Resource):
             parser.add_argument('token', location='headers')
             parser.add_argument('timestamp', location='headers')
             parser.add_argument('rs_id', location=['json', 'form'])
-            parser.add_argument('cust_id', location=['json', 'form'])
 
             # 分析请求
             args = parser.parse_args()
             token = args["token"]
             timestamp = args["timestamp"]
             rs_id = args["rs_id"]
-            cust_id = args["cust_id"]
 
-            rs_list = WowService.getRentalService(username, token, timestamp, rs_id, cust_id)
+            rs_list = WowService().getRentalService(username, token, timestamp, rs_id)
             if rs_list is not None:
                 rss = []
                 for rs in rs_list:
@@ -242,7 +240,7 @@ class RentalResource(Resource):
             username = args["username"]
             token = args["token"]
             print("ProfileResource post is ", args)
-            userprofile = WowService.mergeUserProfile(username, token, timestamp, args)
+            userprofile = WowService().mergeUserProfile(username, token, timestamp, args)
             if userprofile is not None:
                 result = {"stat": 1, "customer": userprofile.desc()}
                 return json.dumps(result)
