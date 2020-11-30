@@ -25,12 +25,12 @@ def signup():
     return render_template('signup.html')
 
 
-@app.route('/customer', methods=['GET'])
+@app.route('/customerprofile', methods=['GET'])
 def customer():
     return render_template('customer.html')
 
 
-@app.route('/rental', methods=['GET'])
+@app.route('/rentalservice', methods=['GET'])
 def rental():
     return render_template('rental.html')
 

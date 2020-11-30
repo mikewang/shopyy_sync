@@ -11,7 +11,7 @@
   <title>Sign up</title>
 
     <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->a
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
   <script src="https://cdn.bootcdn.net/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
@@ -50,7 +50,7 @@
 
       <div class="form-group">
        <label for="rs_id">Rental Service ID</label>
-       <input type="text" readonly="readonly" class="form-control" id="rs_id" value={{rs_id}}/>
+       <input type="text" readonly="readonly" class="form-control" id="rs_id" value="0"/>
       </div>
       <div class="form-group">
        <label for="Pickup_Location">Pickup Location</label>
@@ -81,6 +81,10 @@
        <input type="text" class="form-control" id="Daily_Odometer_Limit" />
       </div>
       <div class="form-group">
+       <label for="Vehicle_Info">Vehicle Info</label>
+       <select type="text" class="form-control" id="Vehicle_Info"> <option value="3001" selected="">Toyota</option><option value="3004">Ford</option><option value="3008">Chevrolet</option></select>
+      </div>
+      <div class="form-group">
        <label for="rental_rate">rental rate</label>
        <input type="text" class="form-control" id="rental_rate" />
       </div>
@@ -96,10 +100,7 @@
        <label for="really_amount">really amount</label>
        <input type="text" class="form-control" id="really_amount" />
       </div>
-             <div class="form-group">
-       <label for="Vehicle_Info">Vehicle Info</label>
-       <input type="text" class="form-control" id="Vehicle_Info" />
-      </div>
+
       <div class="form-group">
        <label for="wow_userid">WOW User ID</label>
        <input type="text" class="form-control" id="wow_userid" />
@@ -157,7 +158,23 @@
                             var r = JSON.parse(result);
                             var stat = r["stat"];
                             if (stat == 1) {
-                              var rental = r["rental"];
+                              var rs_list = r["rs_list"];
+                              var ll = rs_list.length;
+                              if (ll > 0) {
+                               rental = rs_list[0];
+                                $("#rs_id").val(rental["rs_id"]);
+
+                                $("#saveRentalButton").text("Save Rental Service");
+                              }
+                              else {
+                               $("#rs_id").val(0);
+                               $("#saveRentalButton").text("Create New Rental Service");
+
+                              }
+
+                              for (rs in rs_list) {
+
+                              }
                               $("#rs_id").val(rental["rs_id"]);
                               $("#Pickup_Location").val(rental["Pickup_Location"]);
                               $("#Dropoff_Location").val(rental["Dropoff_Location"]);

@@ -33,121 +33,130 @@ class WowService(object):
         print("add user service done ,  user is ", add_user)
         return add_user
 
-    def getUser(self, p_username, p_token, p_timestamp):
+
+    def getToken(self, p_username, p_timestamp):
         dao = WowDao()
         userinfo = dao.select_user(None, p_username)
         if userinfo is not None:
             decode_token = userinfo.UserName + userinfo.Password + str(p_timestamp)
             token = hashlib.md5(decode_token.encode(encoding='UTF-8')).hexdigest()
-            print("userinfo name is ", p_token, userinfo.UserName, userinfo.Password, p_timestamp)
-            print("userinfo name is ", token, userinfo.UserName, userinfo.Password, p_timestamp)
-            if token == p_token:
-               print("token checked ok , username is ", p_username)
-            else:
-                userinfo = None
-        return userinfo
+            userprofile = dao.select_user_profile(userinfo.UserID)
+            return token, userinfo, userprofile
+        else:
+            return "", None
+
+
+    def getUser(self, p_username, p_token, p_timestamp):
+        token, userinfo, userprofile = self.getToken(p_username, p_timestamp)
+        if token == p_token:
+            return userinfo
+        else:
+            return None
+
 
     def getUserProfile(self, p_username, p_token, p_timestamp):
-        userpfile = UserProfile()
-        dao = WowDao()
-        userinfo = dao.select_user(None, p_username)
-        if userinfo is not None:
-            decode_token = userinfo.UserName + userinfo.Password + str(p_timestamp)
-            token = hashlib.md5(decode_token.encode(encoding='UTF-8')).hexdigest()
-            if token == p_token:
-               userpfile.UserID = userinfo.UserID
-               temp_userpfile = dao.select_user_profile(userinfo.UserID)
-               if temp_userpfile is not None:
-                   userpfile = temp_userpfile
-            else:
-               userpfile = None
-        return userpfile
+        token, userinfo,userprofile = self.getToken(p_username, p_timestamp)
+        if token == p_token:
+            return userprofile
+        else:
+            return None
+
 
     def mergeUserProfile(self, p_username, p_token, p_timestamp, args):
-        userpfile = UserProfile()
-        dao = WowDao()
-        userinfo = dao.select_user(None, p_username)
-        if userinfo is not None:
-            decode_token = userinfo.UserName + userinfo.Password + str(p_timestamp)
-            token = hashlib.md5(decode_token.encode(encoding='UTF-8')).hexdigest()
-            if token == p_token:
-               userpfile.UserID = userinfo.UserID
-               temp_userpfile = dao.select_user_profile(userinfo.UserID)
-               if temp_userpfile is not None:
-                   # update
-                   userpfile = temp_userpfile
-                   userpfile.CustType = args["CustType"]
-                   userpfile.FirstName = args["FirstName"]
-                   userpfile.LastName = args["LastName"]
-                   userpfile.DriverLicenseNumber = args["DriverLicenseNumber"]
-                   userpfile.InsuranceCompanyName = args["InsuranceCompanyName"]
-                   userpfile.InsurancePolicyNumber = args["InsurancePolicyNumber"]
-                   userpfile.CorporateName = args["CorporateName"]
-                   userpfile.CorporateRegNo = args["CorporateRegNo"]
-                   userpfile.CorporateEmployeeID = args["CorporateEmployeeID"]
-                   userpfile.Street = args["Street"]
-                   userpfile.City = args["City"]
-                   userpfile.State = args["State"]
-                   userpfile.Country = args["Country"]
-                   userpfile.Zip = args["Zip"]
-                   userpfile.Email = args["Email"]
-                   userpfile.Tel = args["Tel"]
-                   print("userpfile update is ", userpfile.desc())
-                   userpfile = dao.update_user_profile(userpfile)
-
-               else:
-                   # insert
-                   userpfile.CustType = args["CustType"]
-                   userpfile.FirstName = args["FirstName"]
-                   userpfile.LastName = args["LastName"]
-                   userpfile.DriverLicenseNumber = args["DriverLicenseNumber"]
-                   userpfile.InsuranceCompanyName = args["InsuranceCompanyName"]
-                   userpfile.InsurancePolicyNumber = args["InsurancePolicyNumber"]
-                   userpfile.CorporateName = args["CorporateName"]
-                   userpfile.CorporateRegNo = args["CorporateRegNo"]
-                   userpfile.CorporateEmployeeID = args["CorporateEmployeeID"]
-                   userpfile.Street = args["Street"]
-                   userpfile.City = args["City"]
-                   userpfile.State = args["State"]
-                   userpfile.Country = args["Country"]
-                   userpfile.Zip = args["Zip"]
-                   userpfile.Email = args["Email"]
-                   userpfile.Tel = args["Tel"]
-                   print("userpfile add is ", userpfile.desc())
-                   userpfile = dao.insert_user_profile(userpfile)
+        token, userinfo,temp_userpfile = self.getToken(p_username, p_timestamp)
+        if token == p_token:
+            dao = WowDao()
+            userpfile = UserProfile()
+            if temp_userpfile is not None:
+                # update
+                userpfile = temp_userpfile
+                userpfile.CustType = args["CustType"]
+                userpfile.FirstName = args["FirstName"]
+                userpfile.LastName = args["LastName"]
+                userpfile.DriverLicenseNumber = args["DriverLicenseNumber"]
+                userpfile.InsuranceCompanyName = args["InsuranceCompanyName"]
+                userpfile.InsurancePolicyNumber = args["InsurancePolicyNumber"]
+                userpfile.CorporateName = args["CorporateName"]
+                userpfile.CorporateRegNo = args["CorporateRegNo"]
+                userpfile.CorporateEmployeeID = args["CorporateEmployeeID"]
+                userpfile.Street = args["Street"]
+                userpfile.City = args["City"]
+                userpfile.State = args["State"]
+                userpfile.Country = args["Country"]
+                userpfile.Zip = args["Zip"]
+                userpfile.Email = args["Email"]
+                userpfile.Tel = args["Tel"]
+                print("userpfile update is ", userpfile.desc())
+                userpfile = dao.update_user_profile(userpfile)
             else:
-               userpfile = None
-        return userpfile
+                # insert
+                userpfile.CustType = args["CustType"]
+                userpfile.FirstName = args["FirstName"]
+                userpfile.LastName = args["LastName"]
+                userpfile.DriverLicenseNumber = args["DriverLicenseNumber"]
+                userpfile.InsuranceCompanyName = args["InsuranceCompanyName"]
+                userpfile.InsurancePolicyNumber = args["InsurancePolicyNumber"]
+                userpfile.CorporateName = args["CorporateName"]
+                userpfile.CorporateRegNo = args["CorporateRegNo"]
+                userpfile.CorporateEmployeeID = args["CorporateEmployeeID"]
+                userpfile.Street = args["Street"]
+                userpfile.City = args["City"]
+                userpfile.State = args["State"]
+                userpfile.Country = args["Country"]
+                userpfile.Zip = args["Zip"]
+                userpfile.Email = args["Email"]
+                userpfile.Tel = args["Tel"]
+                print("userpfile add is ", userpfile.desc())
+                userpfile = dao.insert_user_profile(userpfile)
+            return temp_userpfile
+        else:
+            return None
+
 
 
     def getRentalService(self, p_username, p_token, p_timestamp, p_rs_id):
-        rs_list = []
-        dao = WowDao()
-        userinfo = dao.select_user(None, p_username)
-        if userinfo is not None:
-            decode_token = userinfo.UserName + userinfo.Password + str(p_timestamp)
-            token = hashlib.md5(decode_token.encode(encoding='UTF-8')).hexdigest()
-            if token == p_token:
-                temp_userpfile = dao.select_user_profile(userinfo.UserID)
-                if temp_userpfile is None:
-                    rs_list = None
-                else:
-                    temp_cust_id = temp_userpfile.CustID
-                    rs_list = dao.select_rental_service(p_rs_id, temp_cust_id)
+        token, userinfo,temp_userpfile = self.getToken(p_username, p_timestamp)
+        if token == p_token:
+            rs_list = []
+            dao = WowDao()
+            if temp_userpfile is not None:
+                temp_cust_id = temp_userpfile.CustID
+                rs_list = dao.select_rental_service(p_rs_id, temp_cust_id)
             else:
                 rs_list = None
-        return rs_list
+            return rs_list
+        else:
+            return None
 
 
     def getAdminRentalService(self, p_username, p_token, p_timestamp, p_rs_id, p_cust_id):
-        rs_list = []
-        dao = WowDao()
-        userinfo = dao.select_user(None, p_username)
-        if userinfo is not None:
-            decode_token = userinfo.UserName + userinfo.Password + str(p_timestamp)
-            token = hashlib.md5(decode_token.encode(encoding='UTF-8')).hexdigest()
-            if token == p_token:
-                rs_list = dao.select_rental_service(p_rs_id, p_cust_id)
+        token, userinfo,temp_userpfile = self.getToken(p_username, p_timestamp)
+        if token == p_token:
+            dao = WowDao()
+            rs_list = dao.select_rental_service(p_rs_id, p_cust_id)
+            return rs_list
+        else:
+            return None
+
+
+    def mergeRentalService(self, p_username, p_token, p_timestamp, args):
+        token, userinfo, temp_userpfile = self.getToken(p_username, p_timestamp)
+        if token == p_token:
+            dao = WowDao()
+            if temp_userpfile is not None:
+                rs_id = args["rs_id"]
+                rs_list = dao.select_rental_service(rs_id, None)
+                if len(rs_list) > 0:
+                    rs = rs_list[0]
+                    if rs.Cust_ID != temp_userpfile.CustID:
+                        rs = None
+                    else:
+                        # update
+                        pass
+                else:
+                    rs = None
             else:
-                rs_list = None
-        return rs_list
+                rs = None
+            return rs
+        else:
+            return None
