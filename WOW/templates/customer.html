@@ -14,6 +14,34 @@
   <script>
 $(document).ready(function() {
 
+
+
+    $("#cust_type").on('change',
+    function() {
+        var cust_type = $(this).val();
+        if (cust_type == "I") {
+            $("#corporatename").parent().hide();
+            $("#regno").parent().hide();
+            $("#employeeid").parent().hide();
+            $("#firstname").parent().show();
+            $("#lastname").parent().show();
+            $("#driver_license_number").parent().show();
+            $("#insurance_company_name").parent().show();
+            $("#insurance_policy_number").parent().show();
+        } else {
+            $("#corporatename").parent().show();
+            $("#regno").parent().show();
+            $("#employeeid").parent().show();
+
+            $("#firstname").parent().hide();
+            $("#lastname").parent().hide();
+            $("#driver_license_number").parent().hide();
+            $("#insurance_company_name").parent().hide();
+            $("#insurance_policy_number").parent().hide();
+        }
+    });
+    
+
     $("#signupBtn").click(function() {
     	var d = new Date();
         var t = d.getTime();
@@ -122,41 +150,28 @@ $(document).ready(function() {
        <input type="text" class="form-control" id="city" />
       </div>
 
-### another
-      <div class="control-group">
-       <div class="form-group floating-label-form-group controls">
-        <label>Corporate Name </label>
-        <input type="text" class="form-control" placeholder="State" id="state" name="state" required="" data-validation-required-message="Please enter your state." />
-        <p class="help-block text-danger"></p>
-       </div>
+                                 <div class="form-group">
+       <label for="state">State</label>
+       <input type="text" class="form-control" id="state" />
       </div>
-      <div class="control-group">
-       <div class="form-group floating-label-form-group controls">
-        <label>Corporate Name </label>
-        <input type="text" class="form-control" placeholder="Country" id="country" tname="country" required="" data-validation-required-message="Please enter your country." />
-        <p class="help-block text-danger"></p>
-       </div>
+
+                                 <div class="form-group">
+       <label for="country">Country</label>
+       <input type="text" class="form-control" id="country" />
       </div>
-      <div class="control-group">
-       <div class="form-group floating-label-form-group controls">
-        <label>Corporate Name </label>
-        <input type="text" class="form-control" placeholder="Zip" id="zip" name="zip" required="" data-validation-required-message="Please enter your Zip." />
-        <p class="help-block text-danger"></p>
-       </div>
+
+                                          <div class="form-group">
+       <label for="zip">Zip</label>
+       <input type="text" class="form-control" id="zip" />
       </div>
-      <div class="control-group">
-       <div class="form-group floating-label-form-group controls">
-        <label>Corporate Name </label>
-        <input type="email" class="form-control" placeholder="Email" id="email" name="email" required="" data-validation-required-message="Please enter your email." />
-        <p class="help-block text-danger"></p>
-       </div>
+
+                                          <div class="form-group">
+       <label for="email">Email</label>
+       <input type="text" class="form-control" id="email" />
       </div>
-      <div class="control-group">
-       <div class="form-group floating-label-form-group controls">
-        <label>Corporate Name </label>
-        <input type="tel" class="form-control" placeholder="Tel" id="tel" name="tel" required="" data-validation-required-message="Please enter your Tel." />
-        <p class="help-block text-danger"></p>
-       </div>
+                                         <div class="form-group">
+       <label for="tel">Tel</label>
+       <input type="text" class="form-control" id="tel" />
       </div>
       <br />
       <div id="success"></div>
