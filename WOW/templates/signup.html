@@ -35,7 +35,10 @@
 			<h3>
 			 WOW - Sign up
 			</h3>
-					</div>
+        </div>
+        		<div class="col-md-12 column">
+                    <label id="homeDirectLabel" ></label>
+        </div>
 	 <div class="col-md-12 column">
 			<form role="form">
 				<div class="form-group">
@@ -46,7 +49,7 @@
 				</div>
 
 				<div class="form-group">
-					<button type="submit" class="btn btn-default" id="signupBtn">Submit</button>
+					<button type="button" class="btn btn-default" id="signupBtn">Sign up</button>
 				</div>
 
 			</form>
@@ -70,83 +73,46 @@
 $(document).ready(function() {
 
     $("#signupBtn").on('click', function () {
-            	var d = new Date();
+        $("#signupBtn").hide();
+        var d = new Date();
         var t = d.getTime();
         var timestamp = Math.round(d / 1000);
 
-        p_username = $("#username").val();
-        p_password = $("#password").val();
-        //alert("username is " + p_username + " ,password is " + p_password);
-        p_password = $.md5(p_password);
+        username = $("#username").val();
+        password = $("#password").val();
+        p_password = $.md5(password);
         var data = {
-                "username": p_username,
-                "password": p_password
+                "username": username,
+                "password": password
             };
-
         $.ajax({
             type: "POST",
             url: "/user",
             data: data,
-            beforeSend: function(request) {
-            request.setRequestHeader("timestamp", timestamp);
-            },
+            async:false,
+            datatype: 'json',
             success: function (result) {
-                alert("result is " + result);
-            var r = JSON.parse(result);
+
+               var r = JSON.parse(result);
             var stat = r["stat"];
-            if (stat == 1) {
-               alert("sign up success.");
-                $.cookie("username", username);
-               $.cookie("password", password);
-
-               $(location).attr('href', '/');
-
-            } else {
-                alert("sign up failure.");
-            }
-
-            }
-        });
-
-    });
-
-    $("#signupBtn").click2(function() {
-    	var d = new Date();
-        var t = d.getTime();
-        var timestamp = Math.round(d / 1000);
-
-        p_username = $("#username").val();
-        p_password = $("#password").val();
-        //alert("username is " + p_username + " ,password is " + p_password);
-        p_password = $.md5(p_password);
-        var data = {
-                "username": p_username,
-                "password": p_password
-            };
-
-        $.ajax({
-        type: "POST",
-        url: "/user",
-        beforeSend: function(request) {
-            request.setRequestHeader("timestamp", timestamp);
-        },
-        data: data,
-        dataType: 'json',
-        success: function(result) {
-            var r = JSON.parse(result);
-            var stat = r["stat"];
-            alert("stat is " + stat);
             if (stat == 1) {
                $.cookie("username", username);
                $.cookie("password", password);
+                alert("sign up success.");
                $(location).attr('href', '/');
-
             } else {
                 alert("sign up failure.");
             }
-        }
+
+                },
+            complete: function () {
+                $("#signupBtn").show();
+
+            }
         });
+
     });
+
 });
 </script>
 

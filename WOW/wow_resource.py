@@ -68,6 +68,7 @@ class UserResource(Resource):
             if add_userinfo is not None:
                 result = {"stat": 1}
                 result = json.dumps(result)
+            print(self, result)
             return result
         except Exception as e:
             print('str(Exception):\t', str(Exception))

@@ -94,13 +94,13 @@ class WowDao(object):
         try:
             userInfo = p_userInfo
             conn = self.conn_mysql()
-            with conn.cursor() as cursor:
-                sql = "insert into user_info(USER_NAME, USER_TYPE, PASSWORD, created) values(%s, %s, %s, now()) "
-                values = (userInfo.UserName, userInfo.UserType, userInfo.Password)
-                cursor.execute(sql, values)
-                userInfo.UserID = cursor.lastrowid
-                cursor.close()
-                conn.commit()
+            cursor = conn.cursor()
+            sql = "insert into user_info(USER_NAME, USER_TYPE, PASSWORD, created) values(%s, %s, %s, now()) "
+            values = (userInfo.UserName, userInfo.UserType, userInfo.Password)
+            cursor.execute(sql, values)
+            userInfo.UserID = cursor.lastrowid
+            cursor.close()
+            conn.commit()
             conn.close()
             return userInfo
         except Exception as e:

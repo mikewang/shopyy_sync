@@ -12,7 +12,7 @@ api = Api(app)
 
 @app.route('/', methods=['GET'])
 def index():
-    return render_template('signup.html')
+    return render_template('index.html')
 
 
 @app.route('/signin', methods=['GET'])
@@ -25,9 +25,14 @@ def signup():
     return render_template('signup.html')
 
 
-@app.route('/profile', methods=['GET'])
-def profile():
+@app.route('/customer', methods=['GET'])
+def customer():
     return render_template('customer.html')
+
+
+@app.route('/rental', methods=['GET'])
+def rental():
+    return render_template('rental.html')
 
 
 api.add_resource(UserResource, '/user', '/user/<string:username>')
