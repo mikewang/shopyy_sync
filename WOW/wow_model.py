@@ -65,3 +65,40 @@ class UserProfile(object):
         return model_dict
 
 
+class RentalService(object):
+    def __init__(self):
+        super(RentalService, self).__init__()
+        self.__setup_model()
+
+    def __del__(self):
+        pass
+
+    def __setup_model(self):
+        self.rs_id = 0
+        self.Pickup_Location = 'I'
+        self.Dropoff_Location = ''
+        self.Pickup_Date = ''
+        self.Dropoff_Date = ''
+        self.Start_Odometer = 0
+        self.End_Odometer = 0
+        self.Daily_Odometer_Limit = 0
+        self.rental_rate = 0.0
+        self.rental_fee = 0.0
+        self.rental_amount = 0.0
+        self.really_amount = 0.0
+        self.Vehicle_ID = 0
+        self.Cust_ID = 0
+
+        self.wow_userid = 0
+
+
+    def desc(self):
+        model_dict = self.__dict__
+        model_dict["rental_rate"] = str(self.rental_rate)
+        model_dict["rental_fee"] = str(self.rental_fee)
+        model_dict["rental_amount"] = str(self.rental_amount)
+        model_dict["really_amount"] = str(self.really_amount)
+
+        # product_dict["CreateDate"] = self.CreateDate.strftime('%Y-%m-%d %H:%M:%S')
+        print(self, model_dict)
+        return model_dict

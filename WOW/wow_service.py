@@ -20,8 +20,7 @@ class WowService(object):
         time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         return time_str
 
-    @staticmethod
-    def addUser(p_user_dict):
+    def addUser(self, p_user_dict):
         p1 = p_user_dict
         userInfo = UserInfo()
         userInfo.UserName = p1["UserName"]
@@ -33,7 +32,7 @@ class WowService(object):
         print("registerUser service done , register user i s", add_user)
         return add_user
 
-    def getUser(p_username, p_token, p_timestamp):
+    def getUser(self, p_username, p_token, p_timestamp):
         dao = WowDao()
         userinfo = dao.select_user(None, p_username)
         if userinfo is not None:
@@ -47,7 +46,7 @@ class WowService(object):
                 userinfo = None
         return userinfo
 
-    def getUserProfile(p_username, p_token, p_timestamp):
+    def getUserProfile(self, p_username, p_token, p_timestamp):
         userpfile = UserProfile()
         dao = WowDao()
         userinfo = dao.select_user(None, p_username)
@@ -63,7 +62,7 @@ class WowService(object):
                userpfile = None
         return userpfile
 
-    def mergeUserProfile(p_username, p_token, p_timestamp, args):
+    def mergeUserProfile(self, p_username, p_token, p_timestamp, args):
         userpfile = UserProfile()
         dao = WowDao()
         userinfo = dao.select_user(None, p_username)
@@ -118,3 +117,16 @@ class WowService(object):
             else:
                userpfile = None
         return userpfile
+
+    def getRentalService(self, p_username, p_token, p_timestamp, p_rs_id, p_cust_id):
+        rs_list = []
+        dao = WowDao()
+        userinfo = dao.select_user(None, p_username)
+        if userinfo is not None:
+            decode_token = userinfo.UserName + userinfo.Password + str(p_timestamp)
+            token = hashlib.md5(decode_token.encode(encoding='UTF-8')).hexdigest()
+            if token == p_token:
+                rs_list = dao.select_rental_service(p_rs_id, p_cust_id)
+            else:
+                rs_list = None
+        return rs_list

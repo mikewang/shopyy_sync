@@ -4,7 +4,7 @@ from waitress import serve
 from flask import request, jsonify, Response
 import json
 
-from WOW.wow_resource import UserResource, ProfileResource
+from WOW.wow_resource import UserResource, ProfileResource, RentalResource
 
 app = Flask(__name__)
 api = Api(app)
@@ -12,32 +12,27 @@ api = Api(app)
 
 @app.route('/', methods=['GET'])
 def index():
-    return render_template('signin.html')
+    return render_template('index.html')
 
 
 @app.route('/signin', methods=['GET'])
 def signin():
     return render_template('signin.html')
 
+
 @app.route('/signup', methods=['GET'])
 def signup():
     return render_template('signup.html')
 
+
 @app.route('/profile', methods=['GET'])
 def profile():
-    return render_template('profile.html')
-
-@app.route('/customer', methods=['GET'])
-def customer():
     return render_template('customer.html')
-
-
-
-
 
 
 api.add_resource(UserResource, '/user', '/user/<string:username>')
 api.add_resource(ProfileResource, '/customer', '/customer/<string:username>')
+api.add_resource(RentalResource, '/rental', '/rental/<string:username>')
 
 if __name__ == '__main__':
     app.run()

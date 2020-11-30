@@ -6,7 +6,7 @@ import os
 import pyodbc
 import datetime
 import base64
-from WOW.wow_model import UserInfo, UserProfile
+from WOW.wow_model import UserInfo, rental, RentalService
 from Model.product import ProductInfo, ProductEnquiryPrice
 import pymysql
 
@@ -122,52 +122,52 @@ class WowDao(object):
 
     def select_user_profile(self, p_userID):
         try:
-            userProfile = None
+            rental = None
             conn = self.conn_mysql()
             cursor = conn.cursor()
             sql = "SELECT CUST_ID,CUST_TYPE,STREET,CITY,STATE,COUNTRY,ZIP,EMAIL,TEL,USER_ID FROM customer_info where User_ID=%s"
             cursor.execute(sql, p_userID)
             row = cursor.fetchone()
             if row is not None:
-                userProfile = UserProfile()
-                userProfile.CustID = row[0]
-                userProfile.CustType = row[1]
-                userProfile.Street = row[2]
-                userProfile.City = row[3]
-                userProfile.State = row[4]
-                userProfile.Country = row[5]
-                userProfile.Zip = row[6]
-                userProfile.Email = row[7]
-                userProfile.Tel = row[8]
-                userProfile.UserID = row[9]
+                rental = rental()
+                rental.CustID = row[0]
+                rental.CustType = row[1]
+                rental.Street = row[2]
+                rental.City = row[3]
+                rental.State = row[4]
+                rental.Country = row[5]
+                rental.Zip = row[6]
+                rental.Email = row[7]
+                rental.Tel = row[8]
+                rental.UserID = row[9]
             else:
                 print("User Profile:  Not Existed.")
             cursor.close()
-            if userProfile is not None:
-                if userProfile.CustType == 'I':
+            if rental is not None:
+                if rental.CustType == 'I':
                     cursor = conn.cursor()
                     sql = "SELECT CUST_ID,FIRST_NAME,LAST_NAME,DRIVER_LICENSE_NUMBER,INSURANCE_COMPANY_NAME,INSURANCE_POLICY_NUMBER FROM customer_individual where CUST_ID=%s"
-                    cursor.execute(sql, userProfile.CustID)
+                    cursor.execute(sql, rental.CustID)
                     row = cursor.fetchone()
                     if row is not None:
-                        userProfile.FirstName = row[1]
-                        userProfile.LastName = row[2]
-                        userProfile.DriverLicenseNumber = row[3]
-                        userProfile.InsuranceCompanyName = row[4]
-                        userProfile.InsurancePolicyNumber = row[5]
+                        rental.FirstName = row[1]
+                        rental.LastName = row[2]
+                        rental.DriverLicenseNumber = row[3]
+                        rental.InsuranceCompanyName = row[4]
+                        rental.InsurancePolicyNumber = row[5]
                     cursor.close()
-                elif userProfile.CustType == 'C':
+                elif rental.CustType == 'C':
                     cursor = conn.cursor()
                     sql = "SELECT CUST_ID,NAME,REG_NO,EMPLOYEE_ID FROM customer_corporate where CUST_ID=%s"
-                    cursor.execute(sql, userProfile.CustID)
+                    cursor.execute(sql, rental.CustID)
                     row = cursor.fetchone()
                     if row is not None:
-                        userProfile.CorporateName = row[1]
-                        userProfile.CorporateRegNo = row[2]
-                        userProfile.CorporateEmployeeID = row[3]
+                        rental.CorporateName = row[1]
+                        rental.CorporateRegNo = row[2]
+                        rental.CorporateEmployeeID = row[3]
                     cursor.close()
             conn.close()
-            return userProfile
+            return rental
         except Exception as e:
             print('str(Exception):\t', str(Exception))
             print('str(e):\t\t', str(e))
@@ -182,9 +182,9 @@ class WowDao(object):
             print('#' * 60)
             return None
 
-    def insert_user_profile(self, p_userProfile):
+    def insert_user_profile(self, p_rental):
         try:
-            customer = p_userProfile
+            customer = p_rental
             conn = self.conn_mysql()
             with conn.cursor() as cursor:
                 sql = "insert into customer_info(CUST_TYPE,STREET,CITY,STATE,COUNTRY,ZIP,EMAIL,TEL,USER_ID) " \
@@ -224,9 +224,9 @@ class WowDao(object):
             print('#' * 60)
             return None
 
-    def update_user_profile(self, p_userProfile):
+    def update_user_profile(self, p_rental):
         try:
-            customer = p_userProfile
+            customer = p_rental
             conn = self.conn_mysql()
             print("update_user_profile", customer)
             with conn.cursor() as cursor:
@@ -251,6 +251,58 @@ class WowDao(object):
             conn.commit()
             conn.close()
             return customer
+        except Exception as e:
+            print('str(Exception):\t', str(Exception))
+            print('str(e):\t\t', str(e))
+            print('repr(e):\t', repr(e))
+            # Get information about the exception that is currently being handled
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            print('e.message:\t', exc_value)
+            print("Note, object e and exc of Class %s is %s the same." %
+                  (type(exc_value), ('not', '')[exc_value is e]))
+            print('traceback.print_exc(): ', traceback.print_exc())
+            print('traceback.format_exc():\n%s' % traceback.format_exc())
+            print('#' * 60)
+            return None
+
+
+    def select_rental_service(self, p_rs_id, p_cust_id ):
+        try:
+            rental_list = []
+            conn = self.conn_mysql()
+            cursor = conn.cursor()
+            if p_rs_id is not None:
+                sql = "SELECT rs_id, pickup_location, dropoff_location  DATE_FORMAT(pickup_date,'%%Y-%%m-%%d %%H:%%i:%%s') as pickup_date, DATE_FORMAT(dropoff_date,'%%Y-%%m-%%d %%H:%%i:%%s') as dropoff_date, start_odometer, end_odometer, daily_odometer_limit, rental_rate  rental_fee, rental_amount, really_amount v_id   cust_id, dc_id, ro_id user_id   " \
+                      " FROM Rental_Service where rs_id=%s"
+                cursor.execute(sql, p_rs_id)
+            elif p_cust_id is not None:
+                sql = "SELECT rs_id, pickup_location, dropoff_location  DATE_FORMAT(pickup_date,'%%Y-%%m-%%d %%H:%%i:%%s') as pickup_date, DATE_FORMAT(dropoff_date,'%%Y-%%m-%%d %%H:%%i:%%s') as dropoff_date, start_odometer, end_odometer, daily_odometer_limit, rental_rate  rental_fee, rental_amount, really_amount v_id   cust_id, dc_id, ro_id user_id   " \
+                      " FROM Rental_Service where cust_id=%s"
+                cursor.execute(sql, p_cust_id)
+            else:
+                sql = "SELECT rs_id, pickup_location, dropoff_location  DATE_FORMAT(pickup_date,'%%Y-%%m-%%d %%H:%%i:%%s') as pickup_date, DATE_FORMAT(dropoff_date,'%%Y-%%m-%%d %%H:%%i:%%s') as dropoff_date, start_odometer, end_odometer, daily_odometer_limit, rental_rate  rental_fee, rental_amount, really_amount v_id   cust_id, dc_id, ro_id user_id   " \
+                      " FROM Rental_Service"
+                cursor.execute(sql)
+            for row in cursor:
+                rental = RentalService()
+                rental.rs_id = row[0]
+                rental.Pickup_Location = row[1]
+                rental.Dropoff_Location = row[2]
+                rental.Pickup_Date = row[3]
+                rental.Dropoff_Date = row[4]
+                rental.Start_Odometer = row[5]
+                rental.End_Odometer = row[6]
+                rental.Daily_Odometer_Limit = row[7]
+                rental.rental_rate = row[8]
+                rental.rental_fee = row[9]
+                rental.rental_amount = row[10]
+                rental.really_amount = row[11]
+                rental.Vehicle_ID = row[12]
+                rental.Cust_ID = row[13]
+                rental_list.append(rental)
+            cursor.close()
+            conn.close()
+            return rental_list
         except Exception as e:
             print('str(Exception):\t', str(Exception))
             print('str(e):\t\t', str(e))
