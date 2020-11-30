@@ -9,77 +9,20 @@
   <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/css/bootstrap-theme.min.css" rel="stylesheet" />
   <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/css/bootstrap.min.css" rel="stylesheet" />
   <title>Sign up</title>
+
+  	     <!-- Bootstrap core JavaScript -->
+  <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+<!--  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>-->
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  <!-- Custom scripts for this template -->
+  <script src="{{ url_for('static', filename='js/clean-blog.min.js') }}"></script>
+ <script src="{{ url_for('static', filename='js/jquery.md5.js') }}"></script>
+  <script  type="text/javascript" src="{{ url_for('static', filename='js/jquery.md5.js') }}"></script>
+
  </head>
  <body>
-  <script>
-$(document).ready(function() {
 
-
-
-    $("#cust_type").on('change',
-    function() {
-        var cust_type = $(this).val();
-        if (cust_type == "I") {
-            $("#corporatename").parent().hide();
-            $("#regno").parent().hide();
-            $("#employeeid").parent().hide();
-            $("#firstname").parent().show();
-            $("#lastname").parent().show();
-            $("#driver_license_number").parent().show();
-            $("#insurance_company_name").parent().show();
-            $("#insurance_policy_number").parent().show();
-        } else {
-            $("#corporatename").parent().show();
-            $("#regno").parent().show();
-            $("#employeeid").parent().show();
-
-            $("#firstname").parent().hide();
-            $("#lastname").parent().hide();
-            $("#driver_license_number").parent().hide();
-            $("#insurance_company_name").parent().hide();
-            $("#insurance_policy_number").parent().hide();
-        }
-    });
-    
-
-    $("#signupBtn").click(function() {
-    	var d = new Date();
-        var t = d.getTime();
-        var timestamp = Math.round(d / 1000);
-
-        p_username = $("#username").val()
-        p_password = $("#password").val()
-        // alert("username is " + p_username + " password is " + p_password)
-        p_password = $.md5(p_password)
-
-        $.ajax({
-            type: "POST",
-            url: "/user",
-            beforeSend: function(request) {
-                request.setRequestHeader("timestamp", timestamp)
-            },
-            data: {
-                "username": p_username,
-                "password": p_password
-            },
-            dataType: 'json',
-            success: function(result) {
-            	var r = JSON.parse(result)
-            	var stat = r["stat"];
-                    if (stat == 1) {
-						$.cookie("username", p_username);
-						$.cookie("password", p_password);
-						alert("sign up successful.");
-						$(location).attr('href', '/');
-                    } else {
-                    	alert("sign up failure");
-                    }
-			}
-        });
-
-    });
-});
-</script>
   <div class="container">
    <div class="row clearfix">
     <div class="col-md-12 column">
@@ -116,60 +59,51 @@ $(document).ready(function() {
        <label for="driver_license_number">Driver License Number</label>
        <input type="text" class="form-control" id="driver_license_number" />
       </div>
-            <div class="form-group">
+      <div class="form-group">
        <label for="insurance_company_name">Insurance Company Name</label>
        <input type="text" class="form-control" id="insurance_company_name" />
       </div>
-                  <div class="form-group">
+      <div class="form-group">
        <label for="insurance_policy_number">Insurance Policy Number</label>
        <input type="text" class="form-control" id="insurance_policy_number" />
       </div>
-
-                  <div class="form-group">
+      <div class="form-group">
        <label for="corporatename">Corporate Name</label>
        <input type="text" class="form-control" id="corporatename" />
       </div>
-                  <div class="form-group">
+      <div class="form-group">
        <label for="regno">Corporate Reg No</label>
        <input type="text" class="form-control" id="regno" />
       </div>
-
-
-                  <div class="form-group">
+      <div class="form-group">
        <label for="employeeid">Corporate Employee ID</label>
        <input type="text" class="form-control" id="employeeid" />
       </div>
-
-                        <div class="form-group">
+      <div class="form-group">
        <label for="street">Street</label>
        <input type="text" class="form-control" id="street" />
       </div>
-
-                        <div class="form-group">
+      <div class="form-group">
        <label for="city">City</label>
        <input type="text" class="form-control" id="city" />
       </div>
-
-                                 <div class="form-group">
+      <div class="form-group">
        <label for="state">State</label>
        <input type="text" class="form-control" id="state" />
       </div>
-
-                                 <div class="form-group">
+      <div class="form-group">
        <label for="country">Country</label>
        <input type="text" class="form-control" id="country" />
       </div>
-
-                                          <div class="form-group">
+      <div class="form-group">
        <label for="zip">Zip</label>
        <input type="text" class="form-control" id="zip" />
       </div>
-
-                                          <div class="form-group">
+      <div class="form-group">
        <label for="email">Email</label>
        <input type="text" class="form-control" id="email" />
       </div>
-                                         <div class="form-group">
+      <div class="form-group">
        <label for="tel">Tel</label>
        <input type="text" class="form-control" id="tel" />
       </div>
@@ -189,15 +123,192 @@ $(document).ready(function() {
     </div>
    </div>
   </footer>
-  <!-- Optional JavaScript -->
-  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-  <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/js/affix.js"></script>
-  <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/js/alert.js"></script>
-  <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/js/alert.min.js"></script>
-  <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/js/bootstrap.js"></script>
-  <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/js/button.js"></script>
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static', filename='js/jquery.md5.js') }}"></script>
-  <script src="https://cdn.bootcdn.net/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+<script>
+   $(document).ready(function() {
+    var d = new Date();
+    var t = d.getTime();
+    var timestamp = Math.round(d / 1000);
+    var username = $.cookie("username");
+    var password = $.cookie("password");
+    var token = $.md5(username + password + timestamp);
+    if (username != null && password != null) {
+        $.ajax({
+            type: "GET",
+            url: "/user/" + username,
+            beforeSend: function(request) {
+                request.setRequestHeader("token", token);
+                request.setRequestHeader("timestamp", timestamp);
+            },
+            data: {},
+            dataType: 'json',
+            success: function(result) {
+                var r = JSON.parse(result);
+                var stat = r["stat"];
+                if (stat == 1) {
+                    // login success.
+                    $("#corporatename").parent().parent().hide();
+                    $("#regno").parent().parent().hide();
+                    $("#employeeid").parent().parent().hide();
+                    $.ajax({
+                        type: "GET",
+                        url: "/customer/" + username,
+                        beforeSend: function(request) {
+                            request.setRequestHeader("token", token);
+                            request.setRequestHeader("timestamp", timestamp);
+                        },
+                        dataType: "json",
+                        success: function(result) {
+                            var r = JSON.parse(result);
+                            var stat = r["stat"];
+                            if (stat == 1) {
+                                var customer = r["customer"];
+                                var cust_id = customer["CustID"];
+                                 var cust_type = customer["CustType"];
+                                    if (cust_type == "I") {
+                                        $("#corporatename").parent().parent().hide();
+                                        $("#regno").parent().parent().hide();
+                                        $("#employeeid").parent().parent().hide();
+                                        $("#firstname").parent().parent().show();
+                                        $("#lastname").parent().parent().show();
+                                        $("#driver_license_number").parent().parent().show();
+                                        $("#insurance_company_name").parent().parent().show();
+                                        $("#insurance_policy_number").parent().parent().show();
+                                    } else {
+                                        $("#corporatename").parent().parent().show();
+                                        $("#regno").parent().parent().show();
+                                        $("#employeeid").parent().parent().show();
+
+                                        $("#firstname").parent().parent().hide();
+                                        $("#lastname").parent().parent().hide();
+                                        $("#driver_license_number").parent().parent().hide();
+                                        $("#insurance_company_name").parent().parent().hide();
+                                        $("#insurance_policy_number").parent().parent().hide();
+                                    }
+                                    if (cust_type == "I") {
+                                      $("#cust_type").val("I");
+
+                                    }
+                                    else {
+                                      $("#cust_type").val("C");
+                                    }
+                                if (cust_id == 0) {
+                                    alert("Please input customer infomation.");
+                                }
+                                else {
+                                  // difference columns
+                                  if (cust_type == "I") {
+                                    $("#firstname").val(customer["FirstName"]);
+                                    $("#lastname").val(customer["LastName"]);
+                                    $("#driver_license_number").val(customer["DriverLicenseNumber"]);
+                                    $("#insurance_company_name").val(customer["InsuranceCompanyName"]);
+                                    $("#insurance_policy_number").val(customer["InsurancePolicyNumber"]);
+
+                                  } else {
+                                    $("#corporatename").val(customer["CorporateName"]);
+                                    $("#regno").val(customer["CorporateRegNo"]);
+                                    $("#employeeid").val(customer["CorporateEmployeeID"]);
+                                  }
+                                  // same columns
+                                  $("#street").val(customer["Street"]);
+                                  $("#city").val(customer["City"]);
+                                  $("#state").val(customer["State"]);
+                                  $("#country").val(customer["Country"]);
+                                  $("#zip").val(customer["Zip"]);
+                                  $("#email").val(customer["Email"]);
+                                  $("#tel").val(customer["Tel"]);
+
+                                }
+
+                            } else {
+                              alert("token is error.")
+
+                            }
+                        }
+                    });
+                } else {
+                    $(location).attr('href', '/');
+                }
+            }
+        });
+
+    } else {
+        $(location).attr('href', '/');
+    }
+
+    $("#cust_type").on('change',
+    function() {
+        var cust_type = $(this).val();
+        if (cust_type == "I") {
+            $("#corporatename").parent().parent().hide();
+            $("#regno").parent().parent().hide();
+            $("#employeeid").parent().parent().hide();
+            $("#firstname").parent().parent().show();
+            $("#lastname").parent().parent().show();
+            $("#driver_license_number").parent().parent().show();
+            $("#insurance_company_name").parent().parent().show();
+            $("#insurance_policy_number").parent().parent().show();
+        } else {
+            $("#corporatename").parent().parent().show();
+            $("#regno").parent().parent().show();
+            $("#employeeid").parent().parent().show();
+
+            $("#firstname").parent().parent().hide();
+            $("#lastname").parent().parent().hide();
+            $("#driver_license_number").parent().parent().hide();
+            $("#insurance_company_name").parent().parent().hide();
+            $("#insurance_policy_number").parent().parent().hide();
+        }
+    });
+
+
+$("#saveCustomerButton").click(function() {
+
+    var data = {
+        "CustType": $("#cust_type").val(),
+        "FirstName": $("#firstname").val(),
+        "LastName": $("#lastname").val(),
+        "DriverLicenseNumber": $("#driver_license_number").val(),
+        "InsuranceCompanyName": $("#insurance_company_name").val(),
+        "InsurancePolicyNumber": $("#insurance_policy_number").val(),
+        "CorporateName": $("#corporatename").val(),
+        "CorporateRegNo": $("#regno").val(),
+        "CorporateEmployeeID": $("#employeeid").val(),
+        "Street": $("#street").val(),
+        "City": $("#city").val(),
+        "State": $("#state").val(),
+        "Country": $("#country").val(),
+        "Zip": $("#zip").val(),
+        "Email": $("#email").val(),
+        "Tel": $("#tel").val()
+    };
+
+    $.ajax({
+        type: "POST",
+        url: "/customer",
+        beforeSend: function(request) {
+            request.setRequestHeader("username", username);
+            request.setRequestHeader("token", token);
+            request.setRequestHeader("timestamp", timestamp);
+        },
+        data: data,
+        dataType: 'json',
+        success: function(result) {
+            var r = JSON.parse(result);
+            var stat = r["stat"];
+            if (stat == 1) {
+                alert("save success.");
+
+            } else {
+                alert("save failure.");
+            }
+        }
+    });
+
+});
+
+});
+</script>
+
+
  </body>
 </html>
