@@ -1,47 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
- <head>
-  <!-- Required meta tags -->
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/css/bootstrap-theme.css" rel="stylesheet" />
-  <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/css/bootstrap-theme.min.css" rel="stylesheet" />
-  <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/css/bootstrap.min.css" rel="stylesheet" />
-  <!-- Optional JavaScript -->
-  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-  <title>Sign in</title>
-  <!-- Optional JavaScript -->
-  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
- </head>
- <body>
-  <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
-  <script src="https://cdn.bootcdn.net/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-  <!-- Custom scripts for this template -->
-  <script src="{{ url_for('static', filename='js/jquery.md5.js') }}"></script>
-  <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/js/affix.js"></script>
-  <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/js/alert.js"></script>
-  <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/js/alert.min.js"></script>
-  <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/js/bootstrap.js"></script>
-  <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/js/button.js"></script>
+{% extends "basic.html" %}
+{% block body %}
   <div class="container">
    <div class="row clearfix">
     <div class="col-md-12 column">
-     <ul class="nav nav-tabs">
-      <li class="active"> <a href="#">Home</a> </li>
-      <li> <a href="/rentalservice">Rental Service</a> </li>
-      <li> <a href="/customerprofile">Customer Profile</a> </li>
-      <li class="dropdown pull-right"> <a href="#" data-toggle="dropdown" class="dropdown-toggle" id="signout">Sign Out<strong class="caret"></strong></a> </li>
-     </ul>
-     <h3> WOW - Home </h3>
-    </div>
-   </div>
-  </div>
-  <div class="container">
-   <div class="row clearfix">
-    <div class="col-md-12 column">
-     <table class="table table-hover">
+     <table class="table table-hover" id="rentalTable">
       <thead>
        <tr>
         <th> ID </th>
@@ -54,74 +16,13 @@
         <th> </th>
        </tr>
       </thead>
-      <tbody>
-       <tr>
-        <td> 1 </td>
-        <td> TB - Monthly </td>
-        <td> 01/04/2012 </td>
-        <td> Default </td>
-        <td> 1 </td>
-        <td> TB - Monthly </td>
-        <td> 01/04/2012 </td>
-        <td> Default </td>
-       </tr>
-       <tr class="success">
-        <td> 1 </td>
-        <td> TB - Monthly </td>
-        <td> 01/04/2012 </td>
-        <td> Approved </td>
-        <td> 1 </td>
-        <td> TB - Monthly </td>
-        <td> 01/04/2012 </td>
-        <td> Default </td>
-       </tr>
-       <tr class="error">
-        <td> 2 </td>
-        <td> TB - Monthly </td>
-        <td> 02/04/2012 </td>
-        <td> Declined </td>
-        <td> 1 </td>
-        <td> TB - Monthly </td>
-        <td> 01/04/2012 </td>
-        <td> Default </td>
-       </tr>
-       <tr class="warning">
-        <td> 3 </td>
-        <td> TB - Monthly </td>
-        <td> 03/04/2012 </td>
-        <td> Pending </td>
-        <td> 1 </td>
-        <td> TB - Monthly </td>
-        <td> 01/04/2012 </td>
-        <td> Default </td>
-       </tr>
-       <tr class="info">
-        <td> 4 </td>
-        <td> TB - Monthly </td>
-        <td> 04/04/2012 </td>
-        <td> Call in to confirm </td>
-        <td> 1 </td>
-        <td> TB - Monthly </td>
-        <td> 01/04/2012 </td>
-        <td> Default </td>
-       </tr>
-      </tbody>
+     <tbody></tbody>
      </table>
     </div>
    </div>
   </div>
-  <hr />
-  <!-- Footer -->
-  <footer>
-   <div class="container">
-    <div class="row clearfix">
-		        <div class="col-lg-8 col-md-10 mx-auto">
-          <p class="copyright text-muted">Copyright &copy; WOW</p>
-        </div>
-    </div>
-   </div>
-  </footer>
-  <script>
+
+<script>
    $(document).ready(function() {
     var d = new Date();
     var t = d.getTime();
@@ -141,6 +42,7 @@
             dataType: 'json',
             success: function(result) {
                 var r = JSON.parse(result);
+                console.log("get rental service is ", r);
                 var stat = r["stat"];
                 if (stat == 1) {
                     // login success.
@@ -153,13 +55,46 @@
                         },
                         dataType: "json",
                         success: function(result) {
+                            $("#rentalTable tbody").html('');
                             var r = JSON.parse(result);
                             var stat = r["stat"];
                             if (stat == 1) {
                                 var rs_list = r["rs_list"];
-                                alert("rental service length is " + rs_list.length);
-                                for (rs in rs_list) {
-                                	var rs_id = rs["rs_id"]
+
+                                //alert("rental service length is " + rs_list.length);
+                                for (keys in rs_list) {
+                                     var rental = rs_list[keys];
+                                     // `forEach()` method
+                                     Object.entries(rental).forEach(([key, value]) => {
+                                     console.log(`${key}: ${value}`)
+                                     });
+
+                                    var ccstr = "<td>" + rental.rs_id + "</td>";
+                                    ccstr = ccstr + "<td>" + rental.Pickup_Location + "</td>";
+                                    ccstr = ccstr + "<td>" + rental.Dropoff_Location + "</td>";
+                                    ccstr = ccstr + "<td>" + rental.Pickup_Date + "</td>";
+                                    ccstr = ccstr + "<td>" + rental.Dropoff_Date + "</td>";
+                                    ccstr = ccstr + "<td>" + rental.Start_Odometer + "</td>";
+                                    ccstr = ccstr + "<td>" + rental.End_Odometer + "</td>";
+                                    ccstr = ccstr + "<td><a href='/rental/'" + rental.rs_id + ">More</a> </td>";
+
+                                    if (((keys + 1) % 2) == 0) {
+                                    $("#rentalTable tbody").append("<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>")
+                                    }
+                                    else {
+                                     $("#rentalTable tbody").append("<tr class=\"error\"><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>")
+                                    }
+
+                                    var currentRow = $("#rentalTable tbody tr:last");
+                                    currentRow.find("td:eq(0)").html(rental.rs_id) ;
+                                 currentRow.find("td:eq(1)").html(rental.Pickup_Location) ;
+                                 currentRow.find("td:eq(2)").html(rental.Dropoff_Location) ;
+                                 currentRow.find("td:eq(3)").html(rental.Pickup_Date) ;
+                                 currentRow.find("td:eq(4)").html(rental.Dropoff_Date) ;
+                                 currentRow.find("td:eq(5)").html(rental.Start_Odometer) ;
+                                 currentRow.find("td:eq(6)").html(rental.End_Odometer) ;
+                                 currentRow.find("td:eq(7)").html("<a href='/rentalservice?id=" + rental.rs_id + "'>More</a>") ;
+
 
 								}
                             } else {
@@ -184,80 +119,12 @@ $("#signout").on('click',function (){
 	$.cookie("username", null);
     $.cookie("password", null);
  	$(location).attr('href', '/');
-})
-
-    $("#signout").on('change',
-    function() {
-        var cust_type = $(this).val();
-        if (cust_type == "I") {
-            $("#corporatename").parent().hide();
-            $("#regno").parent().hide();
-            $("#employeeid").parent().hide();
-            $("#firstname").parent().show();
-            $("#lastname").parent().show();
-            $("#driver_license_number").parent().show();
-            $("#insurance_company_name").parent().show();
-            $("#insurance_policy_number").parent().show();
-        } else {
-            $("#corporatename").parent().show();
-            $("#regno").parent().show();
-            $("#employeeid").parent().show();
-
-            $("#firstname").parent().hide();
-            $("#lastname").parent().hide();
-            $("#driver_license_number").parent().hide();
-            $("#insurance_company_name").parent().hide();
-            $("#insurance_policy_number").parent().hide();
-        }
-    });
-
-
-$("#saveCustomerButton").click(function() {
-
-    var data = {
-        "CustType": $("#cust_type").val(),
-        "FirstName": $("#firstname").val(),
-        "LastName": $("#lastname").val(),
-        "DriverLicenseNumber": $("#driver_license_number").val(),
-        "InsuranceCompanyName": $("#insurance_company_name").val(),
-        "InsurancePolicyNumber": $("#insurance_policy_number").val(),
-        "CorporateName": $("#corporatename").val(),
-        "CorporateRegNo": $("#regno").val(),
-        "CorporateEmployeeID": $("#employeeid").val(),
-        "Street": $("#street").val(),
-        "City": $("#city").val(),
-        "State": $("#state").val(),
-        "Country": $("#country").val(),
-        "Zip": $("#zip").val(),
-        "Email": $("#email").val(),
-        "Tel": $("#tel").val()
-    };
-
-    $.ajax({
-        type: "POST",
-        url: "/customer",
-        beforeSend: function(request) {
-            request.setRequestHeader("username", username);
-            request.setRequestHeader("token", token);
-            request.setRequestHeader("timestamp", timestamp);
-        },
-        data: data,
-        dataType: 'json',
-        success: function(result) {
-            var r = JSON.parse(result);
-            var stat = r["stat"];
-            if (stat == 1) {
-                alert("save success.");
-
-            } else {
-                alert("save failure.");
-            }
-        }
-    });
-
 });
+
 
 });
 </script>
- </body>
-</html>
+
+{% endblock %}
+
+

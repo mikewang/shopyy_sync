@@ -1,44 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-    <!-- Bootstrap CSS -->
-	  <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/css/bootstrap-theme.css" rel="stylesheet">
-	  <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/css/bootstrap-theme.min.css" rel="stylesheet">
-		<link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/css/bootstrap.min.css" rel="stylesheet">
-
-    <title>Sign up</title>
-
-	      <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
-  <script src="https://cdn.bootcdn.net/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-  <!-- Custom scripts for this template -->
- <script src="{{ url_for('static', filename='js/jquery.md5.js') }}"></script>
-
-  <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/js/affix.js"></script>
-  <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/js/alert.js"></script>
-  <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/js/alert.min.js"></script>
-  <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/js/bootstrap.js"></script>
-  <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/js/button.js"></script>
-  </head>
-  <body>
-
-
+{% extends "basic.html" %}
+{% block body %}
 <div class="container">
 	<div class="row clearfix">
-		<div class="col-md-12 column">
-			<h3>
-			 WOW - Sign up
-			</h3>
-        </div>
-        		<div class="col-md-12 column">
-                    <label id="homeDirectLabel" ></label>
-        </div>
 	 <div class="col-md-12 column">
 			<form role="form">
 				<div class="form-group">
@@ -57,20 +20,10 @@
 	</div>
 </div>
 
-<hr>
-  <!-- Footer -->
-  <footer>
-    <div class="container">
-      <div class="row clearfix">
- <p class="copyright text-muted" >Copyright &copy; WOW</p>
-      </div>
-    </div>
-  </footer>
-
-
-
-    <script>
+<script>
 $(document).ready(function() {
+	    	$("#headerNav").hide();
+    	$("#headerText").text("WOW - Sing up");
 
     $("#signupBtn").on('click', function () {
         $("#signupBtn").hide();
@@ -80,7 +33,7 @@ $(document).ready(function() {
 
         username = $("#username").val();
         password = $("#password").val();
-        p_password = $.md5(password);
+        password = $.md5(password);
         var data = {
                 "username": username,
                 "password": password
@@ -115,8 +68,5 @@ $(document).ready(function() {
 
 });
 </script>
+{% endblock %}
 
-
-
-  </body>
-</html>

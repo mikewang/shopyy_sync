@@ -1,56 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
- <head>
-  <!-- Required meta tags -->
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/css/bootstrap-theme.css" rel="stylesheet" />
-  <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/css/bootstrap-theme.min.css" rel="stylesheet" />
-  <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/css/bootstrap.min.css" rel="stylesheet" />
-  <title>Sign up</title>
-
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
-  <script src="https://cdn.bootcdn.net/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-  <!-- Custom scripts for this template -->
- <script src="{{ url_for('static', filename='js/jquery.md5.js') }}"></script>
-
-  <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/js/affix.js"></script>
-  <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/js/alert.js"></script>
-  <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/js/alert.min.js"></script>
-  <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/js/bootstrap.js"></script>
-  <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/js/button.js"></script>
-
- </head>
- <body>
+{% extends "basic.html" %}
+{% block body %}
 
   <div class="container">
    <div class="row clearfix">
-    <div class="col-md-12 column">
-     <ul class="nav nav-tabs">
-      <li class="active"> <a href="#">首页</a> </li>
-      <li> <a href="#">简介</a> </li>
-      <li class="disabled"> <a href="#">信息</a> </li>
-      <li class="dropdown pull-right"> <a href="#" data-toggle="dropdown" class="dropdown-toggle">下拉<strong class="caret"></strong></a>
-       <ul class="dropdown-menu">
-        <li> <a href="#">操作</a> </li>
-        <li> <a href="#">设置栏目</a> </li>
-        <li> <a href="#">更多设置</a> </li>
-        <li class="divider"> </li>
-        <li> <a href="#">分割线</a> </li>
-       </ul> </li>
-     </ul>
-     <h3> WOW - Rental Service </h3>
-    </div>
     <div class="col-md-12 column">
      <form role="form">
 
       <div class="form-group">
        <label for="rs_id">Rental Service ID</label>
-       <input type="text" readonly="readonly" class="form-control" id="rs_id" value="0"/>
+       <input type="text" readonly="readonly" class="form-control" id="rs_id" value={{ rs_id }} />
       </div>
       <div class="form-group">
        <label for="Pickup_Location">Pickup Location</label>
@@ -108,21 +66,14 @@
       <br />
       <div id="success"></div>
       <button type="button" class="btn btn-primary" id="saveRentalButton">Save</button>
+      <button type="button" class="btn btn-default" id="deleteRentalButton">Delete</button>
      </form>
     </div>
    </div>
   </div>
-  <hr />
-  <!-- Footer -->
-  <footer>
-   <div class="container">
-    <div class="row clearfix">
-     <p class="copyright text-muted">Copyright &copy; WOW</p>
-    </div>
-   </div>
-  </footer>
-<script>
+ <script>
    $(document).ready(function() {
+    $("#headerText").text("WOW - Rental Service");
     var d = new Date();
     var t = d.getTime();
     var timestamp = Math.round(d / 1000);
@@ -144,7 +95,8 @@
                 var stat = r["stat"];
                 if (stat == 1) {
                     // login success.
-
+                    console.log("get rental service id is ", $("#rs_id").val());
+                    var data = {"rs_id" : $("#rs_id").val()}
                     $.ajax({
                         type: "GET",
                         url: "/rental/" + username,
@@ -152,7 +104,7 @@
                             request.setRequestHeader("token", token);
                             request.setRequestHeader("timestamp", timestamp);
                         },
-                        data: {"rs_id":$("#rs_id").val()},
+                        data: data,
                         dataType: "json",
                         success: function(result) {
                             var r = JSON.parse(result);
@@ -161,28 +113,24 @@
                               var rs_list = r["rs_list"];
                               var ll = rs_list.length;
                               if (ll > 0) {
-                               rental = rs_list[0];
+                                rental = rs_list[0];
                                 $("#rs_id").val(rental["rs_id"]);
-
                                 $("#saveRentalButton").text("Save Rental Service");
+                                $("#Pickup_Location").val(rental["Pickup_Location"]);
+                                $("#Dropoff_Location").val(rental["Dropoff_Location"]);
+                                $("#Pickup_Date").val(rental["Pickup_Date"]);
                               }
                               else {
                                $("#rs_id").val(0);
                                $("#saveRentalButton").text("Create New Rental Service");
-
+                               var time = new Date();
+                               var day = ("0" + time.getDate()).slice(-2);
+                               var month = ("0" + (time.getMonth() + 1)).slice(-2);
+                               var today = time.getFullYear() + "-" + (month) + "-" + (day);
+                               $("#Pickup_Date").val(today);
                               }
-
-                              for (rs in rs_list) {
-
-                              }
-                              $("#rs_id").val(rental["rs_id"]);
-                              $("#Pickup_Location").val(rental["Pickup_Location"]);
-                              $("#Dropoff_Location").val(rental["Dropoff_Location"]);
-                              $("#Pickup_Date").val(rental["Pickup_Date"]);
-
-
                             } else {
-                              alert("token is error.")
+
 
                             }
                         }
@@ -201,6 +149,7 @@
 
 
 $("#saveRentalButton").click(function() {
+    console.log("save rental begin");
 
     var data = {
         "rs_id": $("#rs_id").val(),
@@ -224,18 +173,60 @@ $("#saveRentalButton").click(function() {
             var stat = r["stat"];
             if (stat == 1) {
                 alert("save success.");
+                $(location).attr('href', '/');
 
             } else {
                 alert("save failure.");
             }
+        },
+        complete: function (){
+            console.log("save rental end.");
         }
+
+    });
+
+});
+
+
+$("#deleteRentalButton").click(function() {
+    console.log("delete rental begin");
+    if ($("#rs_id").val() == 0 ) {
+     alert("delete rental service is failure.");
+     return ;
+    }
+        var data = {
+        "rs_id": $("#rs_id").val(),
+       };
+
+    $.ajax({
+        type: "DELETE",
+        url: "/rental",
+        beforeSend: function(request) {
+            request.setRequestHeader("username", username);
+            request.setRequestHeader("token", token);
+            request.setRequestHeader("timestamp", timestamp);
+        },
+        data: data,
+        dataType: 'json',
+        success: function(result) {
+            var r = JSON.parse(result);
+            var stat = r["stat"];
+            if (stat == 1) {
+                alert("delete success.");
+                $(location).attr('href', '/');
+
+            } else {
+                alert("delete failure.");
+            }
+        },
+        complete: function (){
+            console.log("delete rental end.");
+        }
+
     });
 
 });
 
 });
 </script>
-
-
- </body>
-</html>
+{% endblock %}

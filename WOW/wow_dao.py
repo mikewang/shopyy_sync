@@ -190,6 +190,8 @@ class WowDao(object):
                 cursor.execute(sql, values)
                 customer.CustID = cursor.lastrowid
                 cursor.close()
+                conn.commit()
+                print("add customer info ", customer.desc())
             if customer.CustType == 'I':
                 with conn.cursor() as cursor:
                     sql = "insert into customer_individual(CUST_ID,FIRST_NAME,LAST_NAME,DRIVER_LICENSE_NUMBER,INSURANCE_COMPANY_NAME,INSURANCE_POLICY_NUMBER) " \
@@ -197,6 +199,7 @@ class WowDao(object):
                     values = [customer.CustID, customer.FirstName, customer.LastName,customer.DriverLicenseNumber, customer.InsuranceCompanyName, customer.InsurancePolicyNumber]
                     cursor.execute(sql, values)
                     cursor.close()
+                    conn.commit()
             if customer.CustType == 'C':
                 with conn.cursor() as cursor:
                     sql = "insert into customer_individual(CUST_ID,NAME,REG_NO,EMPLOYEE_ID) " \
@@ -204,7 +207,7 @@ class WowDao(object):
                     values = [customer.CustID, customer.CorporateName, customer.CorporateRegNo,customer.CorporateEmployeeID]
                     cursor.execute(sql, values)
                     cursor.close()
-            conn.commit()
+                    conn.commit()
             conn.close()
             return customer
         except Exception as e:
@@ -270,28 +273,30 @@ class WowDao(object):
             cursor = conn.cursor()
             if p_rs_id is not None:
                 sql = "SELECT rs_id, pickup_location, dropoff_location , " \
-                      "DATE_FORMAT(pickup_date,'%%Y-%%m-%%d %%H:%%i:%%s') as pickup_date, " \
-                      "DATE_FORMAT(dropoff_date,'%%Y-%%m-%%d %%H:%%i:%%s') as dropoff_date, " \
+                      "DATE_FORMAT(pickup_date,'%%Y-%%m-%%d') as pickup_date, " \
+                      "DATE_FORMAT(dropoff_date,'%%Y-%%m-%%d') as dropoff_date, " \
                       "start_odometer, end_odometer, daily_odometer_limit, rental_rate , rental_fee," \
                       " rental_amount, really_amount, v_id , cust_id, dc_id, ro_id, user_id   " \
                       " FROM Rental_Service where rs_id=%s"
+
                 cursor.execute(sql, p_rs_id)
             elif p_cust_id is not None:
                 sql = "SELECT rs_id, pickup_location, dropoff_location , " \
-                      "DATE_FORMAT(pickup_date,'%%Y-%%m-%%d %%H:%%i:%%s') as pickup_date, " \
-                      "DATE_FORMAT(dropoff_date,'%%Y-%%m-%%d %%H:%%i:%%s') as dropoff_date, " \
+                      "DATE_FORMAT(pickup_date,'%%Y-%%m-%%d') as pickup_date, " \
+                      "DATE_FORMAT(dropoff_date,'%%Y-%%m-%%d') as dropoff_date, " \
                       "start_odometer, end_odometer, daily_odometer_limit, rental_rate , rental_fee," \
                       " rental_amount, really_amount, v_id , cust_id, dc_id, ro_id, user_id   " \
                       " FROM Rental_Service where cust_id=%s"
                 cursor.execute(sql, p_cust_id)
             else:
                 sql = "SELECT rs_id, pickup_location, dropoff_location , " \
-                      "DATE_FORMAT(pickup_date,'%%Y-%%m-%%d %%H:%%i:%%s') as pickup_date, " \
-                      "DATE_FORMAT(dropoff_date,'%%Y-%%m-%%d %%H:%%i:%%s') as dropoff_date, " \
+                      "DATE_FORMAT(pickup_date,'%%Y-%%m-%%d') as pickup_date, " \
+                      "DATE_FORMAT(dropoff_date,'%%Y-%%m-%%d') as dropoff_date, " \
                       "start_odometer, end_odometer, daily_odometer_limit, rental_rate , rental_fee," \
                       " rental_amount, really_amount, v_id , cust_id, dc_id, ro_id, user_id   " \
                       " FROM Rental_Service"
                 cursor.execute(sql)
+            print("select_rental_service sql is ", p_rs_id, p_cust_id, sql)
             for row in cursor:
                 rental = RentalService()
                 rental.rs_id = row[0]
@@ -312,6 +317,90 @@ class WowDao(object):
             cursor.close()
             conn.close()
             return rental_list
+        except Exception as e:
+            print('str(Exception):\t', str(Exception))
+            print('str(e):\t\t', str(e))
+            print('repr(e):\t', repr(e))
+            # Get information about the exception that is currently being handled
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            print('e.message:\t', exc_value)
+            print("Note, object e and exc of Class %s is %s the same." %
+                  (type(exc_value), ('not', '')[exc_value is e]))
+            print('traceback.print_exc(): ', traceback.print_exc())
+            print('traceback.format_exc():\n%s' % traceback.format_exc())
+            print('#' * 60)
+            return None
+
+    def insert_rental_service(self, p_rental):
+        try:
+            rental = p_rental
+            conn = self.conn_mysql()
+            with conn.cursor() as cursor:
+                sql = "insert into Rental_Service(pickup_location,dropoff_location,pickup_date,CUST_ID) " \
+                      "values(%s,%s,str_to_date(%s,\'%%Y-%%m-%%d\'), %s)"
+                print("sql is ", sql)
+                values = (rental.Pickup_Location, rental.Dropoff_Location, rental.Pickup_Date, rental.Cust_ID)
+                cursor.execute(sql, values)
+                rental.rs_id = cursor.lastrowid
+                cursor.close()
+                conn.commit()
+            conn.close()
+            return rental
+        except Exception as e:
+            print('str(Exception):\t', str(Exception))
+            print('str(e):\t\t', str(e))
+            print('repr(e):\t', repr(e))
+            # Get information about the exception that is currently being handled
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            print('e.message:\t', exc_value)
+            print("Note, object e and exc of Class %s is %s the same." %
+                  (type(exc_value), ('not', '')[exc_value is e]))
+            print('traceback.print_exc(): ', traceback.print_exc())
+            print('traceback.format_exc():\n%s' % traceback.format_exc())
+            print('#' * 60)
+            return None
+
+    def update_rental_service(self, p_rental):
+        try:
+            rental = p_rental
+            conn = self.conn_mysql()
+            print("update rental service is ", rental)
+            with conn.cursor() as cursor:
+                sql = "update Rental_Service set pickup_location = %s, dropoff_location = %s, " \
+                      "pickup_date = str_to_date(%s,'%%Y-%%m-%%d') where rs_id=%s"
+                values = (rental.Pickup_Location, rental.Dropoff_Location, rental.Pickup_Date,rental.rs_id)
+                cursor.execute(sql, values)
+                cursor.close()
+            conn.commit()
+            conn.close()
+            return rental
+        except Exception as e:
+            print('str(Exception):\t', str(Exception))
+            print('str(e):\t\t', str(e))
+            print('repr(e):\t', repr(e))
+            # Get information about the exception that is currently being handled
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            print('e.message:\t', exc_value)
+            print("Note, object e and exc of Class %s is %s the same." %
+                  (type(exc_value), ('not', '')[exc_value is e]))
+            print('traceback.print_exc(): ', traceback.print_exc())
+            print('traceback.format_exc():\n%s' % traceback.format_exc())
+            print('#' * 60)
+            return None
+
+    def delete_rental_service(self, p_rental):
+        try:
+            rental = p_rental
+            conn = self.conn_mysql()
+            print("update rental service is ", rental)
+            with conn.cursor() as cursor:
+                sql = "delete from  Rental_Service  where rs_id=%s"
+                values = (rental.rs_id)
+                cursor.execute(sql, values)
+                cursor.close()
+            conn.commit()
+            conn.close()
+            return rental
         except Exception as e:
             print('str(Exception):\t', str(Exception))
             print('str(e):\t\t', str(e))

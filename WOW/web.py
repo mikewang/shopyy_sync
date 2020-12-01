@@ -32,7 +32,11 @@ def customer():
 
 @app.route('/rentalservice', methods=['GET'])
 def rental():
-    return render_template('rental.html')
+    rs_id = request.args.get('id')
+    print("request parameter id is ", rs_id)
+    if rs_id is None:
+        rs_id = 0
+    return render_template('rental.html', rs_id=rs_id)
 
 
 api.add_resource(UserResource, '/user', '/user/<string:username>')
