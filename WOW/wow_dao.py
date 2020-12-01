@@ -334,10 +334,14 @@ class WowDao(object):
             rental = p_rental
             conn = self.conn_mysql()
             with conn.cursor() as cursor:
-                sql = "insert into Rental_Service(pickup_location,dropoff_location,pickup_date,CUST_ID) " \
-                      "values(%s,%s,str_to_date(%s,\'%%Y-%%m-%%d\'), %s)"
+                sql = "insert into Rental_Service(pickup_location,dropoff_location,pickup_date,Dropoff_Date, " \
+                      "Start_Odometer, Daily_Odometer_Limit," \
+                      " V_ID, rental_rate, rental_fee, rental_amount, really_amount, CUST_ID, user_id) " \
+                      "values(%s,%s,str_to_date(%s,\'%%Y-%%m-%%d\'),str_to_date(%s,\'%%Y-%%m-%%d\'), %s,%s,%s,%s,%s,%s,%s,%s,%s)"
                 print("sql is ", sql)
-                values = (rental.Pickup_Location, rental.Dropoff_Location, rental.Pickup_Date, rental.Cust_ID)
+                values = (rental.Pickup_Location, rental.Dropoff_Location, rental.Pickup_Date, rental.Dropoff_Date,
+                          rental.Start_Odometer, rental.Daily_Odometer_Limit, rental.Vehicle_ID, rental.rental_rate, rental.rental_fee,
+                          rental.really_amount, rental.really_amount, rental.Cust_ID, rental.wow_userid)
                 cursor.execute(sql, values)
                 rental.rs_id = cursor.lastrowid
                 cursor.close()
@@ -365,8 +369,13 @@ class WowDao(object):
             print("update rental service is ", rental)
             with conn.cursor() as cursor:
                 sql = "update Rental_Service set pickup_location = %s, dropoff_location = %s, " \
-                      "pickup_date = str_to_date(%s,'%%Y-%%m-%%d') where rs_id=%s"
-                values = (rental.Pickup_Location, rental.Dropoff_Location, rental.Pickup_Date,rental.rs_id)
+                      "pickup_date = str_to_date(%s,'%%Y-%%m-%%d'), Dropoff_Date = str_to_date(%s,'%%Y-%%m-%%d')," \
+                      "Start_Odometer = %s,Daily_Odometer_Limit = %s,V_ID = %s,rental_rate = %s, " \
+                      "rental_fee = %s,rental_amount = %s,really_amount = %s,user_id = %s" \
+                      " where rs_id=%s"
+                values = (rental.Pickup_Location, rental.Dropoff_Location, rental.Pickup_Date,rental.Dropoff_Date,
+                          rental.Start_Odometer, rental.Daily_Odometer_Limit, rental.Vehicle_ID, rental.rental_rate,
+                          rental.rental_fee,rental.really_amount, rental.really_amount,  rental.wow_userid,rental.rs_id)
                 cursor.execute(sql, values)
                 cursor.close()
             conn.commit()

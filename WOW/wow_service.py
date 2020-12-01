@@ -39,7 +39,7 @@ class WowService(object):
             userprofile = dao.select_user_profile(userinfo.UserID)
             return token, userinfo, userprofile
         else:
-            return "", None
+            return "", None, None
 
     def getUser(self, p_username, p_token, p_timestamp):
         token, userinfo, userprofile = self.getToken(p_username, p_timestamp)
@@ -124,15 +124,6 @@ class WowService(object):
         else:
             return None
 
-    def getAdminRentalService(self, p_username, p_token, p_timestamp, p_rs_id, p_cust_id):
-        token, userinfo, temp_userpfile = self.getToken(p_username, p_timestamp)
-        if token == p_token:
-            dao = WowDao()
-            rs_list = dao.select_rental_service(p_rs_id, p_cust_id)
-            return rs_list
-        else:
-            return None
-
     def mergeRentalService(self, p_username, p_token, p_timestamp, args):
         token, userinfo, temp_userpfile = self.getToken(p_username, p_timestamp)
         if token == p_token:
@@ -142,7 +133,7 @@ class WowService(object):
                 rs_list = dao.select_rental_service(rs_id, None)
                 if len(rs_list) > 0:
                     rs = rs_list[0]
-                    if rs.Cust_ID != temp_userpfile.CustID:
+                    if rs.Cust_ID != temp_userpfile.CustID and userinfo.UserType != 'admin':
                         rs = None
                     else:
                         # update
@@ -151,6 +142,17 @@ class WowService(object):
                         rental.Pickup_Location = args["Pickup_Location"]
                         rental.Dropoff_Location = args["Dropoff_Location"]
                         rental.Pickup_Date = args["Pickup_Date"]
+                        rental.Dropoff_Date = args["Dropoff_Date"]
+                        rental.Start_Odometer = args["Start_Odometer"]
+                        rental.Daily_Odometer_Limit = args["Daily_Odometer_Limit"]
+                        rental.Vehicle_ID = args["Vehicle_ID"]
+                        rental.rental_rate = args["rental_rate"]
+                        rental.rental_fee = args["rental_fee"]
+                        rental.rental_amount = args["rental_amount"]
+                        rental.really_amount = args["really_amount"]
+                        # rental.Cust_ID = args["Cust_ID"]
+                        rental.wow_userid = args["wow_userid"]
+
                         # other fields
                         rental.Cust_ID = rs.Cust_ID
                         rs = dao.update_rental_service(rental)
@@ -160,6 +162,16 @@ class WowService(object):
                     rental.Pickup_Location = args["Pickup_Location"]
                     rental.Dropoff_Location = args["Dropoff_Location"]
                     rental.Pickup_Date = args["Pickup_Date"]
+                    rental.Dropoff_Date = args["Dropoff_Date"]
+                    rental.Start_Odometer = args["Start_Odometer"]
+                    rental.Daily_Odometer_Limit = args["Daily_Odometer_Limit"]
+                    rental.Vehicle_ID = args["Vehicle_ID"]
+                    rental.rental_rate = args["rental_rate"]
+                    rental.rental_fee = args["rental_fee"]
+                    rental.rental_amount = args["rental_amount"]
+                    rental.really_amount = args["really_amount"]
+                    # rental.Cust_ID = args["Cust_ID"]
+                    rental.wow_userid = args["wow_userid"]
                     # other fields
                     rental.Cust_ID = temp_userpfile.CustID
                     rs = dao.insert_rental_service(rental)

@@ -114,11 +114,24 @@
                               var ll = rs_list.length;
                               if (ll > 0) {
                                 rental = rs_list[0];
+                                Object.entries(rental).forEach(([key, value]) =>{
+                                        console.log(`${key}: ${value}`);
+                                    });
                                 $("#rs_id").val(rental["rs_id"]);
                                 $("#saveRentalButton").text("Save Rental Service");
                                 $("#Pickup_Location").val(rental["Pickup_Location"]);
                                 $("#Dropoff_Location").val(rental["Dropoff_Location"]);
                                 $("#Pickup_Date").val(rental["Pickup_Date"]);
+                                $("#Dropoff_Date").val(rental["Dropoff_Date"]);
+                                $("#Start_Odometer").val(rental["Start_Odometer"]);
+                                $("#Daily_Odometer_Limit").val(rental["Daily_Odometer_Limit"]);
+                                $("#Vehicle_Info").val(rental["Vehicle_ID"]);
+                                $("#rental_rate").val(rental["rental_rate"]);
+                                $("#rental_fee").val(rental["rental_fee"]);
+                                $("#rental_amount").val(rental["rental_amount"]);
+                                $("#really_amount").val(rental["really_amount"]);
+                                $("#Cust_ID").val(rental["Cust_ID"]);
+                                $("#wow_userid").val(rental["wow_userid"]);
                               }
                               else {
                                $("#rs_id").val(0);
@@ -156,7 +169,18 @@ $("#saveRentalButton").click(function() {
         "Pickup_Location": $("#Pickup_Location").val(),
         "Dropoff_Location": $("#Dropoff_Location").val(),
         "Pickup_Date": $("#Pickup_Date").val(),
+     "Dropoff_Date": $("#Dropoff_Date").val(),
+     "Start_Odometer": $("#Start_Odometer").val(),
+     "Daily_Odometer_Limit": $("#Daily_Odometer_Limit").val(),
+     "Vehicle_ID": $("#Vehicle_Info").val(),
+     "rental_rate": $("#rental_rate").val(),
+     "rental_fee": $("#rental_fee").val(),
+     "rental_amount": $("#rental_amount").val(),
+     "really_amount": $("#really_amount").val(),
+     "Cust_ID": $("#Cust_ID").val(),
+     "wow_userid": $("#wow_userid").val(),
     };
+    console.log("data is ", data);
 
     $.ajax({
         type: "POST",

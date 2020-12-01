@@ -224,6 +224,16 @@ class RentalResource(Resource):
             parser.add_argument('Pickup_Location', location=['json', 'form'])
             parser.add_argument('Dropoff_Location', location=['json', 'form'])
             parser.add_argument('Pickup_Date', location=['json', 'form'])
+            parser.add_argument('Dropoff_Date', location=['json', 'form'])
+            parser.add_argument('Start_Odometer', location=['json', 'form'])
+            parser.add_argument('Daily_Odometer_Limit', location=['json', 'form'])
+            parser.add_argument('Vehicle_ID', location=['json', 'form'])
+            parser.add_argument('rental_rate', location=['json', 'form'])
+            parser.add_argument('rental_fee', location=['json', 'form'])
+            parser.add_argument('rental_amount', location=['json', 'form'])
+            parser.add_argument('really_amount', location=['json', 'form'])
+            parser.add_argument('Cust_ID', location=['json', 'form'])
+            parser.add_argument('wow_userid', location=['json', 'form'])
 
             # 分析请求
             args = parser.parse_args()
