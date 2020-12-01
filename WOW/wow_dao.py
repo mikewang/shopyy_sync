@@ -265,7 +265,6 @@ class WowDao(object):
             print('#' * 60)
             return None
 
-
     def select_rental_service(self, p_rs_id, p_cust_id ):
         try:
             rental_list = []
@@ -278,7 +277,6 @@ class WowDao(object):
                       "start_odometer, end_odometer, daily_odometer_limit, rental_rate , rental_fee," \
                       " rental_amount, really_amount, v_id , cust_id, dc_id, ro_id, user_id   " \
                       " FROM Rental_Service where rs_id=%s"
-
                 cursor.execute(sql, p_rs_id)
             elif p_cust_id is not None:
                 sql = "SELECT rs_id, pickup_location, dropoff_location , " \
@@ -290,8 +288,8 @@ class WowDao(object):
                 cursor.execute(sql, p_cust_id)
             else:
                 sql = "SELECT rs_id, pickup_location, dropoff_location , " \
-                      "DATE_FORMAT(pickup_date,'%%Y-%%m-%%d') as pickup_date, " \
-                      "DATE_FORMAT(dropoff_date,'%%Y-%%m-%%d') as dropoff_date, " \
+                      "DATE_FORMAT(pickup_date,'%Y-%m-%d') as pickup_date, " \
+                      "DATE_FORMAT(dropoff_date,'%Y-%m-%d') as dropoff_date, " \
                       "start_odometer, end_odometer, daily_odometer_limit, rental_rate , rental_fee," \
                       " rental_amount, really_amount, v_id , cust_id, dc_id, ro_id, user_id   " \
                       " FROM Rental_Service"

@@ -178,16 +178,17 @@ class RentalResource(Resource):
             parser.add_argument('token', location='headers')
             parser.add_argument('timestamp', location='headers')
             parser.add_argument("rs_id", location=['json', 'args'])
-
+            parser.add_argument("cust_id", location=['json', 'args'])
             # 分析请求
             args = parser.parse_args()
             token = args["token"]
             timestamp = args["timestamp"]
             rs_id = args["rs_id"]
+            cust_id = args["cust_id"]
 
             print(self, args)
 
-            rs_list = WowService().getRentalService(username, token, timestamp, rs_id)
+            rs_list = WowService().getRentalService(username, token, timestamp, rs_id, cust_id)
             if rs_list is not None:
                 rss = []
                 for rs in rs_list:

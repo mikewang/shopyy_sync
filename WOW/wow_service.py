@@ -107,16 +107,19 @@ class WowService(object):
         else:
             return None
 
-    def getRentalService(self, p_username, p_token, p_timestamp, p_rs_id):
+    def getRentalService(self, p_username, p_token, p_timestamp, p_rs_id, p_cust_id):
         token, userinfo, temp_userpfile = self.getToken(p_username, p_timestamp)
         if token == p_token:
             rs_list = []
             dao = WowDao()
-            if temp_userpfile is not None:
-                temp_cust_id = temp_userpfile.CustID
-                rs_list = dao.select_rental_service(p_rs_id, temp_cust_id)
+            if userinfo.UserType == "admin":
+                rs_list = dao.select_rental_service(p_rs_id, p_cust_id)
             else:
-                rs_list = None
+                if temp_userpfile is not None:
+                    temp_cust_id = temp_userpfile.CustID
+                    rs_list = dao.select_rental_service(p_rs_id, temp_cust_id)
+                else:
+                    rs_list = None
             return rs_list
         else:
             return None
