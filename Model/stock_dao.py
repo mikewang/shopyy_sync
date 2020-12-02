@@ -153,7 +153,7 @@ class StockDao(object):
             filter_enquriy = filter_stock["enquiry"]
             if filter_enquriy is not None:
                 if filter_enquriy == '未询价':
-                    v_sql = v_sql + " and  coalesce(h.id,0) == 0 "
+                    v_sql = v_sql + " and  coalesce(h.id,0) = 0 "
                 elif filter_enquriy == '已询价':
                     v_sql = v_sql + " and  coalesce(h.id,0) > 0 "
             filter_begin = filter_stock["begin"]
@@ -274,7 +274,7 @@ class StockDao(object):
                 v_sql = v_sql + " and b.[其它.商品品牌] in (" + filter_sql + ")"
             filter_enquriy = filter_stock["enquiry"]
             if filter_enquriy == '未询价':
-                v_sql = v_sql + " and  coalesce(h.id,0) == 0 "
+                v_sql = v_sql + " and  coalesce(h.id,0) = 0 "
             elif filter_enquriy == '已询价':
                 v_sql = v_sql + " and  coalesce(h.id,0) > 0 "
             filter_begin = filter_stock["begin"]
@@ -363,6 +363,8 @@ class StockDao(object):
                       " values(?,?,?,?,?,?,?,0)"
                 print("insert Stock_Product_Order_App sql is ", sql)
                 cursor.execute(sql, stockProductID, opCode, purchaseNum, purchasePrice, orderStat, supplier, settlement)
+                myTableId = cursor.fetchone()[0]
+                print("Stock_Product_Order_App id is ", myTableId)
                 cursor.commit()
             cursor.close
             cnxn.close
