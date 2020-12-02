@@ -35,6 +35,7 @@ class ProductInfo(object):
         self.permittedNum = 0
         self.shouldPrice = 0.0
         self.brand = ''
+        self.priceEnquiredID = 0
         self.orderNum = 0
         self.orderPrice = 0.0
         # settlement = 1， 确认订货成功，并没有现实收货，0，默认值，未确认订货成功。
@@ -42,12 +43,13 @@ class ProductInfo(object):
         self.orderOpCode = ''
         self.orderProductID = 0
 
+
     def desc(self):
         product_dict = self.__dict__
         product_dict["shouldPrice"] = str(self.shouldPrice)
         product_dict["orderPrice"] = str(self.orderPrice)
         # product_dict["CreateDate"] = self.CreateDate.strftime('%Y-%m-%d %H:%M:%S')
-        print("product is ", self.StockProductID, self.ProductID, self.GoodsCDesc)
+        print("product is ", self.StockProductID, self.ProductID, "price enquried is ", self.priceEnquiredID, self.GoodsCDesc, self.permittedNum,self.orderNum,self.shouldPrice,self.orderPrice)
         return product_dict
 
 
