@@ -127,9 +127,20 @@ class StockDao(object):
             topN = " top " + str(page_no*10)
             # 采购人	StockProductID	ProductID	SignDate	GoodsCode	SpecNo	GoodsSpec	GoodsUnit	_ImageID	ImageGuid	ImageFmt	ModuleID	FileDate	ThumbImage	其它.供应商名称	其它.允采购量	其它.应采购价	其它.商品品牌
             # 数据源
-            v_sql ="select " + topN + " e.[采购人], a.StockProductID,a.ProductID,CONVERT(varchar, d.SignDate, 120 ) as SignDate,a.GoodsCode,a.SpecNo,f.GoodsCDesc, a.GoodsUnit, b._ImageID,c.ImageGuid,c.ImageFmt,c.ModuleID,CONVERT(varchar, c.FileDate, 120 ) as FileDate,c.ThumbImage,b.[其它.供应商名称],b.[其它.允采购量],b.[其它.应采购价],b.[其它.商品品牌], coalesce(g.ordernum,0) as ordernum    " \
-                                      "FROM [csidbo].[Stock_Product_Info] as a join  csidbo.FTPart_Stock_Product_Property_1 as b on a.StockProductID=b.MainID join csidbo.Product_Image as c on b._ImageID=c.ProductImageID join csidbo.stock_info d on d.ID=a.StockID join csidbo.[FTPart_Stock_Property_1] e on e.[MainID] = d.ID left join csidbo.[Stock_Product_Info_Desc] f on a.StockProductID=f.StockProductID " \
-                                      "left join (select [StockProductID], sum([OrderNum]*[OrderStat]) as ordernum from [csidbo].[Stock_Product_Order_App] group by [StockProductID]) g on a.StockProductID=g.StockProductID  "
+            v_sql = "select " + topN + " "
+            v_sql = v_sql + "e.[采购人], a.StockProductID,a.ProductID,CONVERT(varchar, d.SignDate, 120 ) as SignDate," \
+                            "a.GoodsCode,a.SpecNo,f.GoodsCDesc, a.GoodsUnit, b._ImageID,c.ImageGuid,c.ImageFmt," \
+                            "c.ModuleID,CONVERT(varchar, c.FileDate, 120 ) as FileDate,c.ThumbImage,b.[其它.供应商名称]," \
+                            "b.[其它.允采购量],b.[其它.应采购价],b.[其它.商品品牌], " \
+                            "coalesce(g.ordernum,0) as ordernum, coalesce(h.id,0) as priceEnquiredID  " \
+                            "FROM [csidbo].[Stock_Product_Info] as a " \
+                            "join  csidbo.FTPart_Stock_Product_Property_1 as b on a.StockProductID=b.MainID " \
+                            "join csidbo.Product_Image as c on b._ImageID=c.ProductImageID " \
+                            "join csidbo.stock_info d on d.ID=a.StockID " \
+                            "join csidbo.[FTPart_Stock_Property_1] e on e.[MainID] = d.ID " \
+                            "left join csidbo.[Stock_Product_Info_Desc] f on a.StockProductID=f.StockProductID " \
+                            "left join (select [StockProductID], sum([OrderNum]*[OrderStat]) as ordernum from [csidbo].[Stock_Product_Order_App] group by [StockProductID]) g on a.StockProductID=g.StockProductID  " \
+                            "left join (select max(id) as id, StockProductID from csidbo.[Stock_Product_EnquiryPrice_App]) h on  a.StockProductID=h.StockProductID "
             v_sql = v_sql + "  where b.[其它.允采购量] > coalesce(g.ordernum,0) "
 
             filter_brand = filter_stock["brand"]
@@ -142,9 +153,9 @@ class StockDao(object):
             filter_enquriy = filter_stock["enquiry"]
             if filter_enquriy is not None:
                 if filter_enquriy == '未询价':
-                    v_sql = v_sql + " and a.StockProductID not in (select distinct StockProductID from csidbo.[Stock_Product_EnquiryPrice_App]) "
-                else:
-                    v_sql = v_sql + " and a.StockProductID in (select distinct StockProductID from csidbo.[Stock_Product_EnquiryPrice_App]) "
+                    v_sql = v_sql + " and  coalesce(h.id,0) == 0 "
+                elif filter_enquriy == '已询价':
+                    v_sql = v_sql + " and  coalesce(h.id,0) > 0 "
             filter_begin = filter_stock["begin"]
             if filter_begin is not None:
                 v_sql = v_sql + " and d.SignDate >= '" + filter_begin + "'"
@@ -179,6 +190,7 @@ class StockDao(object):
                 product.shouldPrice = row[16]
                 product.brand = row[17]
                 product.orderNum = row[18]
+                product.priceEnquiredID = row[19]
                 product_list.append(product)
             cursor.close()
             cnxn.close()
@@ -205,8 +217,8 @@ class StockDao(object):
             topN = " top " + str(page_no * 10)
             # 采购人	StockProductID	ProductID	SignDate	GoodsCode	SpecNo	GoodsSpec	GoodsUnit	_ImageID	ImageGuid	ImageFmt	ModuleID	FileDate	ThumbImage	其它.供应商名称	其它.允采购量	其它.应采购价	其它.商品品牌
             # 数据源
-            v_sql = "select " + topN
-            v_sql = v_sql + " e.[采购人], a.StockProductID,a.ProductID,CONVERT(varchar, g.CreateTime, 120 ) as CreateTime," \
+            v_sql = "select " + topN + " "
+            v_sql = v_sql + "e.[采购人], a.StockProductID,a.ProductID,CONVERT(varchar, g.CreateTime, 120 ) as CreateTime," \
                             "a.GoodsCode,a.SpecNo,f.GoodsCDesc, a.GoodsUnit, b._ImageID,c.ImageGuid,c.ImageFmt," \
                             "c.ModuleID,CONVERT(varchar, c.FileDate, 120 ) as FileDate,c.ThumbImage,g.supplier as supplier," \
                             "b.[其它.允采购量],b.[其它.应采购价],b.[其它.商品品牌],coalesce(g.[OrderNum]*g.[OrderStat],0) as ordernum," \
