@@ -4,6 +4,7 @@ import sys
 import datetime
 from flask_restful import reqparse, Resource
 from Service.stock_service import StockService
+import json
 
 
 class UserResource(Resource):
@@ -24,7 +25,7 @@ class UserResource(Resource):
                 result["data"] = user_info
             else:
                 result = {"code": 201, "msg": "用户不存在或者密码错"}
-            return result, result["code"]
+            return json.dumps(result), result["code"]
         except Exception as e:
             print('str(Exception):\t', str(Exception))
             print('str(e):\t\t', str(e))
@@ -45,6 +46,5 @@ class UserResource(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('token')
         args = parser.parse_args()
-        print("request paramter:", args)
-        result = args
-        return args
+        print("request parameter:", args)
+        return None

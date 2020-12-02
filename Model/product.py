@@ -38,6 +38,8 @@ class ProductInfo(object):
         self.priceEnquiredID = 0
         self.orderNum = 0
         self.orderPrice = 0.0
+        # orderStat = 1 ，订货，-1 退货。和ordernum 组合使用，决定允许采购量
+        self.orderStat = 1
         # settlement = 1， 确认订货成功，并没有现实收货，0，默认值，未确认订货成功。
         self.settlement = 0
         self.orderOpCode = ''

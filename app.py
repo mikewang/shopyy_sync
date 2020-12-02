@@ -16,6 +16,7 @@ api = Api(app)
 def index():
     return "Hello API."
 
+
 api.add_resource(UserResource, '/User', '/User/<string:OpCode>')
 api.add_resource(ProductResource, '/Product', '/Product/<int:pageNo>')
 api.add_resource(ImageResource, '/Image', '/Image/<string:guid>')
@@ -24,14 +25,14 @@ api.add_resource(EnquiryResource, '/Enquiry')
 api.add_resource(OrderResource, '/Order', '/Order/<int:pageNo>')
 
 
-
 @api.representation('text/html')  # 当要返回的数据类型是这里定义的content-type的时候，会执行这里的函数
 def output_html(data, code, headers):
     """ 在representation装饰的函数中，必须放回一个Response对象 """
     resp = Response(data)
     return resp
 
-#http://127.0.0.1:8997/Product/1?token=014987a60ada732c43262e4fa6d0a119&timestamp=1604754897&OpCode=delong
+
+# http://127.0.0.1:8997/Product/1?token=014987a60ada732c43262e4fa6d0a119&timestamp=1604754897&OpCode=delong
 
 if __name__ == '__main__':
     # prod = ProductInfo()

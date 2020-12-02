@@ -391,15 +391,14 @@ class StockDao(object):
                 print("order product is ", prod["id"], prod["stockProductID"], prod)
                 id = prod["id"]
                 stockProductID = prod["stockProductID"]
+                opCode = prod["opCode"]
                 if operate_type == "cancel":
                     sql = "update Stock_Product_Order_App " \
-                          "set  orderStat=-1 " \
+                          "set  orderStat=-1 , opCode = ?" \
                           "where id = ? and stockProductID = ? and orderStat != -1"
                     print("update Stock_Product_Order_App sql is ", sql)
-                    cursor.execute(sql, id, stockProductID)
+                    cursor.execute(sql, opCode, id, stockProductID)
                 elif operate_type == "complete":
-                    # 订货人 工号
-                    opCode = prod["opCode"]
                     purchaseNum = prod["purchaseNum"]
                     purchasePrice = prod["purchasePrice"]
                     # 订货 或者 退货
@@ -407,10 +406,10 @@ class StockDao(object):
                     supplier = prod["supplier"]
                     settlement = prod["settlement"]
                     sql = "update Stock_Product_Order_App " \
-                          "set opCode = ?, OrderNum = ? , OrderPrice=?, orderStat=?, supplier=? , settlement=1 " \
+                          "set opCode = ?, OrderNum = ? , OrderPrice=?, supplier=? , settlement=1 " \
                           "where id = ? and stockProductID = ? and settlement <> 1 "
                     print("update Stock_Product_Order_App sql is ", sql)
-                    cursor.execute(sql, opCode, purchaseNum, purchasePrice, orderStat, supplier, settlement, id, stockProductID)
+                    cursor.execute(sql, opCode, purchaseNum, purchasePrice, supplier, settlement, id, stockProductID)
                 cursor.commit()
             cursor.close
             cnxn.close
