@@ -7,7 +7,7 @@ from io import BytesIO
 from PIL import Image, ImageDraw
 from flask import send_file
 from flask_restful import reqparse, Resource
-from Service.user_service import UserService
+from Service.stock_service import StockService
 
 
 class ImageResource(Resource):
@@ -31,7 +31,7 @@ class ImageResource(Resource):
             month = args["month"]
             module = args["module"]
             print(args)
-            user_service = UserService()
+            user_service = StockService()
             filepath = os.path.normpath(os.path.join("D:\ymcartphotos", "2019", "01", "501", "201901084598491BB92E63A2B183F04758DF4278"))
             filepath = user_service.getProductImage(OpCode, timestamp, token, guid, year, month, module)
             try:

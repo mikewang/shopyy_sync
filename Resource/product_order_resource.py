@@ -4,7 +4,7 @@ import sys
 import datetime
 import json
 from flask_restful import reqparse, Resource
-from Service.user_service import UserService
+from Service.stock_service import StockService
 from Model.product import ProductInfo
 from Model.product import DecimalEncoder
 import base64
@@ -26,14 +26,14 @@ class ProductOrderResource(Resource):
             parser.add_argument('prod_list', location='json')
             # 分析请求
             args = parser.parse_args()
-            print("reqparse args is ", args)
+            print("ProductOrderResource post args is ", args)
             OpCode = args["OpCode"]
             token = args["token"]
             timestamp = args["timestamp"]
             prod_list_json_base64 = args["prod_list"]
             prod_list_json_base64 = base64Replace(prod_list_json_base64)
             prod_list_json = base64.b64decode(prod_list_json_base64).decode('utf-8')
-            user_service = UserService()
+            user_service = StockService()
             print("prod list json data is ", prod_list_json)
             result = {"code": 201, "msg": ""}
             prod_dict_list = json.loads(prod_list_json)
@@ -129,7 +129,7 @@ class ProductOrderResource(Resource):
             else:
                 filter_stock['supplier'] = None
             print("filter_stock is ", filter_stock)
-            user_service = UserService()
+            user_service = StockService()
             prod_list = user_service.getStockProductOrder(OpCode, timestamp, token, pageNo, filter_stock)
             result = {"code": 200, "msg": ""}
             if prod_list is not None:

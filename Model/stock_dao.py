@@ -10,10 +10,10 @@ from Model.user import UserInfo
 from Model.product import ProductInfo, ProductEnquiryPrice
 
 
-class UserDao(object):
+class StockDao(object):
 
     def __init__(self):
-        super(UserDao, self).__init__()
+        super(StockDao, self).__init__()
         try:
             config = configparser.ConfigParser()
             configure_file = 'OrderApi.ini'
@@ -205,9 +205,19 @@ class UserDao(object):
             topN = " top " + str(page_no * 10)
             # 采购人	StockProductID	ProductID	SignDate	GoodsCode	SpecNo	GoodsSpec	GoodsUnit	_ImageID	ImageGuid	ImageFmt	ModuleID	FileDate	ThumbImage	其它.供应商名称	其它.允采购量	其它.应采购价	其它.商品品牌
             # 数据源
-            v_sql = "select " + topN + " e.[采购人], a.StockProductID,a.ProductID,CONVERT(varchar, g.CreateTime, 120 ) as CreateTime,a.GoodsCode,a.SpecNo,f.GoodsCDesc, a.GoodsUnit, b._ImageID,c.ImageGuid,c.ImageFmt,c.ModuleID,CONVERT(varchar, c.FileDate, 120 ) as FileDate,c.ThumbImage,g.supplier as supplier,b.[其它.允采购量],b.[其它.应采购价],b.[其它.商品品牌], coalesce(g.[OrderNum]*g.[OrderStat],0) as ordernum , g.orderprice    " \
-                                       "FROM [csidbo].[Stock_Product_Info] as a join  csidbo.FTPart_Stock_Product_Property_1 as b on a.StockProductID=b.MainID join csidbo.Product_Image as c on b._ImageID=c.ProductImageID join csidbo.stock_info d on d.ID=a.StockID join csidbo.[FTPart_Stock_Property_1] e on e.[MainID] = d.ID left join csidbo.[Stock_Product_Info_Desc] f on a.StockProductID=f.StockProductID " \
-                                       " join [csidbo].[Stock_Product_Order_App] as g on a.StockProductID=g.StockProductID  "
+            v_sql = "select " + topN
+            v_sql = v_sql + " e.[采购人], a.StockProductID,a.ProductID,CONVERT(varchar, g.CreateTime, 120 ) as CreateTime," \
+                            "a.GoodsCode,a.SpecNo,f.GoodsCDesc, a.GoodsUnit, b._ImageID,c.ImageGuid,c.ImageFmt," \
+                            "c.ModuleID,CONVERT(varchar, c.FileDate, 120 ) as FileDate,c.ThumbImage,g.supplier as supplier," \
+                            "b.[其它.允采购量],b.[其它.应采购价],b.[其它.商品品牌],coalesce(g.[OrderNum]*g.[OrderStat],0) as ordernum," \
+                            "g.orderprice, g.settlement,g.opcode as order_opcode, g.id as product_order_id " \
+                            "FROM [csidbo].[Stock_Product_Info] as a " \
+                            "join  csidbo.FTPart_Stock_Product_Property_1 as b on a.StockProductID=b.MainID " \
+                            "join csidbo.Product_Image as c on b._ImageID=c.ProductImageID " \
+                            "join csidbo.stock_info d on d.ID=a.StockID " \
+                            "join csidbo.[FTPart_Stock_Property_1] e on e.[MainID] = d.ID " \
+                            "left join csidbo.[Stock_Product_Info_Desc] f on a.StockProductID=f.StockProductID " \
+                            "join [csidbo].[Stock_Product_Order_App] as g on a.StockProductID=g.StockProductID  "
             v_sql = v_sql + "  where 1=1  "
 
             filter_brand = filter_stock["brand"]
@@ -236,8 +246,8 @@ class UserDao(object):
                     filter_sql = filter_sql + "'" + b + "',"
                 filter_sql = filter_sql.rstrip(',')
                 v_sql = v_sql + " and g.supplier in (" + filter_sql + ")"
-            v_sql = v_sql + " order by g.CreateTime desc,a.stockproductid desc"
-            sql = "select  top 10 * from (" + v_sql + " ) as v1 order by v1.CreateTime asc,v1.StockProductID asc"
+            v_sql = v_sql + " order by g.CreateTime desc,a.stockproductid desc, g.id desc"
+            sql = "select  top 10 * from (" + v_sql + " ) as v1 order by v1.CreateTime asc,v1.StockProductID asc, v1.product_order_id asc"
             print("sql is ", sql)
             cursor.execute(sql)
             for row in cursor:
@@ -265,6 +275,10 @@ class UserDao(object):
                 product.brand = row[17]
                 product.orderNum = row[18]
                 product.orderPrice = row[19]
+                # settlement = 1， 确认订货成功，并没有现实收货，0，默认值，未确认订货成功。
+                product.settlement = row[20]
+                product.orderOpCode = row[21]
+                product.orderProductID = row[22]
 
                 product_list.append(product)
             cursor.close()
@@ -326,8 +340,46 @@ class UserDao(object):
                 orderStat = prod["orderStat"]
                 supplier = prod["supplier"]
 
-                sql = "insert into Stock_Product_Order_App(stockProductID,opCode, OrderNum, OrderPrice,orderStat,supplier) values(?,?,?,?,?,?)"
-                print("insert Stock_Product_Order_App ", sql)
+                sql = "insert into Stock_Product_Order_App(stockProductID,opCode, OrderNum, OrderPrice,orderStat," \
+                      "supplier, settlement) " \
+                      " values(?,?,?,?,?,?,?,0)"
+                print("insert Stock_Product_Order_App sql is ", sql)
+                cursor.execute(sql, stockProductID, opCode, purchaseNum, purchasePrice, orderStat, supplier)
+                cursor.commit()
+            cursor.close
+            cnxn.close
+            return "1"
+        except Exception as e:
+            print('str(Exception):\t', str(Exception))
+            print('str(e):\t\t', str(e))
+            print('repr(e):\t', repr(e))
+            # Get information about the exception that is currently being handled
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            print('e.message:\t', exc_value)
+            print("Note, object e and exc of Class %s is %s the same." %
+                  (type(exc_value), ('not', '')[exc_value is e]))
+            print('traceback.print_exc(): ', traceback.print_exc())
+            print('traceback.format_exc():\n%s' % traceback.format_exc())
+            print('#' * 60)
+            return None
+
+    def merge_stock_product_order(self, prod_dict_list):
+        try:
+            cnxn = pyodbc.connect(self._conn_str)
+            cursor = cnxn.cursor()
+            for prod in prod_dict_list:
+                print("enquiried product is ", prod["stockProductID"], prod)
+                stockProductID = prod["stockProductID"]
+                opCode = prod["opCode"]
+                purchaseNum = prod["purchaseNum"]
+                purchasePrice = prod["purchasePrice"]
+                orderStat = prod["orderStat"]
+                supplier = prod["supplier"]
+
+                sql = "insert into Stock_Product_Order_App(stockProductID,opCode, OrderNum, OrderPrice,orderStat," \
+                      "supplier, settlement) " \
+                      " values(?,?,?,?,?,?,?,0)"
+                print("insert Stock_Product_Order_App sql is ", sql)
                 cursor.execute(sql, stockProductID, opCode, purchaseNum, purchasePrice, orderStat, supplier)
                 cursor.commit()
             cursor.close

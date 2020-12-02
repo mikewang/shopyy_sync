@@ -3,7 +3,7 @@ import traceback
 import sys
 import datetime
 from flask_restful import reqparse, Resource
-from Service.user_service import UserService
+from Service.stock_service import StockService
 
 
 class UserResource(Resource):
@@ -17,8 +17,8 @@ class UserResource(Resource):
             print("request paramter:", args, OpCode)
             token = args["token"]
             timestamp = args["timestamp"]
-            user_service = UserService()
-            user_info = user_service.login(OpCode, timestamp, token)
+            stock_service = StockService()
+            user_info = stock_service.login(OpCode, timestamp, token)
             result = {"code": 200, "msg": ""}
             if user_info is not None:
                 result["data"] = user_info

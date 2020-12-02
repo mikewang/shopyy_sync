@@ -4,7 +4,7 @@ import sys
 import datetime
 import json
 from flask_restful import reqparse, Resource
-from Service.user_service import UserService
+from Service.stock_service import StockService
 from Model.product import ProductInfo
 from Model.product import DecimalEncoder
 import base64
@@ -36,7 +36,7 @@ class ProductEnquiryResource(Resource):
             prod_list_json_base64 = args["prod_list"]
             prod_list_json_base64 = base64Replace(prod_list_json_base64)
             prod_list_json = base64.b64decode(prod_list_json_base64).decode('utf-8')
-            user_service = UserService()
+            user_service = StockService()
             print("prod list json data is ", prod_list_json)
             result = {"code": 201, "msg": ""}
             # prod_dict_list = prod_list

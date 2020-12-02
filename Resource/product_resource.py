@@ -5,7 +5,7 @@ import datetime
 import base64
 import json
 from flask_restful import reqparse, Resource
-from Service.user_service import UserService
+from Service.stock_service import StockService
 from Model.product import ProductInfo
 from Model.product import DecimalEncoder
 
@@ -73,7 +73,7 @@ class ProductResource(Resource):
             else:
                 filter_stock['end'] = None
             print("filter_stock is ", filter_stock)
-            user_service = UserService()
+            user_service = StockService()
             prod_list = user_service.getStockProduct(OpCode, timestamp, token, pageNo, filter_stock)
             result = {"code": 200, "msg": ""}
             if prod_list is not None:

@@ -3,14 +3,14 @@ import hashlib
 import os
 import base64
 from Model.user import UserInfo
-from Model.user_dao import UserDao
+from Model.stock_dao import StockDao
 
 
-class UserService(UserInfo):
+class StockService(UserInfo):
 
     def __init__(self):
-        super(UserService, self).__init__()
-        self._dao = UserDao()
+        super(StockService, self).__init__()
+        self._dao = StockDao()
         self._loginUser = None
 
     def getDecodeToken(self, OpCode, timestamp, decode_password):

@@ -4,7 +4,7 @@ import sys
 import datetime
 import json
 from flask_restful import reqparse, Resource
-from Service.user_service import UserService
+from Service.stock_service import StockService
 from Model.product import ProductInfo
 from Model.product import DecimalEncoder
 
@@ -31,7 +31,7 @@ class DictResource(Resource):
             OpCode = args["OpCode"]
             token = args["token"]
             timestamp = args["timestamp"]
-            user_service = UserService()
+            user_service = StockService()
             if item_type is None:
                 item_list = user_service.getDictItem(OpCode, timestamp, token, self.item_type)
             else:

@@ -37,6 +37,10 @@ class ProductInfo(object):
         self.brand = ''
         self.orderNum = 0
         self.orderPrice = 0.0
+        # settlement = 1， 确认订货成功，并没有现实收货，0，默认值，未确认订货成功。
+        self.settlement = 0
+        self.orderOpCode = ''
+        self.orderProductID = 0
 
     def desc(self):
         product_dict = self.__dict__
