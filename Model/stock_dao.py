@@ -143,8 +143,6 @@ class StockDao(object):
                             "left join (select max(id) as id, StockProductID from csidbo.[Stock_Product_EnquiryPrice_App] group by StockProductID ) h on  a.StockProductID=h.StockProductID "
             v_sql = v_sql + "  where b.[其它.允采购量] > coalesce(g.ordernum,0) "
 
-            print("select_stock_product_list sql is ", v_sql)
-
             filter_brand = filter_stock["brand"]
             if filter_brand is not None:
                 filter_sql = ''
@@ -165,9 +163,10 @@ class StockDao(object):
             if filter_end is not None:
                 v_sql = v_sql + " and d.SignDate <= '" + filter_end + " 23:59:59'"
             v_sql = v_sql + " order by d.signdate desc,a.stockproductid desc"
-            sql = "select  top 10 * from (" + v_sql + " ) as v1 order by v1.SignDate asc,v1.StockProductID asc"
-            print("sql is ", sql)
-            cursor.execute(sql)
+            v_sql = "select  top 10 * from (" + v_sql + " ) as v1 order by v1.SignDate asc,v1.StockProductID asc"
+
+            print("select_stock_product_list sql is ", v_sql)
+            cursor.execute(v_sql)
             for row in cursor:
                 product = ProductInfo()
                 product.OpCode = row[0]
