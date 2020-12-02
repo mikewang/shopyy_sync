@@ -75,7 +75,7 @@ class ProductEnquiryPrice(object):
         product_dict = self.__dict__
         #product_dict["shouldPrice"] = str(self.shouldPrice)
         # product_dict["CreateDate"] = self.CreateDate.strftime('%Y-%m-%d %H:%M:%S')
-        print(product_dict)
+        # print(product_dict)
         return product_dict
 
 

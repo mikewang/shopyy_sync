@@ -79,8 +79,6 @@ class ProductResource(Resource):
             if prod_list is not None:
                 json_list = []
                 for prod in prod_list:
-                    print(prod.__dict__)
-                    # prod_json = json.dumps(prod.desc())
                     json_list.append(prod.desc())
                 result["data"] = json_list
             else:
@@ -100,7 +98,7 @@ class ProductResource(Resource):
             print('#' * 60)
         finally:
             time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            print("get product.py", OpCode, time_str)
+            print("ProductResource get stock product ", OpCode, time_str)
 
     def post(self):
         parser = reqparse.RequestParser()

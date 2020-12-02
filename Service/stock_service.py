@@ -54,7 +54,7 @@ class StockService(UserInfo):
                     # bytes = io.BytesIO(ThumbImage)
                     # wrapper = io.TextIOWrapper(ThumbImage, encoding="utf-8")
                     product_image["imageBase64"] = base64_image
-                    print("imageBase64", base64_image)
+                    # print("imageBase64", base64_image)
                     product_image["ThumbImage"] = None
                 else:
                     print("Error token:", "get image", GoodsCode)
