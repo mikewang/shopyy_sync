@@ -4,7 +4,7 @@ block_cipher = None
 
 py_files = ['app.py', 'Model/user.py',
 'Resource/user_resource.py','Resource/product_resource.py',
-'Resource/image_resource.py','Model/user_dao.py','Service/user_service.py']
+'Resource/image_resource.py','Model/stock_dao.py','Service/stock_service.py']
 
 add_files = [('templates\\*.html', 'templates')]
 
