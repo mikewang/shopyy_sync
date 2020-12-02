@@ -143,6 +143,8 @@ class StockDao(object):
                             "left join (select max(id) as id, StockProductID from csidbo.[Stock_Product_EnquiryPrice_App] group by StockProductID ) h on  a.StockProductID=h.StockProductID "
             v_sql = v_sql + "  where b.[其它.允采购量] > coalesce(g.ordernum,0) "
 
+            print("select_stock_product_list sql is ", v_sql)
+
             filter_brand = filter_stock["brand"]
             if filter_brand is not None:
                 filter_sql = ''
