@@ -9,7 +9,7 @@ class UserInfo(object):
 
     def __init__(self):
         super(UserInfo, self).__init__()
-        print("initial class", self)
+        #print("initial class", self)
         self.__setup_user()
 
     def __del__(self):

@@ -83,8 +83,7 @@
                                     currentRow.find("td:eq(4)").html(rental.Dropoff_Date);
                                     currentRow.find("td:eq(5)").html(rental.Start_Odometer);
                                     currentRow.find("td:eq(6)").html(rental.End_Odometer);
-
-                                    currentRow.find("td:eq(7)").html("<a href='/rentalservice?id=" + rental.rs_id + "'>" + rental.Cust_ID + "</a>");
+                                    currentRow.find("td:eq(7)").html("<a href='/rentalservice?id=" + rental.rs_id + "'>" + rental.name + "</a>");
 
                                 }
                             } else {

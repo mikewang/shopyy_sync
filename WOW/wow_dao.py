@@ -6,8 +6,8 @@ import os
 import pyodbc
 import datetime
 import base64
-from WOW.wow_model import UserInfo, UserProfile, RentalService
-from Model.product import ProductInfo, ProductEnquiryPrice
+from wow_model import UserInfo, UserProfile, RentalService
+#from Model.product import ProductInfo, ProductEnquiryPrice
 import pymysql
 
 
@@ -39,6 +39,8 @@ class WowDao(object):
     def conn_mysql(self):
         config = configparser.ConfigParser()
         config_file = os.path.normpath(os.path.join(os.curdir, "wow_config.ini"))
+        print("config file is ", config_file)
+        #config_file = 'D:\\NYU\\2020Fall\\DB\\Yue\\Project\\Project2\\WOW\\wow_config.ini'
         config.read(config_file)
         mysql_host = config.get("mysql_db", "host")
         mysql_user = config.get("mysql_db", "user")
@@ -271,28 +273,13 @@ class WowDao(object):
             conn = self.conn_mysql()
             cursor = conn.cursor()
             if p_rs_id is not None:
-                sql = "SELECT rs_id, pickup_location, dropoff_location , " \
-                      "DATE_FORMAT(pickup_date,'%%Y-%%m-%%d') as pickup_date, " \
-                      "DATE_FORMAT(dropoff_date,'%%Y-%%m-%%d') as dropoff_date, " \
-                      "start_odometer, end_odometer, daily_odometer_limit, rental_rate , rental_fee," \
-                      " rental_amount, really_amount, v_id , cust_id, dc_id, ro_id, user_id   " \
-                      " FROM Rental_Service where rs_id=%s"
+                sql = "SELECT a.rs_id, a.pickup_location, a.dropoff_location ,DATE_FORMAT(a.pickup_date,'%%Y-%%m-%%d') as pickup_date,DATE_FORMAT(a.dropoff_date,'%%Y-%%m-%%d') as dropoff_date,  a.start_odometer, a.end_odometer, a.daily_odometer_limit, a.rental_rate , a.rental_fee,a.rental_amount, a.really_amount, a.v_id , a.cust_id, c.name, a.dc_id, a.ro_id from rental_service a join customer_info b on a.cust_ID=b.cust_ID left join (select CUST_ID, concat(FIRST_NAME,' ',LAST_NAME) name  from customer_individual union ALL select cust_id, NAME from customer_corporate) c on b.cust_id = c.CUST_ID where a.rs_id=%s"
                 cursor.execute(sql, p_rs_id)
             elif p_cust_id is not None:
-                sql = "SELECT rs_id, pickup_location, dropoff_location , " \
-                      "DATE_FORMAT(pickup_date,'%%Y-%%m-%%d') as pickup_date, " \
-                      "DATE_FORMAT(dropoff_date,'%%Y-%%m-%%d') as dropoff_date, " \
-                      "start_odometer, end_odometer, daily_odometer_limit, rental_rate , rental_fee," \
-                      " rental_amount, really_amount, v_id , cust_id, dc_id, ro_id, user_id   " \
-                      " FROM Rental_Service where cust_id=%s"
+                sql = "SELECT a.rs_id, a.pickup_location, a.dropoff_location ,DATE_FORMAT(a.pickup_date,'%%Y-%%m-%%d') as pickup_date,DATE_FORMAT(a.dropoff_date,'%%Y-%%m-%%d') as dropoff_date,  a.start_odometer, a.end_odometer, a.daily_odometer_limit, a.rental_rate , a.rental_fee,a.rental_amount, a.really_amount, a.v_id ,a.cust_id, c.name, a.dc_id, a.ro_id from rental_service a join customer_info b on a.cust_ID=b.cust_ID left join (select CUST_ID, concat(FIRST_NAME,' ',LAST_NAME) name  from customer_individual union ALL select cust_id, NAME from customer_corporate) c on b.cust_id = c.CUST_ID where a.cust_id=%s"
                 cursor.execute(sql, p_cust_id)
             else:
-                sql = "SELECT rs_id, pickup_location, dropoff_location , " \
-                      "DATE_FORMAT(pickup_date,'%Y-%m-%d') as pickup_date, " \
-                      "DATE_FORMAT(dropoff_date,'%Y-%m-%d') as dropoff_date, " \
-                      "start_odometer, end_odometer, daily_odometer_limit, rental_rate , rental_fee," \
-                      " rental_amount, really_amount, v_id , cust_id, dc_id, ro_id, user_id   " \
-                      " FROM Rental_Service"
+                sql = "SELECT a.rs_id, a.pickup_location, a.dropoff_location ,DATE_FORMAT(a.pickup_date,'%Y-%m-%d') as pickup_date,DATE_FORMAT(a.dropoff_date,'%Y-%m-%d') as dropoff_date,  a.start_odometer, a.end_odometer, a.daily_odometer_limit, a.rental_rate , a.rental_fee,a.rental_amount, a.really_amount, a.v_id ,a.cust_id, c.name, a.dc_id, a.ro_id from rental_service a join customer_info b on a.cust_ID=b.cust_ID left join (select CUST_ID, concat(FIRST_NAME,' ',LAST_NAME) name  from customer_individual union ALL select cust_id, NAME from customer_corporate) c on b.cust_id = c.CUST_ID where a.cust_id=%s"
                 cursor.execute(sql)
             print("select_rental_service sql is ", p_rs_id, p_cust_id, sql)
             for row in cursor:
@@ -311,6 +298,7 @@ class WowDao(object):
                 rental.really_amount = row[11]
                 rental.Vehicle_ID = row[12]
                 rental.Cust_ID = row[13]
+                rental.name = row[14]
                 rental_list.append(rental)
             cursor.close()
             conn.close()
@@ -335,12 +323,12 @@ class WowDao(object):
             conn = self.conn_mysql()
             with conn.cursor() as cursor:
                 sql = "insert into Rental_Service(pickup_location,dropoff_location,pickup_date,Dropoff_Date, " \
-                      "Start_Odometer, Daily_Odometer_Limit," \
+                      "Start_Odometer,End_Odometer, Daily_Odometer_Limit," \
                       " V_ID, rental_rate, rental_fee, rental_amount, really_amount, CUST_ID, user_id) " \
-                      "values(%s,%s,str_to_date(%s,\'%%Y-%%m-%%d\'),str_to_date(%s,\'%%Y-%%m-%%d\'), %s,%s,%s,%s,%s,%s,%s,%s,%s)"
+                      "values(%s,%s,str_to_date(%s,\'%%Y-%%m-%%d\'),str_to_date(%s,\'%%Y-%%m-%%d\'), %s, %s,%s,%s,%s,%s,%s,%s,%s,%s)"
                 print("sql is ", sql)
                 values = (rental.Pickup_Location, rental.Dropoff_Location, rental.Pickup_Date, rental.Dropoff_Date,
-                          rental.Start_Odometer, rental.Daily_Odometer_Limit, rental.Vehicle_ID, rental.rental_rate, rental.rental_fee,
+                          rental.Start_Odometer,rental.End_Odometer, rental.Daily_Odometer_Limit, rental.Vehicle_ID, rental.rental_rate, rental.rental_fee,
                           rental.really_amount, rental.really_amount, rental.Cust_ID, rental.wow_userid)
                 cursor.execute(sql, values)
                 rental.rs_id = cursor.lastrowid
@@ -370,11 +358,11 @@ class WowDao(object):
             with conn.cursor() as cursor:
                 sql = "update Rental_Service set pickup_location = %s, dropoff_location = %s, " \
                       "pickup_date = str_to_date(%s,'%%Y-%%m-%%d'), Dropoff_Date = str_to_date(%s,'%%Y-%%m-%%d')," \
-                      "Start_Odometer = %s,Daily_Odometer_Limit = %s,V_ID = %s,rental_rate = %s, " \
+                      "Start_Odometer = %s,End_Odometer=%s,Daily_Odometer_Limit = %s,V_ID = %s,rental_rate = %s, " \
                       "rental_fee = %s,rental_amount = %s,really_amount = %s,user_id = %s" \
                       " where rs_id=%s"
                 values = (rental.Pickup_Location, rental.Dropoff_Location, rental.Pickup_Date,rental.Dropoff_Date,
-                          rental.Start_Odometer, rental.Daily_Odometer_Limit, rental.Vehicle_ID, rental.rental_rate,
+                          rental.Start_Odometer, rental.End_Odometer,rental.Daily_Odometer_Limit, rental.Vehicle_ID, rental.rental_rate,
                           rental.rental_fee,rental.really_amount, rental.really_amount,  rental.wow_userid,rental.rs_id)
                 cursor.execute(sql, values)
                 cursor.close()

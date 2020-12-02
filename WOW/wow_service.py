@@ -4,8 +4,8 @@ import os
 import base64
 import datetime
 import hashlib
-from WOW.wow_model import UserInfo, UserProfile, RentalService
-from WOW.wow_dao import WowDao
+from wow_model import UserInfo, UserProfile, RentalService
+from wow_dao import WowDao
 
 
 class WowService(object):
@@ -144,6 +144,7 @@ class WowService(object):
                         rental.Pickup_Date = args["Pickup_Date"]
                         rental.Dropoff_Date = args["Dropoff_Date"]
                         rental.Start_Odometer = args["Start_Odometer"]
+                        rental.End_Odometer = args["End_Odometer"]
                         rental.Daily_Odometer_Limit = args["Daily_Odometer_Limit"]
                         rental.Vehicle_ID = args["Vehicle_ID"]
                         rental.rental_rate = args["rental_rate"]

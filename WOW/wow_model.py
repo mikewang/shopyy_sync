@@ -88,6 +88,7 @@ class RentalService(object):
         self.really_amount = 0.0
         self.Vehicle_ID = 0
         self.Cust_ID = 0
+        self.name = ''
 
         self.wow_userid = 0
 

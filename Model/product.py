@@ -9,7 +9,7 @@ class ProductInfo(object):
 
     def __init__(self):
         super(ProductInfo, self).__init__()
-        print("initial class", self)
+        #print("initial class", self)
         self.__setup_product()
 
     def __del__(self):

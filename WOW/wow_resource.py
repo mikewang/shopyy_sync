@@ -8,7 +8,7 @@ from PIL import Image, ImageDraw
 from flask import send_file, render_template
 from flask_restful import reqparse, Resource
 import json
-from WOW.wow_service import WowService
+from wow_service import WowService
 
 
 class UserResource(Resource):
@@ -226,6 +226,7 @@ class RentalResource(Resource):
             parser.add_argument('Pickup_Date', location=['json', 'form'])
             parser.add_argument('Dropoff_Date', location=['json', 'form'])
             parser.add_argument('Start_Odometer', location=['json', 'form'])
+            parser.add_argument('End_Odometer', location=['json', 'form'])
             parser.add_argument('Daily_Odometer_Limit', location=['json', 'form'])
             parser.add_argument('Vehicle_ID', location=['json', 'form'])
             parser.add_argument('rental_rate', location=['json', 'form'])
