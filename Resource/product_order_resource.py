@@ -24,29 +24,31 @@ class ProductOrderResource(Resource):
             parser.add_argument('token', location='headers')
             parser.add_argument('timestamp', location='headers')
             parser.add_argument('prod_list', location='json')
+            parser.add_argument('operate', location='json')
             # 分析请求
             args = parser.parse_args()
-            print("ProductOrderResource post args is ", args)
             OpCode = args["OpCode"]
             token = args["token"]
             timestamp = args["timestamp"]
+            operate = args["operate"]
             prod_list_json_base64 = args["prod_list"]
             prod_list_json_base64 = base64Replace(prod_list_json_base64)
             prod_list_json = base64.b64decode(prod_list_json_base64).decode('utf-8')
-            user_service = StockService()
-            print("prod list json data is ", prod_list_json)
+            run_time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            print(run_time_str, "prod json is ", prod_list_json)
             result = {"code": 201, "msg": ""}
             prod_dict_list = json.loads(prod_list_json)
             if prod_dict_list is None:
                 result["data"] = []
-                result = {"code": 500, "msg": "prod list json is error."}
+                result = {"code": 500, "msg": "prod json is error."}
                 return result, result["code"]
-            result_status = user_service.addStockProductOrder(OpCode, timestamp, token, prod_dict_list)
+            user_service = StockService()
+            result_status = user_service.postStockProductOrder(OpCode, timestamp, token, prod_dict_list, operate)
             if result_status is not None:
                 result["data"] = result_status
             else:
                 result["data"] = []
-                result = {"code": 201, "msg": "product.py is not existed."}
+                result = {"code": 201, "msg": "product is not existed."}
             return result, result["code"]
         except Exception as e:
             print('str(Exception):\t', str(Exception))
@@ -60,8 +62,8 @@ class ProductOrderResource(Resource):
             print('traceback.format_exc():\n%s' % traceback.format_exc())
             print('#' * 60)
         finally:
-            time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            print("post order product ", OpCode, time_str)
+            run_time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            print(run_time_str, "add order product ", OpCode)
 
     def get(self, pageNo):
         try:

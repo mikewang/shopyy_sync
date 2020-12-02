@@ -210,7 +210,37 @@ class StockDao(object):
             print('#' * 60)
             return None
 
+    def add_stock_product_enquiry_price(self, prod_dict_list):
+        try:
+            cnxn = pyodbc.connect(self._conn_str)
+            cursor = cnxn.cursor()
+            # {\"stockProductID\":10705,\"ID\":0,\"opCode\":\"delong\",\"createTime\":\"2020-11-23 14:21:54\"
+            for prod in prod_dict_list:
+                print("enquiried product is ", prod["stockProductID"], prod)
+                stockProductID = prod["stockProductID"]
+                opCode = prod["opCode"]
+                sql = "insert into Stock_Product_EnquiryPrice_App(stockProductID,opCode) values(?,?)"
+                cursor.execute(sql, stockProductID, opCode)
+                cursor.commit()
+            cursor.close
+            cnxn.close
+            return "1"
+        except Exception as e:
+            print('str(Exception):\t', str(Exception))
+            print('str(e):\t\t', str(e))
+            print('repr(e):\t', repr(e))
+            # Get information about the exception that is currently being handled
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            print('e.message:\t', exc_value)
+            print("Note, object e and exc of Class %s is %s the same." %
+                  (type(exc_value), ('not', '')[exc_value is e]))
+            print('traceback.print_exc(): ', traceback.print_exc())
+            print('traceback.format_exc():\n%s' % traceback.format_exc())
+            print('#' * 60)
+            return None
+
     def select_stock_product_order_list(self, page_no, filter_stock):
+        # 检索 所有的 订货商品
         try:
             product_list = []
             cnxn = pyodbc.connect(self._conn_str)
@@ -222,15 +252,17 @@ class StockDao(object):
             v_sql = v_sql + "e.[采购人], a.StockProductID,a.ProductID,CONVERT(varchar, g.CreateTime, 120 ) as CreateTime," \
                             "a.GoodsCode,a.SpecNo,f.GoodsCDesc, a.GoodsUnit, b._ImageID,c.ImageGuid,c.ImageFmt," \
                             "c.ModuleID,CONVERT(varchar, c.FileDate, 120 ) as FileDate,c.ThumbImage,g.supplier as supplier," \
-                            "b.[其它.允采购量],b.[其它.应采购价],b.[其它.商品品牌],coalesce(g.[OrderNum]*g.[OrderStat],0) as ordernum," \
-                            "g.orderprice, g.settlement,g.opcode as order_opcode, g.id as product_order_id " \
+                            "b.[其它.允采购量],b.[其它.应采购价],b.[其它.商品品牌],coalesce(g.[OrderNum]*g.[OrderStat],0) as ordernum,  " \
+                            "g.orderprice,g.orderStat, g.settlement,g.opcode as order_opcode, g.id as product_order_id, " \
+                            "coalesce(h.id,0) as priceEnquiredID " \
                             "FROM [csidbo].[Stock_Product_Info] as a " \
                             "join  csidbo.FTPart_Stock_Product_Property_1 as b on a.StockProductID=b.MainID " \
                             "join csidbo.Product_Image as c on b._ImageID=c.ProductImageID " \
                             "join csidbo.stock_info d on d.ID=a.StockID " \
                             "join csidbo.[FTPart_Stock_Property_1] e on e.[MainID] = d.ID " \
                             "left join csidbo.[Stock_Product_Info_Desc] f on a.StockProductID=f.StockProductID " \
-                            "join [csidbo].[Stock_Product_Order_App] as g on a.StockProductID=g.StockProductID  "
+                            "join [csidbo].[Stock_Product_Order_App] as g on a.StockProductID=g.StockProductID " \
+                            "left join (select max(id) as id, StockProductID from csidbo.[Stock_Product_EnquiryPrice_App] group by StockProductID ) h on  a.StockProductID=h.StockProductID  "
             v_sql = v_sql + "  where 1=1  "
 
             filter_brand = filter_stock["brand"]
@@ -241,11 +273,10 @@ class StockDao(object):
                 filter_sql = filter_sql.rstrip(',')
                 v_sql = v_sql + " and b.[其它.商品品牌] in (" + filter_sql + ")"
             filter_enquriy = filter_stock["enquiry"]
-            if filter_enquriy is not None:
-                if filter_enquriy == '未询价':
-                    v_sql = v_sql + " and a.StockProductID not in (select distinct StockProductID from csidbo.[Stock_Product_EnquiryPrice_App]) "
-                else:
-                    v_sql = v_sql + " and a.StockProductID in (select distinct StockProductID from csidbo.[Stock_Product_EnquiryPrice_App]) "
+            if filter_enquriy == '未询价':
+                v_sql = v_sql + " and  coalesce(h.id,0) == 0 "
+            elif filter_enquriy == '已询价':
+                v_sql = v_sql + " and  coalesce(h.id,0) > 0 "
             filter_begin = filter_stock["begin"]
             if filter_begin is not None:
                 v_sql = v_sql + " and g.CreateTime >= '" + filter_begin + "'"
@@ -288,44 +319,18 @@ class StockDao(object):
                 product.brand = row[17]
                 product.orderNum = row[18]
                 product.orderPrice = row[19]
+                # orderStat = 1, 订货， -1 ，退货，但退货记录要保存。
+                product.orderStat = row[20]
                 # settlement = 1， 确认订货成功，并没有现实收货，0，默认值，未确认订货成功。
-                product.settlement = row[20]
+                product.settlement = row[21]
                 product.orderOpCode = row[21]
-                product.orderProductID = row[22]
+                product.orderProductID = row[23]
+                product.priceEnquiredID = row[24]
 
                 product_list.append(product)
             cursor.close()
             cnxn.close()
             return product_list
-        except Exception as e:
-            print('str(Exception):\t', str(Exception))
-            print('str(e):\t\t', str(e))
-            print('repr(e):\t', repr(e))
-            # Get information about the exception that is currently being handled
-            exc_type, exc_value, exc_traceback = sys.exc_info()
-            print('e.message:\t', exc_value)
-            print("Note, object e and exc of Class %s is %s the same." %
-                  (type(exc_value), ('not', '')[exc_value is e]))
-            print('traceback.print_exc(): ', traceback.print_exc())
-            print('traceback.format_exc():\n%s' % traceback.format_exc())
-            print('#' * 60)
-            return None
-
-    def add_stock_product_enquiry_price(self, prod_dict_list):
-        try:
-            cnxn = pyodbc.connect(self._conn_str)
-            cursor = cnxn.cursor()
-            # {\"stockProductID\":10705,\"ID\":0,\"opCode\":\"delong\",\"createTime\":\"2020-11-23 14:21:54\"
-            for prod in prod_dict_list:
-                print("enquiried product is ", prod["stockProductID"], prod)
-                stockProductID = prod["stockProductID"]
-                opCode = prod["opCode"]
-                sql = "insert into Stock_Product_EnquiryPrice_App(stockProductID,opCode) values(?,?)"
-                cursor.execute(sql, stockProductID, opCode)
-                cursor.commit()
-            cursor.close
-            cnxn.close
-            return "1"
         except Exception as e:
             print('str(Exception):\t', str(Exception))
             print('str(e):\t\t', str(e))
@@ -352,12 +357,12 @@ class StockDao(object):
                 purchasePrice = prod["purchasePrice"]
                 orderStat = prod["orderStat"]
                 supplier = prod["supplier"]
-
+                settlement = prod["settlement"]
                 sql = "insert into Stock_Product_Order_App(stockProductID,opCode, OrderNum, OrderPrice,orderStat," \
                       "supplier, settlement) " \
                       " values(?,?,?,?,?,?,?,0)"
                 print("insert Stock_Product_Order_App sql is ", sql)
-                cursor.execute(sql, stockProductID, opCode, purchaseNum, purchasePrice, orderStat, supplier)
+                cursor.execute(sql, stockProductID, opCode, purchaseNum, purchasePrice, orderStat, supplier, settlement)
                 cursor.commit()
             cursor.close
             cnxn.close
@@ -376,24 +381,34 @@ class StockDao(object):
             print('#' * 60)
             return None
 
-    def merge_stock_product_order(self, prod_dict_list):
+    def update_stock_product_order(self, prod_dict_list, operate_type):
         try:
             cnxn = pyodbc.connect(self._conn_str)
             cursor = cnxn.cursor()
             for prod in prod_dict_list:
-                print("enquiried product is ", prod["stockProductID"], prod)
+                print("order product is ", prod["id"], prod["stockProductID"], prod)
+                id = prod["id"]
                 stockProductID = prod["stockProductID"]
-                opCode = prod["opCode"]
-                purchaseNum = prod["purchaseNum"]
-                purchasePrice = prod["purchasePrice"]
-                orderStat = prod["orderStat"]
-                supplier = prod["supplier"]
-
-                sql = "insert into Stock_Product_Order_App(stockProductID,opCode, OrderNum, OrderPrice,orderStat," \
-                      "supplier, settlement) " \
-                      " values(?,?,?,?,?,?,?,0)"
-                print("insert Stock_Product_Order_App sql is ", sql)
-                cursor.execute(sql, stockProductID, opCode, purchaseNum, purchasePrice, orderStat, supplier)
+                if operate_type == "cancel":
+                    sql = "update Stock_Product_Order_App " \
+                          "set  orderStat=-1 " \
+                          "where id = ? and stockProductID = ? and orderStat != -1"
+                    print("update Stock_Product_Order_App sql is ", sql)
+                    cursor.execute(sql, id, stockProductID)
+                elif operate_type == "complete":
+                    # 订货人 工号
+                    opCode = prod["opCode"]
+                    purchaseNum = prod["purchaseNum"]
+                    purchasePrice = prod["purchasePrice"]
+                    # 订货 或者 退货
+                    orderStat = prod["orderStat"]
+                    supplier = prod["supplier"]
+                    settlement = prod["settlement"]
+                    sql = "update Stock_Product_Order_App " \
+                          "set opCode = ?, OrderNum = ? , OrderPrice=?, orderStat=?, supplier=? , settlement=1 " \
+                          "where id = ? and stockProductID = ? and settlement <> 1 "
+                    print("update Stock_Product_Order_App sql is ", sql)
+                    cursor.execute(sql, opCode, purchaseNum, purchasePrice, orderStat, supplier, settlement, id, stockProductID)
                 cursor.commit()
             cursor.close
             cnxn.close
