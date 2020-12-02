@@ -140,7 +140,7 @@ class StockDao(object):
                             "join csidbo.[FTPart_Stock_Property_1] e on e.[MainID] = d.ID " \
                             "left join csidbo.[Stock_Product_Info_Desc] f on a.StockProductID=f.StockProductID " \
                             "left join (select [StockProductID], sum([OrderNum]*[OrderStat]) as ordernum from [csidbo].[Stock_Product_Order_App] group by [StockProductID]) g on a.StockProductID=g.StockProductID  " \
-                            "left join (select max(id) as id, StockProductID from csidbo.[Stock_Product_EnquiryPrice_App]) h on  a.StockProductID=h.StockProductID "
+                            "left join (select max(id) as id, StockProductID from csidbo.[Stock_Product_EnquiryPrice_App] group by StockProductID ) h on  a.StockProductID=h.StockProductID "
             v_sql = v_sql + "  where b.[其它.允采购量] > coalesce(g.ordernum,0) "
 
             filter_brand = filter_stock["brand"]
