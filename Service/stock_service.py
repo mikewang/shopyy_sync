@@ -87,9 +87,9 @@ class StockService(UserInfo):
             print(self.getNowStr(), "Error, get dictionary type is failure.", item_type)
         return item_list
 
-    def getStockProduct(self, OpCode, timestamp, token, pageNo, filter_stock):
+    def getStockProduct(self, OpCode, timestamp, token, pageNo, filter_stock, ptype):
 
-        print(self.getNowStr(), "get stockproduct", OpCode, "PageNo=", pageNo, filter_stock)
+        print(self.getNowStr(), ptype, "get stock product", OpCode, "PageNo=", pageNo, filter_stock)
         product_list = None
         user = self.getUserChecked(OpCode, timestamp, token)
         if user is not None:
@@ -98,19 +98,17 @@ class StockService(UserInfo):
             print(self.getNowStr(), "Error, get stockproduct is failure.", OpCode, "PageNo=", pageNo)
         return product_list
 
-    def getStockProductOrder(self, OpCode, timestamp, token, pageNo, filter_stock):
-
-        print(self.getNowStr(), "get stockproduct order", OpCode, "PageNo=", pageNo, filter_stock)
+    def getOrderProduct(self, OpCode, timestamp, token, pageNo, filter_stock, ptype):
+        print(self.getNowStr(), "get order product ", OpCode, "PageNo=", pageNo, filter_stock)
         product_list = None
         user = self.getUserChecked(OpCode, timestamp, token)
         if user is not None:
-            product_list = self._dao.select_stock_product_order_list(pageNo, filter_stock)
+            product_list = self._dao.select_order_product_list(pageNo, filter_stock, ptype)
         else:
             print(self.getNowStr(), "Error, get stockproduct order is failure.", OpCode, "PageNo=", pageNo)
         return product_list
 
     def getProductImage(self, OpCode, timestamp, token, imageGuid, year, month, module):
-
         print(self.getNowStr(), "get product big image ", OpCode)
         product_list = None
         user = self.getUserChecked(OpCode, timestamp, token)

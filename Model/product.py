@@ -40,10 +40,18 @@ class ProductInfo(object):
         self.orderPrice = 0.0
         # orderStat = 1 ，订货，-1 退货。和ordernum 组合使用，决定允许采购量
         self.orderStat = 1
-        # settlement = 1， 确认订货成功，并没有现实收货，0，默认值，未确认订货成功。
+        # settlement = 1， 确认订货成功，并没有现实收货，0，默认值，未确认订货成功。2, 收到货（写入erp）。3，结算。
         self.settlement = 0
+        self.orderID = 0
         self.orderOpCode = ''
-        self.orderProductID = 0
+        # 订货时间/取消订货时间
+        self.createTime = ''
+        self.sourceOrderID = 0
+        # 确认订货时间
+        self.ensureTime = ''
+        self.ensureOpCode = ''
+        self.receiveGoodsTime = ''
+        self.receiveOpCode = ''
 
 
     def desc(self):

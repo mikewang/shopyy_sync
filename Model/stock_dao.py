@@ -239,7 +239,7 @@ class StockDao(object):
             print('#' * 60)
             return None
 
-    def select_stock_product_order_list(self, page_no, filter_stock):
+    def select_order_product_list(self, page_no, filter_stock, ptype):
         # 检索 所有的 订货商品
         try:
             product_list = []
@@ -249,12 +249,14 @@ class StockDao(object):
             # 采购人	StockProductID	ProductID	SignDate	GoodsCode	SpecNo	GoodsSpec	GoodsUnit	_ImageID	ImageGuid	ImageFmt	ModuleID	FileDate	ThumbImage	其它.供应商名称	其它.允采购量	其它.应采购价	其它.商品品牌
             # 数据源
             v_sql = "select " + topN + " "
-            v_sql = v_sql + "e.[采购人], a.StockProductID,a.ProductID,CONVERT(varchar, g.CreateTime, 120 ) as CreateTime," \
+            v_sql = v_sql + "e.[采购人], a.StockProductID,a.ProductID,CONVERT(varchar, d.SignDate, 120 ) as SignDate," \
                             "a.GoodsCode,a.SpecNo,f.GoodsCDesc, a.GoodsUnit, b._ImageID,c.ImageGuid,c.ImageFmt," \
                             "c.ModuleID,CONVERT(varchar, c.FileDate, 120 ) as FileDate,c.ThumbImage,g.supplier as supplier," \
-                            "b.[其它.允采购量],b.[其它.应采购价],b.[其它.商品品牌],coalesce(g.[OrderNum]*g.[OrderStat],0) as ordernum,  " \
-                            "g.orderprice,g.orderStat, g.settlement,g.opcode as order_opcode, g.id as product_order_id, " \
-                            "coalesce(h.id,0) as priceEnquiredID " \
+                            "b.[其它.允采购量],b.[其它.应采购价],b.[其它.商品品牌],coalesce(g.[OrderNum]*g.[OrderStat],0) as ordernum," \
+                            "g.orderprice,g.orderStat, g.settlement,g.opcode as order_opcode, g.orderID, " \
+                            "coalesce(h.id,0) as priceEnquiredID, CONVERT(varchar, g.CreateTime, 120 ) as CreateTime," \
+                            "g.sourceOrderID, CONVERT(varchar, g.ensureTime, 120 ) as ensureTime, g.ensureOpCode, " \
+                            "CONVERT(varchar, g.receiveGoodsTime, 120 ) as receiveGoodsTime, g.receiveOpCode" \
                             "FROM [csidbo].[Stock_Product_Info] as a " \
                             "join  csidbo.FTPart_Stock_Product_Property_1 as b on a.StockProductID=b.MainID " \
                             "join csidbo.Product_Image as c on b._ImageID=c.ProductImageID " \
@@ -263,7 +265,13 @@ class StockDao(object):
                             "left join csidbo.[Stock_Product_Info_Desc] f on a.StockProductID=f.StockProductID " \
                             "join [csidbo].[Stock_Product_Order_App] as g on a.StockProductID=g.StockProductID " \
                             "left join (select max(id) as id, StockProductID from csidbo.[Stock_Product_EnquiryPrice_App] group by StockProductID ) h on  a.StockProductID=h.StockProductID  "
-            v_sql = v_sql + "  where 1=1  "
+            if ptype == "order":
+                # 订货，订货完成 两个状态
+                v_sql = v_sql + "  where 1=1 and g.settlement <=1 "
+            elif ptype == "receive":
+                v_sql = v_sql + "  where 1=1 and g.settlement >1 "
+            else:
+                v_sql = v_sql + "  where 1=1 "
 
             filter_brand = filter_stock["brand"]
             if filter_brand is not None:
@@ -324,8 +332,14 @@ class StockDao(object):
                 # settlement = 1， 确认订货成功，并没有现实收货，0，默认值，未确认订货成功。
                 product.settlement = row[21]
                 product.orderOpCode = row[21]
-                product.orderProductID = row[23]
+                product.orderID = row[23]
                 product.priceEnquiredID = row[24]
+                product.createTime = row[25]
+                product.sourceOrderID = row[26]
+                product.ensureTime = row[27]
+                product.ensureOpCode = row[28]
+                product.receiveGoodsTime = row[29]
+                product.receiveOpCode = row[30]
 
                 product_list.append(product)
             cursor.close()

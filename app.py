@@ -2,7 +2,7 @@ from flask import Flask, render_template, url_for, Response
 from flask_restful import Api
 from waitress import serve
 from Resource.user_resource import UserResource
-from Resource.product_resource import ProductResource
+from Resource.product_stock_resource import ProductStockResource as ProductResource
 from Resource.image_resource import ImageResource
 from Resource.dict_resource import DictResource
 from Resource.product_enquiry_resource import ProductEnquiryResource as EnquiryResource

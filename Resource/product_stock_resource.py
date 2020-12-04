@@ -14,7 +14,7 @@ def base64Replace(base64_str):
     return base64_str.replace('*', '+').replace('-', '/').replace('.', '=')
 
 
-class ProductResource(Resource):
+class ProductStockResource(Resource):
 
     def get(self, pageNo):
         try:
@@ -27,6 +27,7 @@ class ProductResource(Resource):
             # parser.add_argument('token', location=['headers', 'args'])
             # parser.add_argument('timestamp', location=['headers', 'args'])
             parser.add_argument('t')
+            parser.add_argument('ptype')
             parser.add_argument('brand')
             parser.add_argument('enquiry')
             parser.add_argument('begin')
@@ -36,6 +37,7 @@ class ProductResource(Resource):
             OpCode = args["OpCode"]
             token = args["token"]
             timestamp = args["timestamp"]
+            ptype = args["ptype"]
             print("request args is ", args)
             filter_stock = {}
             brand_base64 = args["brand"]
@@ -74,7 +76,7 @@ class ProductResource(Resource):
                 filter_stock['end'] = None
             print("filter_stock is ", filter_stock)
             user_service = StockService()
-            prod_list = user_service.getStockProduct(OpCode, timestamp, token, pageNo, filter_stock)
+            prod_list = user_service.getStockProduct(OpCode, timestamp, token, pageNo, filter_stock, ptype)
             result = {"code": 200, "msg": ""}
             if prod_list is not None:
                 json_list = []
