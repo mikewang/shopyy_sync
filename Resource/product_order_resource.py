@@ -85,7 +85,7 @@ class ProductOrderResource(Resource):
                 filter_stock['supplier'] = None
             print("filter_stock is ", filter_stock)
             user_service = StockService()
-            prod_list = user_service.getOrderProduct(OpCode, timestamp, token, pageNo, filter_stock, ptype)
+            prod_list = user_service.get_order_product(OpCode, timestamp, token, pageNo, filter_stock, ptype)
             result = {"code": 200, "msg": ""}
             if prod_list is not None:
                 json_list = []
@@ -140,7 +140,7 @@ class ProductOrderResource(Resource):
                 result = {"code": 500, "msg": "prod json is error."}
                 return result, result["code"]
             user_service = StockService()
-            result_status = user_service.postStockProductOrder(OpCode, timestamp, token, prod_dict_list, operate)
+            result_status = user_service.post_order_product(OpCode, timestamp, token, prod_dict_list, operate)
             if result_status is not None:
                 result["data"] = result_status
             else:

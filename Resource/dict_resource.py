@@ -33,9 +33,9 @@ class DictResource(Resource):
             timestamp = args["timestamp"]
             user_service = StockService()
             if item_type is None:
-                item_list = user_service.getDictItem(OpCode, timestamp, token, self.item_type)
+                item_list = user_service.get_dict_item(OpCode, timestamp, token, self.item_type)
             else:
-                item_list = user_service.getDictItem(OpCode, timestamp, token, item_type)
+                item_list = user_service.get_dict_item(OpCode, timestamp, token, item_type)
             result = {"code": 200, "msg": ""}
             if item_list is not None:
                 json_list = []

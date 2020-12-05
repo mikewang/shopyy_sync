@@ -53,7 +53,7 @@ class ProductEnquiryResource(Resource):
                 result["data"] = []
                 result = {"code": 500, "msg": "prod list json is error."}
                 return result, result["code"]
-            result_status = user_service.addStockProductEnquiryPrice(OpCode, timestamp, token, prod_dict_list)
+            result_status = user_service.add_stock_product_enquiry_price(OpCode, timestamp, token, prod_dict_list)
             # data = ["DisneyPlus", "Netflix", "Peacock"]
             # json_string = json.dumps(data)
             # print(json_string)

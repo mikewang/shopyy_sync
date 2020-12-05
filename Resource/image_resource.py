@@ -33,7 +33,7 @@ class ImageResource(Resource):
             print(args)
             user_service = StockService()
             filepath = os.path.normpath(os.path.join("D:\ymcartphotos", "2019", "01", "501", "201901084598491BB92E63A2B183F04758DF4278"))
-            filepath = user_service.getProductImage(OpCode, timestamp, token, guid, year, month, module)
+            filepath = user_service.get_product_image(OpCode, timestamp, token, guid, year, month, module)
             try:
                 image = Image.open(filepath)
             except Exception as e:
