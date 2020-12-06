@@ -39,6 +39,7 @@ class ProductOrderResource(Resource):
             token = args["token"]
             timestamp = args["timestamp"]
             ptype = args["ptype"]
+            # 收货， 退货 两个状态的查询
             print("request args is ", args)
             filter_stock = {}
             brand_base64 = args["brand"]

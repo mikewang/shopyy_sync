@@ -266,9 +266,10 @@ class StockDao(object):
                             "join [csidbo].[Stock_Product_Order_App] as g on a.StockProductID=g.StockProductID " \
                             "left join (select max(id) as id, StockProductID from csidbo.[Stock_Product_EnquiryPrice_App] group by StockProductID ) h on  a.StockProductID=h.StockProductID  "
             if ptype == "order":
-                # 订货，订货完成 两个状态
+                #去掉订货，订货，订货完成三个状态的查询
                 v_sql = v_sql + "  where 1=1 and g.settlement <=1 "
             elif ptype == "receive":
+                # 收货， 退货 两个状态的查询
                 v_sql = v_sql + "  where 1=1 and g.settlement >1 "
             else:
                 v_sql = v_sql + "  where 1=1 "
