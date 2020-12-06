@@ -9,14 +9,13 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWebEngineWidget import *
 
 
 class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
         Form.resize(856, 653)
-        self.pushButton_query = QtWebEngineWidgets.QWebEngineView(Form)
+        self.pushButton_query = QtWidgets.QPushButton(Form)
         self.pushButton_query.setGeometry(QtCore.QRect(740, 30, 75, 23))
         self.pushButton_query.setObjectName("pushButton_query")
         self.pushButton_send = QtWidgets.QPushButton(Form)
@@ -35,7 +34,6 @@ class Ui_Form(object):
         self.dateEdit_end.setGeometry(QtCore.QRect(610, 30, 110, 22))
         self.dateEdit_end.setObjectName("dateEdit_end")
         self.widget = QtWidgets.QWidget(Form)
-        QtWebEngineWidgets.QWebEngineView(Form)
         self.widget.setGeometry(QtCore.QRect(20, 60, 811, 491))
         self.widget.setObjectName("widget")
 
