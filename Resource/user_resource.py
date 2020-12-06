@@ -25,7 +25,7 @@ class UserResource(Resource):
                 result["data"] = user_info
             else:
                 result = {"code": 201, "msg": "用户不存在或者密码错"}
-            return json.dumps(result), result["code"]
+            return result, result["code"]
         except Exception as e:
             print('str(Exception):\t', str(Exception))
             print('str(e):\t\t', str(e))
