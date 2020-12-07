@@ -2,9 +2,9 @@
 
 block_cipher = None
 
-py_files = ['app.py', 'Model/user.py',
-'Resource/user_resource.py','Resource/product_resource.py',
-'Resource/image_resource.py','Model/stock_dao.py','Service/stock_service.py']
+py_files = ['app.py', 'Model/user.py','Model/product.py','Model/stock_dao.py','Service/stock_service.py',
+'Resource/user_resource.py','Resource/product_stock_resource.py','Resource/product_order_resource.py',
+'Resource/product_enquiry_resource.py','Resource/image_resource.py']
 
 add_files = [('templates\\*.html', 'templates')]
 

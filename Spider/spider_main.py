@@ -13,7 +13,7 @@ import os
 import configparser
 import logging
 # PyQt5中使用的基本控件都在PyQt5.QtWidgets模块中
-from PyQt5.QtCore import pyqtSignal, Qt
+from PyQt5.QtCore import pyqtSignal, Qt, QUrl
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5.QtWebEngineWidgets import *
 from PyQt5.QtGui import QPixmap
@@ -34,14 +34,17 @@ class MainWindow(QMainWindow, MainForm):
                             level=logging.WARNING,
                             filename='spider.log',
                             filemode='a')
-        self.checkBox_product_auto_sync.stateChanged.connect(self.start_auto_sync)
         # btn_product_offline_sync
         self.pushButton_query.clicked.connect(lambda: self.query_content())
         self.pushButton_send.clicked.connect(lambda: self.send_content())
 
     def query_content(self):
         try:
-            pass
+            self.browser.load(QUrl("http://www.twitter.com"))
+            self.browser
+            logging.warning("begin load url")
+            #self.setCentralWidget(self.browser)
+
         except Exception as e:
             print(e)
 
