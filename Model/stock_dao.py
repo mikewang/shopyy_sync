@@ -405,7 +405,7 @@ class StockDao(object):
             cnxn = pyodbc.connect(self._conn_str)
             cursor = cnxn.cursor()
             for prod in prod_dict_list:
-                print("order product is ", prod["id"], prod["stockProductID"], prod)
+                print("order product id=", prod["orderID"], prod["stockProductID"])
                 orderID = prod["orderID"]
                 stockProductID = prod["stockProductID"]
                 opCode = prod["opCode"]
@@ -416,7 +416,7 @@ class StockDao(object):
                           "supplier, settlement,sourceOrderID,createTime)  " \
                           "select stockProductID,?, OrderNum, OrderPrice,-1,supplier, settlement,now() " \
                           "from Stock_Product_Order_App where orderID=?"
-                    print("insert Stock_Product_Order_App sql is ", sql)
+                    print("insert Stock_Product_Order_App cancel sql is ", sql)
                     cursor.execute(sql, opCode, orderID)
                     cursor.commit()
                 elif operate_type == "complete":
