@@ -373,9 +373,10 @@ class StockDao(object):
                 orderStat = prod["orderStat"]
                 supplier = prod["supplier"]
                 settlement = prod["settlement"]
+                settlement = 0
                 sql = "insert into Stock_Product_Order_App(stockProductID,opCode, OrderNum, OrderPrice,orderStat," \
                       "supplier, settlement) " \
-                      " values(?,?,?,?,?,?,?,0)"
+                      " values(?,?,?,?,?,?,?)"
                 print("insert Stock_Product_Order_App sql is ", sql)
                 cursor.execute(sql, stockProductID, opCode, purchaseNum, purchasePrice, orderStat, supplier, settlement)
                 myTableId = cursor.fetchone()[0]
