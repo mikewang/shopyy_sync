@@ -402,6 +402,7 @@ class StockDao(object):
 
     def update_stock_product_order(self, prod_dict_list, operate_type):
         try:
+            result = "1"
             cnxn = pyodbc.connect(self._conn_str)
             cursor = cnxn.cursor()
             for prod in prod_dict_list:
@@ -413,13 +414,21 @@ class StockDao(object):
                     # 插入一条 取消 订货记录进来，原订货记录保存。
                     orderStat = -1
                     # 取消订货。
-                    sql = "insert into Stock_Product_Order_App(stockProductID,opCode, OrderNum, OrderPrice,orderStat," \
-                          "supplier, settlement,sourceOrderID,createTime)  " \
-                          "select stockProductID,?, OrderNum, OrderPrice,-1,supplier, settlement,getdate() " \
-                          "from Stock_Product_Order_App where orderID=?"
-                    print("insert Stock_Product_Order_App cancel sql is ", sql)
-                    cursor.execute(sql, opCode, orderID)
-                    cursor.commit()
+                    sql = "select count(*) from Stock_Product_Order_App where sourceOrderID=?"
+                    cursor.execute(sql, orderID)
+                    row = cursor.fetchone()
+                    cc = row[0]
+                    if cc == 0:
+                        sql = "insert into Stock_Product_Order_App(stockProductID,opCode, OrderNum, OrderPrice," \
+                              "orderStat,supplier, settlement,sourceOrderID,createTime)  " \
+                              "select stockProductID,?, OrderNum, OrderPrice,-1,supplier, settlement, orderID, getdate() " \
+                              "from Stock_Product_Order_App where orderID=?"
+                        print("insert Stock_Product_Order_App cancel sql is --- \n ", sql)
+                        cursor.execute(sql, opCode, orderID)
+                        cursor.commit()
+                    else:
+                        result = "-1"
+
                 elif operate_type == "complete":
                     purchaseNum = prod["purchaseNum"]
                     purchasePrice = prod["purchasePrice"]
@@ -430,12 +439,12 @@ class StockDao(object):
                     sql = "update Stock_Product_Order_App " \
                           "set opCode = ?, OrderNum = ? , OrderPrice=?, supplier=? , settlement=1 " \
                           "where orderID = ? and stockProductID = ? and settlement <> 1 "
-                    print("update Stock_Product_Order_App sql is ", sql)
+                    print("update Stock_Product_Order_App sql is ---\n ", sql)
                     cursor.execute(sql, opCode, purchaseNum, purchasePrice, supplier, settlement, orderID, stockProductID)
                     cursor.commit()
             cursor.close
             cnxn.close
-            return "1"
+            return result
         except Exception as e:
             print('str(Exception):\t', str(Exception))
             print('str(e):\t\t', str(e))
