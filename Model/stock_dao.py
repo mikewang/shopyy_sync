@@ -379,8 +379,9 @@ class StockDao(object):
                       " values(?,?,?,?,?,?,?)"
                 print("insert Stock_Product_Order_App sql is ", sql)
                 cursor.execute(sql, stockProductID, opCode, purchaseNum, purchasePrice, orderStat, supplier, settlement)
-                myTableId = cursor.fetchone()[0]
-                print("Stock_Product_Order_App id is ", myTableId)
+                # myTableId = cursor.fetchone()[0]
+                # print("Stock_Product_Order_App id is ", myTableId)
+                #  last row id 不生效。
                 cursor.commit()
             cursor.close
             cnxn.close
