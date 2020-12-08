@@ -406,15 +406,19 @@ class StockDao(object):
             cursor = cnxn.cursor()
             for prod in prod_dict_list:
                 print("order product is ", prod["id"], prod["stockProductID"], prod)
-                id = prod["id"]
+                orderID = prod["orderID"]
                 stockProductID = prod["stockProductID"]
                 opCode = prod["opCode"]
                 if operate_type == "cancel":
-                    sql = "update Stock_Product_Order_App " \
-                          "set  orderStat=-1 , opCode = ?" \
-                          "where id = ? and stockProductID = ? and orderStat != -1"
-                    print("update Stock_Product_Order_App sql is ", sql)
-                    cursor.execute(sql, opCode, id, stockProductID)
+                    # 插入一条 取消 订货记录进来，原订货记录保存。
+                    orderStat = -1
+                    sql = "insert into Stock_Product_Order_App(stockProductID,opCode, OrderNum, OrderPrice,orderStat," \
+                          "supplier, settlement,sourceOrderID,createTime)  " \
+                          "select stockProductID,?, OrderNum, OrderPrice,-1,supplier, settlement,now() " \
+                          "from Stock_Product_Order_App where orderID=?"
+                    print("insert Stock_Product_Order_App sql is ", sql)
+                    cursor.execute(sql, opCode, orderID)
+                    cursor.commit()
                 elif operate_type == "complete":
                     purchaseNum = prod["purchaseNum"]
                     purchasePrice = prod["purchasePrice"]
@@ -427,7 +431,7 @@ class StockDao(object):
                           "where id = ? and stockProductID = ? and settlement <> 1 "
                     print("update Stock_Product_Order_App sql is ", sql)
                     cursor.execute(sql, opCode, purchaseNum, purchasePrice, supplier, settlement, id, stockProductID)
-                cursor.commit()
+                    cursor.commit()
             cursor.close
             cnxn.close
             return "1"
