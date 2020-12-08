@@ -440,7 +440,7 @@ class StockDao(object):
                           "set opCode = ?, OrderNum = ? , OrderPrice=?, supplier=? , settlement=1 " \
                           "where orderID = ? and stockProductID = ? and settlement <> 1 "
                     print("update Stock_Product_Order_App sql is ---\n ", sql)
-                    cursor.execute(sql, opCode, purchaseNum, purchasePrice, supplier, settlement, orderID, stockProductID)
+                    cursor.execute(sql, opCode, purchaseNum, purchasePrice, supplier, orderID, stockProductID)
                     cursor.commit()
             cursor.close
             cnxn.close
