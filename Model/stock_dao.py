@@ -428,9 +428,9 @@ class StockDao(object):
                     settlement = prod["settlement"]
                     sql = "update Stock_Product_Order_App " \
                           "set opCode = ?, OrderNum = ? , OrderPrice=?, supplier=? , settlement=1 " \
-                          "where id = ? and stockProductID = ? and settlement <> 1 "
+                          "where orderID = ? and stockProductID = ? and settlement <> 1 "
                     print("update Stock_Product_Order_App sql is ", sql)
-                    cursor.execute(sql, opCode, purchaseNum, purchasePrice, supplier, settlement, id, stockProductID)
+                    cursor.execute(sql, opCode, purchaseNum, purchasePrice, supplier, settlement, orderID, stockProductID)
                     cursor.commit()
             cursor.close
             cnxn.close
