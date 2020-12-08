@@ -412,9 +412,10 @@ class StockDao(object):
                 if operate_type == "cancel":
                     # 插入一条 取消 订货记录进来，原订货记录保存。
                     orderStat = -1
+                    # 取消订货。
                     sql = "insert into Stock_Product_Order_App(stockProductID,opCode, OrderNum, OrderPrice,orderStat," \
                           "supplier, settlement,sourceOrderID,createTime)  " \
-                          "select stockProductID,?, OrderNum, OrderPrice,-1,supplier, settlement,now() " \
+                          "select stockProductID,?, OrderNum, OrderPrice,-1,supplier, settlement,getdate() " \
                           "from Stock_Product_Order_App where orderID=?"
                     print("insert Stock_Product_Order_App cancel sql is ", sql)
                     cursor.execute(sql, opCode, orderID)
