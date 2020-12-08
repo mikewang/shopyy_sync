@@ -263,7 +263,7 @@ class StockDao(object):
                             "join csidbo.stock_info d on d.ID=a.StockID " \
                             "join csidbo.[FTPart_Stock_Property_1] e on e.[MainID] = d.ID " \
                             "left join csidbo.[Stock_Product_Info_Desc] f on a.StockProductID=f.StockProductID " \
-                            "join [csidbo].[Stock_Product_Order_App] as g on a.StockProductID=g.StockProductID " \
+                            "join (SELECT * FROM [FTTXRUN].[csidbo].[Stock_Product_Order_App] AS T1 WHERE NOT EXISTS( SELECT 1 FROM [FTTXRUN].[csidbo].[Stock_Product_Order_App] AS T2 WHERE T1.orderID=T2.sourceOrderId) and t1.sourceOrderId is null) as g on a.StockProductID=g.StockProductID " \
                             "left join (select max(id) as id, StockProductID from csidbo.[Stock_Product_EnquiryPrice_App] group by StockProductID ) h on  a.StockProductID=h.StockProductID  "
             if ptype == "order":
                 #去掉订货，订货，订货完成三个状态的查询
