@@ -253,10 +253,10 @@ class StockDao(object):
                             "a.GoodsCode,a.SpecNo,f.GoodsCDesc, a.GoodsUnit, b._ImageID,c.ImageGuid,c.ImageFmt," \
                             "c.ModuleID,CONVERT(varchar, c.FileDate, 120 ) as FileDate,c.ThumbImage,g.supplier as supplier," \
                             "b.[其它.允采购量],b.[其它.应采购价],b.[其它.商品品牌],coalesce(g.[OrderNum]*g.[OrderStat],0) as ordernum," \
-                            "g.orderprice,g.orderStat, g.settlement,g.opcode as order_opcode, g.orderID, " \
+                            "g.orderprice, g.orderStat, g.settlement,g.opcode as order_opcode, g.orderID, " \
                             "coalesce(h.id,0) as priceEnquiredID, CONVERT(varchar, g.CreateTime, 120 ) as CreateTime," \
                             "g.sourceOrderID, CONVERT(varchar, g.ensureTime, 120 ) as ensureTime, g.ensureOpCode, " \
-                            "CONVERT(varchar, g.receiveGoodsTime, 120 ) as receiveGoodsTime, g.receiveOpCode" \
+                            "CONVERT(varchar, g.receiveGoodsTime, 120 ) as receiveGoodsTime, g.receiveOpCode " \
                             "FROM [csidbo].[Stock_Product_Info] as a " \
                             "join  csidbo.FTPart_Stock_Product_Property_1 as b on a.StockProductID=b.MainID " \
                             "join csidbo.Product_Image as c on b._ImageID=c.ProductImageID " \
@@ -299,7 +299,7 @@ class StockDao(object):
                     filter_sql = filter_sql + "'" + b + "',"
                 filter_sql = filter_sql.rstrip(',')
                 v_sql = v_sql + " and g.supplier in (" + filter_sql + ")"
-            v_sql = v_sql + " order by g.CreateTime desc,a.stockproductid desc, g.id desc"
+            v_sql = v_sql + " order by g.CreateTime desc,a.stockproductid desc, g.orderID desc"
             sql = "select  top 10 * from (" + v_sql + " ) as v1 order by v1.CreateTime asc,v1.StockProductID asc, v1.product_order_id asc"
             print("sql is ", sql)
             cursor.execute(sql)
