@@ -300,7 +300,7 @@ class StockDao(object):
                 filter_sql = filter_sql.rstrip(',')
                 v_sql = v_sql + " and g.supplier in (" + filter_sql + ")"
             v_sql = v_sql + " order by g.CreateTime desc,a.stockproductid desc, g.orderID desc"
-            sql = "select  top 10 * from (" + v_sql + " ) as v1 order by v1.CreateTime asc,v1.StockProductID asc, v1.product_order_id asc"
+            sql = "select  top 10 * from (" + v_sql + " ) as v1 order by v1.CreateTime asc,v1.StockProductID asc, v1.order_id asc"
             print("sql is ", sql)
             cursor.execute(sql)
             for row in cursor:
