@@ -419,15 +419,16 @@ class StockDao(object):
                     row = cursor.fetchone()
                     cc = row[0]
                     if cc == 0:
-                        sql = "insert into Stock_Product_Order_App(stockProductID,opCode, OrderNum, OrderPrice," \
-                              "orderStat,supplier, settlement,sourceOrderID,createTime)  " \
-                              "select stockProductID,?, OrderNum, OrderPrice,?,supplier, settlement, orderID, getdate() " \
-                              "from Stock_Product_Order_App where orderID=?"
-                        print(operate_type, "insert sql --- \n ", sql)
-                        cursor.execute(sql, opCode, orderStat, orderID)
-                        cursor.commit()
-                    else:
-                        result = "-1"
+                        sql = "delete from Stock_Product_Order_App where sourceOrderID=?"
+                        print(operate_type, "delete sql --- \n ", sql)
+                        cursor.execute(sql, orderID)
+                    sql = "insert into Stock_Product_Order_App(stockProductID,opCode, OrderNum, OrderPrice," \
+                          "orderStat,supplier, settlement,sourceOrderID,createTime)  " \
+                          "select stockProductID,?, OrderNum, OrderPrice,?,supplier, settlement, orderID, getdate() " \
+                          "from Stock_Product_Order_App where orderID=?"
+                    print(operate_type, "insert sql --- \n ", sql)
+                    cursor.execute(sql, opCode, orderStat, orderID)
+                    cursor.commit()
 
                 elif operate_type == "complete":
                     purchaseNum = prod["purchaseNum"]
@@ -453,24 +454,24 @@ class StockDao(object):
                     cursor.execute(sql, orderID)
                     row = cursor.fetchone()
                     cc = row[0]
-                    if cc == 0:
-                        sql = "insert into Stock_Product_Order_App(stockProductID,opCode, OrderNum, OrderPrice," \
-                              "orderStat,supplier, settlement,sourceOrderID,createTime)  " \
-                              "select stockProductID,?, OrderNum, OrderPrice, ? ,supplier, settlement, orderID, getdate() " \
-                              "from Stock_Product_Order_App where orderID=?"
-                        print(operate_type, "insert sql --- \n ", sql)
-                        cursor.execute(sql, opCode,  orderStat, orderID)
-                        if settlement == 2:
-                            sql = "update [FTPart_Stock_Product_Property_1] " \
-                                  "set [其它.采购剩余数量] = [其它.采购剩余数量] + ? " \
-                                  "where [MainID]=?"
-                            cursor.execute(sql, purchaseNum, stockProductID)
-                            print(operate_type, "update sql2 ---\n ", sql)
-
-                        cursor.commit()
-                    else:
-                        print(operate_type, stockProductID, " product has been returned.")
-                        result = "-1"
+                    if cc > 0:
+                        sql = "delete from Stock_Product_Order_App where sourceOrderID=?"
+                        print(operate_type, "delete sql --- \n ", sql)
+                        cursor.execute(sql, orderID)
+                        print(operate_type, stockProductID, " product has been returned, delete it now.")
+                    sql = "insert into Stock_Product_Order_App(stockProductID,opCode, OrderNum, OrderPrice," \
+                          "orderStat,supplier, settlement,sourceOrderID,createTime)  " \
+                          "select stockProductID,?, OrderNum, OrderPrice, ? ,supplier, settlement, orderID, getdate() " \
+                          "from Stock_Product_Order_App where orderID=?"
+                    print(operate_type, "insert sql --- \n ", sql)
+                    cursor.execute(sql, opCode, orderStat, orderID)
+                    if settlement == 2:
+                        sql = "update [FTPart_Stock_Product_Property_1] " \
+                              "set [其它.采购剩余数量] = [其它.采购剩余数量] + ? " \
+                              "where [MainID]=?"
+                        cursor.execute(sql, purchaseNum, stockProductID)
+                        print(operate_type, "update sql2 ---\n ", sql)
+                    cursor.commit()
                 elif operate_type == "undoreturn":
                     # 取消 退货。
                     orderStat = 0
