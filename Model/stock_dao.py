@@ -270,7 +270,7 @@ class StockDao(object):
                 v_sql = v_sql + "  where 1=1 and g.settlement <=1 "
             elif ptype == "receive":
                 # 收货， 退货 两个状态的查询
-                v_sql = v_sql + "  where 1=1 and g.settlement >1 "
+                v_sql = v_sql + "  where 1=1 and g.settlement >=1 "
             else:
                 v_sql = v_sql + "  where 1=1 "
 
@@ -421,10 +421,10 @@ class StockDao(object):
                     if cc == 0:
                         sql = "insert into Stock_Product_Order_App(stockProductID,opCode, OrderNum, OrderPrice," \
                               "orderStat,supplier, settlement,sourceOrderID,createTime)  " \
-                              "select stockProductID,?, OrderNum, OrderPrice,-1,supplier, settlement, orderID, getdate() " \
+                              "select stockProductID,?, OrderNum, OrderPrice,？,supplier, settlement, orderID, getdate() " \
                               "from Stock_Product_Order_App where orderID=?"
-                        print("insert Stock_Product_Order_App cancel sql is --- \n ", sql)
-                        cursor.execute(sql, opCode, orderID)
+                        print("insert Stock_Product_Order_App cancel order sql is --- \n ", sql)
+                        cursor.execute(sql, opCode, orderID, orderStat)
                         cursor.commit()
                     else:
                         result = "-1"
@@ -436,11 +436,44 @@ class StockDao(object):
                     orderStat = prod["orderStat"]
                     supplier = prod["supplier"]
                     settlement = prod["settlement"]
+                    settlement = 1
                     sql = "update Stock_Product_Order_App " \
-                          "set opCode = ?, OrderNum = ? , OrderPrice=?, supplier=? , settlement=1 " \
-                          "where orderID = ? and stockProductID = ? and settlement <> 1 "
-                    print("update Stock_Product_Order_App sql is ---\n ", sql)
-                    cursor.execute(sql, opCode, purchaseNum, purchasePrice, supplier, orderID, stockProductID)
+                          "set opCode = ?, OrderNum = ? , OrderPrice=?, supplier=? , settlement=? " \
+                          "where orderID = ? and stockProductID = ? and settlement <> ? "
+                    print("update Stock_Product_Order_App complete order sql is ---\n ", sql)
+                    cursor.execute(sql, opCode, purchaseNum, purchasePrice, supplier, settlement, orderID, stockProductID, settlement)
+                    cursor.commit()
+                elif operate_type == "return":
+                    # 插入一条 退货 记录进来，原订货记录保存。
+                    orderStat = -1
+                    # 退货。
+                    sql = "select count(*) from Stock_Product_Order_App where sourceOrderID=?"
+                    cursor.execute(sql, orderID)
+                    row = cursor.fetchone()
+                    cc = row[0]
+                    if cc == 0:
+                        sql = "insert into Stock_Product_Order_App(stockProductID,opCode, OrderNum, OrderPrice," \
+                              "orderStat,supplier, settlement,sourceOrderID,createTime)  " \
+                              "select stockProductID,?, OrderNum, OrderPrice, ? ,supplier, settlement, orderID, getdate() " \
+                              "from Stock_Product_Order_App where orderID=?"
+                        print("insert Stock_Product_Order_App return goods sql is --- \n ", sql)
+                        cursor.execute(sql, opCode, orderID, orderStat)
+                        cursor.commit()
+                    else:
+                        result = "-1"
+                elif operate_type == "receive":
+                    purchaseNum = prod["purchaseNum"]
+                    purchasePrice = prod["purchasePrice"]
+                    # 订货 或者 退货
+                    orderStat = prod["orderStat"]
+                    supplier = prod["supplier"]
+                    settlement = prod["settlement"]
+                    settlement = 2
+                    sql = "update Stock_Product_Order_App " \
+                          "set opCode = ?, OrderNum = ? , OrderPrice=?, supplier=? , settlement=? " \
+                          "where orderID = ? and stockProductID = ? and settlement <> ? "
+                    print("update Stock_Product_Order_App receive goods sql is ---\n ", sql)
+                    cursor.execute(sql, opCode, purchaseNum, purchasePrice, supplier, settlement,orderID, stockProductID, settlement)
                     cursor.commit()
             cursor.close
             cnxn.close
