@@ -250,16 +250,16 @@ class StockDao(object):
             # 数据源
             v_sql = "select " + topN + " "
             if ptype == "return":
-                v_sql_tab_g = "(SELECT * FROM [csidbo].[Stock_Product_Order_App] AS T1 " \
-                              "WHERE NOT EXISTS( SELECT 1 FROM [csidbo].[Stock_Product_Order_App] AS T2 " \
-                              "WHERE T1.orderID=T2.sourceOrderId))"
+                v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] AS T1 " \
+                              "WHERE NOT EXISTS( SELECT 1 FROM [Stock_Product_Order_App] AS T2 " \
+                              "WHERE T1.orderID=T2.sourceOrderId) and OrderStat == -1)"
             else:
-                v_sql_tab_g = "(SELECT * FROM [csidbo].[Stock_Product_Order_App] AS T1 " \
-                              "WHERE NOT EXISTS( SELECT 1 FROM [csidbo].[Stock_Product_Order_App] AS T2 " \
+                v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] AS T1 " \
+                              "WHERE NOT EXISTS( SELECT 1 FROM [Stock_Product_Order_App] AS T2 " \
                               "WHERE T1.orderID=T2.sourceOrderId) and t1.sourceOrderId is null)  "
 
             v_sql_tab_h = "(select max(id) as id, StockProductID " \
-                          "from csidbo.[Stock_Product_EnquiryPrice_App] group by StockProductID) "
+                          "from [Stock_Product_EnquiryPrice_App] group by StockProductID) "
 
             v_sql = v_sql + "e.[采购人], a.StockProductID,a.ProductID,CONVERT(varchar, d.SignDate, 120 ) as SignDate," \
                             "a.GoodsCode,a.SpecNo,f.GoodsCDesc, a.GoodsUnit, b._ImageID,c.ImageGuid,c.ImageFmt," \
@@ -273,12 +273,12 @@ class StockDao(object):
                             "CONVERT(varchar, g.CreateTime, 120 ) as CreateTime," \
                             "g.sourceOrderID, CONVERT(varchar, g.ensureTime, 120 ) as ensureTime, g.ensureOpCode, " \
                             "CONVERT(varchar, g.receiveGoodsTime, 120 ) as receiveGoodsTime, g.receiveOpCode " \
-                            "FROM [csidbo].[Stock_Product_Info] as a " \
-                            "join  csidbo.FTPart_Stock_Product_Property_1 as b on a.StockProductID=b.MainID " \
-                            "join csidbo.Product_Image as c on b._ImageID=c.ProductImageID " \
-                            "join csidbo.stock_info d on d.ID=a.StockID " \
-                            "join csidbo.[FTPart_Stock_Property_1] e on e.[MainID] = d.ID " \
-                            "left join csidbo.[Stock_Product_Info_Desc] f on a.StockProductID=f.StockProductID "
+                            "FROM [Stock_Product_Info] as a " \
+                            "join  FTPart_Stock_Product_Property_1 as b on a.StockProductID=b.MainID " \
+                            "join Product_Image as c on b._ImageID=c.ProductImageID " \
+                            "join stock_info d on d.ID=a.StockID " \
+                            "join [FTPart_Stock_Property_1] e on e.[MainID] = d.ID " \
+                            "left join [Stock_Product_Info_Desc] f on a.StockProductID=f.StockProductID "
             v_sql = v_sql + "join " + v_sql_tab_g + "as g on a.StockProductID=g.StockProductID "
             v_sql = v_sql + "left join " + v_sql_tab_h + " h on  a.StockProductID=h.StockProductID  "
 
@@ -321,7 +321,7 @@ class StockDao(object):
                 v_sql = v_sql + " and g.supplier in (" + filter_sql + ")"
             v_sql = v_sql + " order by g.CreateTime desc,a.stockproductid desc, g.orderID desc"
             sql = "select  top 10 * from (" + v_sql + " ) as v1 order by v1.CreateTime asc,v1.StockProductID asc, v1.product_order_id asc"
-            print("sql is ", sql)
+            print(ptype, "sql is ", sql)
             cursor.execute(sql)
             for row in cursor:
                 product = ProductInfo()
@@ -553,15 +553,15 @@ class StockDao(object):
             return None
 
     def select_dict_item_list(self, item_type):
-        # select ID, DictValue from [csidbo].CustomDict where DictType=501027 and status = 0
+        # select ID, DictValue from CustomDict where DictType=501027 and status = 0
         try:
             item_list = []
             cnxn = pyodbc.connect(self._conn_str)
             cursor = cnxn.cursor()
             if item_type == "brand":
-                sql = "select ID, DictValue from [csidbo].CustomDict where DictType=501027 and status=0"
+                sql = "select ID, DictValue from CustomDict where DictType=501027 and status=0"
             else:
-                sql = "Select ID, custname from [csidbo].Cust_Info where grouptype=9 and status=0"
+                sql = "Select ID, custname from Cust_Info where grouptype=9 and status=0"
             cursor.execute(sql)
             for row in cursor:
                 item = dict()
