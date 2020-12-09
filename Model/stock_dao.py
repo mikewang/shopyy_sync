@@ -466,8 +466,10 @@ class StockDao(object):
                     cursor.commit()
                 elif operate_type == "return":
                     # 插入一条 退货 记录进来，原订货记录保存。
+                    print(operate_type,"product", prod)
                     orderStat = -1
                     purchaseNum = prod["purchaseNum"]
+                    purchasePrice = prod["purchasePrice"]
                     settlement = prod["settlement"]
                     # 退货。
                     sql = "select count(*) from Stock_Product_Order_App where sourceOrderID=?"
@@ -481,10 +483,10 @@ class StockDao(object):
                         print(operate_type, stockProductID, " product has been returned, delete it now.")
                     sql = "insert into Stock_Product_Order_App(stockProductID,opCode, OrderNum, OrderPrice," \
                           "orderStat,supplier, settlement,sourceOrderID,createTime)  " \
-                          "select stockProductID,?, OrderNum, OrderPrice, ? ,supplier, settlement, orderID, getdate() " \
+                          "select stockProductID,?, ?, ?, ? ,supplier, settlement, orderID, getdate() " \
                           "from Stock_Product_Order_App where orderID=?"
                     print(operate_type, "insert sql --- \n ", sql)
-                    cursor.execute(sql, opCode, orderStat, orderID)
+                    cursor.execute(sql, opCode, purchaseNum, purchasePrice orderStat, orderID)
                     if settlement == 2:
                         sql = "update [FTPart_Stock_Product_Property_1] " \
                               "set [其它.采购剩余数量] = [其它.采购剩余数量] + ? " \
