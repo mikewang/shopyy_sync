@@ -421,10 +421,10 @@ class StockDao(object):
                     if cc == 0:
                         sql = "insert into Stock_Product_Order_App(stockProductID,opCode, OrderNum, OrderPrice," \
                               "orderStat,supplier, settlement,sourceOrderID,createTime)  " \
-                              "select stockProductID,?, OrderNum, OrderPrice,？,supplier, settlement, orderID, getdate() " \
+                              "select stockProductID,?, OrderNum, OrderPrice,?,supplier, settlement, orderID, getdate() " \
                               "from Stock_Product_Order_App where orderID=?"
                         print("insert Stock_Product_Order_App cancel order sql is --- \n ", sql)
-                        cursor.execute(sql, opCode, orderID, orderStat)
+                        cursor.execute(sql, opCode, orderStat, orderID)
                         cursor.commit()
                     else:
                         result = "-1"
@@ -457,7 +457,7 @@ class StockDao(object):
                               "select stockProductID,?, OrderNum, OrderPrice, ? ,supplier, settlement, orderID, getdate() " \
                               "from Stock_Product_Order_App where orderID=?"
                         print("insert Stock_Product_Order_App return goods sql is --- \n ", sql)
-                        cursor.execute(sql, opCode, orderID, orderStat)
+                        cursor.execute(sql, opCode,  orderStat, orderID)
                         cursor.commit()
                     else:
                         result = "-1"
