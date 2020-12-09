@@ -486,7 +486,7 @@ class StockDao(object):
                           "select stockProductID,?, ?, ?, ? ,supplier, settlement, orderID, getdate() " \
                           "from Stock_Product_Order_App where orderID=?"
                     print(operate_type, "insert sql --- \n ", sql)
-                    cursor.execute(sql, opCode, purchaseNum, purchasePrice orderStat, orderID)
+                    cursor.execute(sql, opCode, purchaseNum, purchasePrice, orderStat, orderID)
                     if settlement == 2:
                         sql = "update [FTPart_Stock_Product_Property_1] " \
                               "set [其它.采购剩余数量] = [其它.采购剩余数量] + ? " \
