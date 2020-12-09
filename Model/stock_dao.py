@@ -446,6 +446,8 @@ class StockDao(object):
                 elif operate_type == "return":
                     # 插入一条 退货 记录进来，原订货记录保存。
                     orderStat = -1
+                    purchaseNum = prod["purchaseNum"]
+                    settlement = prod["settlement"]
                     # 退货。
                     sql = "select count(*) from Stock_Product_Order_App where sourceOrderID=?"
                     cursor.execute(sql, orderID)
@@ -458,6 +460,38 @@ class StockDao(object):
                               "from Stock_Product_Order_App where orderID=?"
                         print(operate_type, "insert sql --- \n ", sql)
                         cursor.execute(sql, opCode,  orderStat, orderID)
+                        if settlement == 2:
+                            sql = "update [FTPart_Stock_Product_Property_1] " \
+                                  "set [其它.采购剩余数量] = [其它.采购剩余数量] + ? " \
+                                  "where [MainID]=?"
+                            cursor.execute(sql, purchaseNum, stockProductID)
+                            print(operate_type, "update sql2 ---\n ", sql)
+
+                        cursor.commit()
+                    else:
+                        print(operate_type, stockProductID, " product has been returned.")
+                        result = "-1"
+                elif operate_type == "undoreturn":
+                    # 取消 退货。
+                    orderStat = 0
+                    purchaseNum = prod["purchaseNum"]
+                    settlement = prod["settlement"]
+                    # 退货。
+                    sql = "select count(*) from Stock_Product_Order_App where orderID=? and orderStat = -1"
+                    cursor.execute(sql, orderID)
+                    row = cursor.fetchone()
+                    cc = row[0]
+                    if cc == 0:
+                        sql = "update Stock_Product_Order_App set orderStat = ? where orderID=?"
+                        print(operate_type, "update sql --- \n ", sql)
+                        cursor.execute(sql,  orderStat, orderID)
+                        if settlement == 2:
+                            sql = "update [FTPart_Stock_Product_Property_1] " \
+                                  "set [其它.采购剩余数量] = [其它.采购剩余数量] - ? " \
+                                  "where [MainID]=?"
+                            cursor.execute(sql, purchaseNum, stockProductID)
+                            print(operate_type, "update sql2 ---\n ", sql)
+
                         cursor.commit()
                     else:
                         result = "-1"
@@ -474,6 +508,11 @@ class StockDao(object):
                           "where orderID = ? and stockProductID = ? and settlement <> ? "
                     print(operate_type, "update sql ---\n ", sql)
                     cursor.execute(sql, opCode, purchaseNum, purchasePrice, supplier, settlement,orderID, stockProductID, settlement)
+                    sql = "update [FTPart_Stock_Product_Property_1] " \
+                          "set [其它.采购剩余数量]=[其它.采购剩余数量] + [其它.允采购量] - ?,[其它.供应商名称]=?,[其它.业务员]=? " \
+                          "where [MainID]=?"
+                    cursor.execute(sql, purchaseNum, supplier, opCode, stockProductID)
+                    print(operate_type, "update sql2 ---\n ", sql)
                     cursor.commit()
             cursor.close
             cnxn.close
