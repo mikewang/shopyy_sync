@@ -423,7 +423,7 @@ class StockDao(object):
                               "orderStat,supplier, settlement,sourceOrderID,createTime)  " \
                               "select stockProductID,?, OrderNum, OrderPrice,?,supplier, settlement, orderID, getdate() " \
                               "from Stock_Product_Order_App where orderID=?"
-                        print("insert Stock_Product_Order_App cancel order sql is --- \n ", sql)
+                        print(operate_type, "insert sql --- \n ", sql)
                         cursor.execute(sql, opCode, orderStat, orderID)
                         cursor.commit()
                     else:
@@ -440,7 +440,7 @@ class StockDao(object):
                     sql = "update Stock_Product_Order_App " \
                           "set opCode = ?, OrderNum = ? , OrderPrice=?, supplier=? , settlement=? " \
                           "where orderID = ? and stockProductID = ? and settlement <> ? "
-                    print("update Stock_Product_Order_App complete order sql is ---\n ", sql)
+                    print(operate_type, "update sql ---\n ", sql)
                     cursor.execute(sql, opCode, purchaseNum, purchasePrice, supplier, settlement, orderID, stockProductID, settlement)
                     cursor.commit()
                 elif operate_type == "return":
@@ -456,7 +456,7 @@ class StockDao(object):
                               "orderStat,supplier, settlement,sourceOrderID,createTime)  " \
                               "select stockProductID,?, OrderNum, OrderPrice, ? ,supplier, settlement, orderID, getdate() " \
                               "from Stock_Product_Order_App where orderID=?"
-                        print("insert Stock_Product_Order_App return goods sql is --- \n ", sql)
+                        print(operate_type, "insert sql --- \n ", sql)
                         cursor.execute(sql, opCode,  orderStat, orderID)
                         cursor.commit()
                     else:
@@ -472,7 +472,7 @@ class StockDao(object):
                     sql = "update Stock_Product_Order_App " \
                           "set opCode = ?, OrderNum = ? , OrderPrice=?, supplier=? , settlement=? " \
                           "where orderID = ? and stockProductID = ? and settlement <> ? "
-                    print("update Stock_Product_Order_App receive goods sql is ---\n ", sql)
+                    print(operate_type, "update sql ---\n ", sql)
                     cursor.execute(sql, opCode, purchaseNum, purchasePrice, supplier, settlement,orderID, stockProductID, settlement)
                     cursor.commit()
             cursor.close
