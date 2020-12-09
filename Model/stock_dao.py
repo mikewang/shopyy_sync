@@ -249,12 +249,28 @@ class StockDao(object):
             # 采购人	StockProductID	ProductID	SignDate	GoodsCode	SpecNo	GoodsSpec	GoodsUnit	_ImageID	ImageGuid	ImageFmt	ModuleID	FileDate	ThumbImage	其它.供应商名称	其它.允采购量	其它.应采购价	其它.商品品牌
             # 数据源
             v_sql = "select " + topN + " "
+            if ptype == "return":
+                v_sql_tab_g = "(SELECT * FROM [csidbo].[Stock_Product_Order_App] AS T1 " \
+                              "WHERE NOT EXISTS( SELECT 1 FROM [csidbo].[Stock_Product_Order_App] AS T2 " \
+                              "WHERE T1.orderID=T2.sourceOrderId))"
+            else:
+                v_sql_tab_g = "(SELECT * FROM [csidbo].[Stock_Product_Order_App] AS T1 " \
+                              "WHERE NOT EXISTS( SELECT 1 FROM [csidbo].[Stock_Product_Order_App] AS T2 " \
+                              "WHERE T1.orderID=T2.sourceOrderId) and t1.sourceOrderId is null)  "
+
+            v_sql_tab_h = "(select max(id) as id, StockProductID " \
+                          "from csidbo.[Stock_Product_EnquiryPrice_App] group by StockProductID) "
+
             v_sql = v_sql + "e.[采购人], a.StockProductID,a.ProductID,CONVERT(varchar, d.SignDate, 120 ) as SignDate," \
                             "a.GoodsCode,a.SpecNo,f.GoodsCDesc, a.GoodsUnit, b._ImageID,c.ImageGuid,c.ImageFmt," \
-                            "c.ModuleID,CONVERT(varchar, c.FileDate, 120 ) as FileDate,c.ThumbImage,g.supplier as supplier," \
-                            "b.[其它.允采购量],b.[其它.应采购价],b.[其它.商品品牌],coalesce(g.[OrderNum]*g.[OrderStat],0) as ordernum," \
-                            "g.orderprice, g.orderStat, g.settlement,g.opcode as order_opcode, g.orderID as product_order_id, " \
-                            "coalesce(h.id,0) as priceEnquiredID, CONVERT(varchar, g.CreateTime, 120 ) as CreateTime," \
+                            "c.ModuleID,CONVERT(varchar, c.FileDate, 120 ) as FileDate,c.ThumbImage," \
+                            "g.supplier as supplier," \
+                            "b.[其它.允采购量],b.[其它.应采购价],b.[其它.商品品牌]," \
+                            "coalesce(g.[OrderNum]*g.[OrderStat],0) as ordernum," \
+                            "g.orderprice, g.orderStat, g.settlement,g.opcode as order_opcode," \
+                            "g.orderID as product_order_id, " \
+                            "coalesce(h.id,0) as priceEnquiredID, " \
+                            "CONVERT(varchar, g.CreateTime, 120 ) as CreateTime," \
                             "g.sourceOrderID, CONVERT(varchar, g.ensureTime, 120 ) as ensureTime, g.ensureOpCode, " \
                             "CONVERT(varchar, g.receiveGoodsTime, 120 ) as receiveGoodsTime, g.receiveOpCode " \
                             "FROM [csidbo].[Stock_Product_Info] as a " \
@@ -262,14 +278,18 @@ class StockDao(object):
                             "join csidbo.Product_Image as c on b._ImageID=c.ProductImageID " \
                             "join csidbo.stock_info d on d.ID=a.StockID " \
                             "join csidbo.[FTPart_Stock_Property_1] e on e.[MainID] = d.ID " \
-                            "left join csidbo.[Stock_Product_Info_Desc] f on a.StockProductID=f.StockProductID " \
-                            "join (SELECT * FROM [FTTXRUN].[csidbo].[Stock_Product_Order_App] AS T1 WHERE NOT EXISTS( SELECT 1 FROM [FTTXRUN].[csidbo].[Stock_Product_Order_App] AS T2 WHERE T1.orderID=T2.sourceOrderId) and t1.sourceOrderId is null) as g on a.StockProductID=g.StockProductID " \
-                            "left join (select max(id) as id, StockProductID from csidbo.[Stock_Product_EnquiryPrice_App] group by StockProductID ) h on  a.StockProductID=h.StockProductID  "
+                            "left join csidbo.[Stock_Product_Info_Desc] f on a.StockProductID=f.StockProductID "
+            v_sql = v_sql + "join " + v_sql_tab_g + "as g on a.StockProductID=g.StockProductID "
+            v_sql = v_sql + "left join " + v_sql_tab_h + " h on  a.StockProductID=h.StockProductID  "
+
             if ptype == "order":
-                #去掉订货，订货，订货完成三个状态的查询
+                # 去掉订货，订货，订货完成三个状态的查询
                 v_sql = v_sql + "  where 1=1 and g.settlement <=1 "
             elif ptype == "receive":
-                # 收货， 退货 两个状态的查询
+                # 收货，状态的查询
+                v_sql = v_sql + "  where 1=1 and g.settlement >=1 "
+            elif ptype == "return":
+                # 退货, 状态的查询
                 v_sql = v_sql + "  where 1=1 and g.settlement >=1 "
             else:
                 v_sql = v_sql + "  where 1=1 "
