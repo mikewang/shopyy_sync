@@ -255,7 +255,7 @@ class StockDao(object):
             else:
                 v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] AS T1 " \
                               "WHERE NOT EXISTS( SELECT 1 FROM [Stock_Product_Order_App] AS T2 " \
-                              "WHERE T1.orderID=T2.sourceOrderId and OrderStat == -1) and t1.sourceOrderId is null)  "
+                              "WHERE T1.orderID=T2.sourceOrderId and OrderStat = -1) and t1.sourceOrderId is null)  "
 
             v_sql_tab_h = "(select max(id) as id, StockProductID " \
                           "from [Stock_Product_EnquiryPrice_App] group by StockProductID) "
