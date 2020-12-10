@@ -266,7 +266,7 @@ class StockDao(object):
                             "c.ModuleID,CONVERT(varchar, c.FileDate, 120 ) as FileDate,c.ThumbImage," \
                             "g.supplier as supplier," \
                             "b.[其它.允采购量],b.[其它.应采购价],b.[其它.商品品牌]," \
-                            "coalesce(g.[OrderNum]*g.[OrderStat],0) as ordernum," \
+                            "coalesce(g.[OrderNum],0) as ordernum," \
                             "g.orderprice, g.orderStat, g.settlement,g.opcode as order_opcode," \
                             "g.orderID as product_order_id, " \
                             "coalesce(h.id,0) as priceEnquiredID, " \
