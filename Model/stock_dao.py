@@ -543,7 +543,7 @@ class StockDao(object):
                     sql = "update [FTPart_Stock_Product_Property_1] " \
                           "set [其它.采购剩余数量]=[其它.采购剩余数量] + [其它.允采购量] - ?,[其它.供应商名称]=?,[其它.业务员]=? " \
                           "where [MainID]=?"
-                    cursor.execute(sql, purchaseNum, supplier, opCode, stockProductID)
+                    cursor.execute(sql, purchaseNum, supplier, receiveOpCode, stockProductID)
                     print(operate_type, "update sql2 ---\n ", sql)
                     cursor.commit()
                 elif operate_type == "settlement":
