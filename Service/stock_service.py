@@ -66,7 +66,7 @@ class StockService(UserInfo):
             return None
 
     def login(self, OpCode, timestamp, token):
-        print(self.get_now_str(), "login", OpCode)
+        print(self.get_now_str(), "login by " + OpCode, "-"*30)
 
         user = self.get_checked_user(OpCode, timestamp, token)
         if user is not None:
@@ -78,7 +78,7 @@ class StockService(UserInfo):
 
     def get_dict_item(self, OpCode, timestamp, token, item_type):
 
-        print(self.get_now_str(), "get  data dictionary type", OpCode, timestamp, token, item_type)
+        print(self.get_now_str(),timestamp, token, item_type, "get data dictionary type by " + OpCode, "-"*30)
         item_list = None
         user = self.get_checked_user(OpCode, timestamp, token)
         if user is not None:
@@ -89,7 +89,7 @@ class StockService(UserInfo):
 
     def get_stock_product(self, OpCode, timestamp, token, pageNo, filter_stock, ptype):
 
-        print(self.get_now_str(), ptype, "get stock product", OpCode, "PageNo=", pageNo, filter_stock)
+        print(self.get_now_str(), ptype, "PageNo=", pageNo, filter_stock, "get stock product by " + OpCode, "-"*30)
         product_list = None
         user = self.get_checked_user(OpCode, timestamp, token)
         if user is not None:
@@ -99,7 +99,7 @@ class StockService(UserInfo):
         return product_list
 
     def get_order_product(self, OpCode, timestamp, token, pageNo, filter_stock, ptype):
-        print(self.get_now_str(), "get order product ", OpCode, "PageNo=", pageNo, filter_stock)
+        print(self.get_now_str(), "PageNo=", pageNo, filter_stock, "get order product by " + OpCode, "-"*30)
         product_list = None
         user = self.get_checked_user(OpCode, timestamp, token)
         if user is not None:
@@ -109,7 +109,7 @@ class StockService(UserInfo):
         return product_list
 
     def get_product_image(self, OpCode, timestamp, token, imageGuid, year, month, module):
-        print(self.get_now_str(), "get product big image ", OpCode)
+        print(self.get_now_str(), "get product big image by " + OpCode, "-"*30)
         product_list = None
         user = self.get_checked_user(OpCode, timestamp, token)
         disk_path = self._dao.disk_path
@@ -123,7 +123,7 @@ class StockService(UserInfo):
 
     def add_stock_product_enquiry_price(self, OpCode, timestamp, token, prod_dict_list):
 
-        print(self.get_now_str(), "add product enquiry price  ", OpCode)
+        print(self.get_now_str(), "add product enquiry price  by " + OpCode, "-"*30)
         user = self.get_checked_user(OpCode, timestamp, token)
         if user is not None:
             result = self._dao.add_stock_product_enquiry_price(prod_dict_list)
@@ -133,12 +133,10 @@ class StockService(UserInfo):
             return None
 
     def post_order_product(self, OpCode, timestamp, token, prod_dict_list, operate):
-        print(self.get_now_str(),  operate,"product order ", OpCode)
+        print(self.get_now_str(),  operate, "product order by " + OpCode, "-"*30)
         user = self.get_checked_user(OpCode, timestamp, token)
         if user is not None:
-            if operate == "cancel":
-                result = self._dao.update_stock_product_order(prod_dict_list, operate)
-            elif operate == "complete":
+            if operate == "cancel" or operate == "complete" or operate == "return" or operate == "receive":
                 result = self._dao.update_stock_product_order(prod_dict_list, operate)
             else:
                 result = self.add_order_product(OpCode, timestamp, token, prod_dict_list)
@@ -149,7 +147,7 @@ class StockService(UserInfo):
 
     def add_order_product(self, OpCode, timestamp, token, prod_dict_list):
 
-        print(self.get_now_str(), "add product order ", OpCode)
+        print(self.get_now_str(), "add product order by " + OpCode, "-"*30)
         user = self.get_checked_user(OpCode, timestamp, token)
         if user is not None:
             result = self._dao.add_stock_product_order(prod_dict_list)
@@ -160,7 +158,7 @@ class StockService(UserInfo):
 
     def cancel_order_product(self, OpCode, timestamp, token, prod_dict_list):
 
-        print(self.get_now_str(), "cancel product order ", OpCode)
+        print(self.get_now_str(), "cancel product order by " + OpCode, "-"*30)
         user = self.get_checked_user(OpCode, timestamp, token)
         if user is not None:
             result = self._dao.update_stock_product_order(prod_dict_list, "cancel")
@@ -171,7 +169,7 @@ class StockService(UserInfo):
 
     def complete_order_product(self, OpCode, timestamp, token, prod_dict_list):
 
-        print(self.get_now_str(), "complete product order ", OpCode)
+        print(self.get_now_str(), "complete product order by " + OpCode, "-"*30)
         user = self.get_checked_user(OpCode, timestamp, token)
         if user is not None:
             result = self._dao.update_stock_product_order(prod_dict_list, "complete")

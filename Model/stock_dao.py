@@ -397,7 +397,7 @@ class StockDao(object):
                 sql = "insert into Stock_Product_Order_App(stockProductID,opCode, OrderNum, OrderPrice,orderStat," \
                       "supplier, settlement) " \
                       " values(?,?,?,?,?,?,?)"
-                print("insert Stock_Product_Order_App sql is ", sql)
+                print("add order", "insert Stock_Product_Order_App sql is ", sql)
                 cursor.execute(sql, stockProductID, opCode, purchaseNum, purchasePrice, orderStat, supplier, settlement)
                 # myTableId = cursor.fetchone()[0]
                 # print("Stock_Product_Order_App id is ", myTableId)
