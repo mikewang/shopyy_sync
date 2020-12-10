@@ -43,15 +43,17 @@ class ProductInfo(object):
         # settlement = 1， 确认订货成功，并没有现实收货，0，默认值，未确认订货成功。2, 收到货（写入erp）。3，结算。
         self.settlement = 0
         self.orderID = 0
-        self.orderOpCode = ''
         # 订货时间/取消订货时间
         self.createTime = ''
+        self.orderOpCode = ''
         self.sourceOrderID = 0
         # 确认订货时间
         self.ensureTime = ''
         self.ensureOpCode = ''
         self.receiveGoodsTime = ''
         self.receiveOpCode = ''
+        self.settlementTime = ''
+        self.settlementOpCode = ''
 
 
     def desc(self):

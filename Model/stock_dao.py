@@ -271,7 +271,8 @@ class StockDao(object):
                             "coalesce(h.id,0) as priceEnquiredID, " \
                             "CONVERT(varchar, g.CreateTime, 120 ) as CreateTime," \
                             "g.sourceOrderID, CONVERT(varchar, g.ensureTime, 120 ) as ensureTime, g.ensureOpCode, " \
-                            "CONVERT(varchar, g.receiveGoodsTime, 120 ) as receiveGoodsTime, g.receiveOpCode " \
+                            "CONVERT(varchar, g.receiveGoodsTime, 120 ) as receiveGoodsTime, g.receiveOpCode," \
+                            "CONVERT(varchar, g.settlementTime, 120 ) as settlementTime, g.settlementOpCode " \
                             "FROM [Stock_Product_Info] as a " \
                             "join  FTPart_Stock_Product_Property_1 as b on a.StockProductID=b.MainID " \
                             "join Product_Image as c on b._ImageID=c.ProductImageID " \
@@ -286,10 +287,13 @@ class StockDao(object):
                 v_sql = v_sql + "  where 1=1 and g.settlement <=1 "
             elif ptype == "receive":
                 # 收货，状态的查询
-                v_sql = v_sql + "  where 1=1 and g.settlement >=1 "
+                v_sql = v_sql + "  where 1=1 and g.settlement >=1 and g.settlement <=2"
             elif ptype == "return":
                 # 退货, 状态的查询
-                v_sql = v_sql + "  where 1=1 and g.settlement >=1 "
+                v_sql = v_sql + "  where 1=1 and g.settlement >=1 and g.settlement <=2"
+            elif ptype == "settlement":
+                # 结算, 状态的查询
+                v_sql = v_sql + "  where 1=1 and g.settlement >=2"
             else:
                 v_sql = v_sql + "  where 1=1 "
 
@@ -351,7 +355,7 @@ class StockDao(object):
                 product.orderStat = row[20]
                 # settlement = 1， 确认订货成功，并没有现实收货，0，默认值，未确认订货成功。
                 product.settlement = row[21]
-                product.orderOpCode = row[21]
+                product.orderOpCode = row[22]
                 product.orderID = row[23]
                 product.priceEnquiredID = row[24]
                 product.createTime = row[25]
@@ -360,6 +364,8 @@ class StockDao(object):
                 product.ensureOpCode = row[28]
                 product.receiveGoodsTime = row[29]
                 product.receiveOpCode = row[30]
+                product.settlementTime = row[31]
+                product.settlementOpCode = row[32]
 
                 product_list.append(product)
             cursor.close()
@@ -386,7 +392,7 @@ class StockDao(object):
             for prod in prod_dict_list:
                 print("enquiried product is ", prod["stockProductID"], prod)
                 stockProductID = prod["stockProductID"]
-                opCode = prod["opCode"]
+                opCode = prod["orderOpCode"]
                 purchaseNum = prod["purchaseNum"]
                 purchasePrice = prod["purchasePrice"]
                 orderStat = prod["orderStat"]
@@ -428,7 +434,7 @@ class StockDao(object):
                 print("order product id=", prod["orderID"], prod["stockProductID"])
                 orderID = prod["orderID"]
                 stockProductID = prod["stockProductID"]
-                opCode = prod["opCode"]
+                opCode = prod["orderOpCode"]
                 if operate_type == "cancel":
                     # 插入一条 取消 订货记录进来，原订货记录保存。
                     orderStat = -1
@@ -450,6 +456,7 @@ class StockDao(object):
                     cursor.commit()
 
                 elif operate_type == "complete":
+                    ensureOpCode = prod["ensureOpCode"]
                     purchaseNum = prod["purchaseNum"]
                     purchasePrice = prod["purchasePrice"]
                     # 订货 或者 退货
@@ -458,10 +465,10 @@ class StockDao(object):
                     settlement = prod["settlement"]
                     settlement = 1
                     sql = "update Stock_Product_Order_App " \
-                          "set opCode = ?, OrderNum = ? , OrderPrice=?, supplier=? , settlement=? " \
+                          "set ensureOpCode = ?, OrderNum = ? , OrderPrice=?, supplier=? , settlement=?, ensureTime=getdate() " \
                           "where orderID = ? and stockProductID = ? and settlement <> ? "
                     print(operate_type, "update sql ---\n ", sql)
-                    cursor.execute(sql, opCode, purchaseNum, purchasePrice, supplier, settlement, orderID, stockProductID, settlement)
+                    cursor.execute(sql, ensureOpCode, purchaseNum, purchasePrice, supplier, settlement, orderID, stockProductID, settlement)
                     cursor.commit()
                 elif operate_type == "return":
                     # 插入一条 退货 记录进来，原订货记录保存。
@@ -518,6 +525,7 @@ class StockDao(object):
                     else:
                         result = "-1"
                 elif operate_type == "receive":
+                    receiveOpCode = prod["receiveOpCode"]
                     purchaseNum = prod["purchaseNum"]
                     purchasePrice = prod["purchasePrice"]
                     # 订货 或者 退货
@@ -526,15 +534,26 @@ class StockDao(object):
                     settlement = prod["settlement"]
                     settlement = 2
                     sql = "update Stock_Product_Order_App " \
-                          "set opCode = ?, OrderNum = ? , OrderPrice=?, supplier=? , settlement=? " \
+                          "set receiveOpCode = ?, settlement=?, receiveGoodsTime=getdate() " \
                           "where orderID = ? and stockProductID = ? and settlement <> ? "
                     print(operate_type, "update sql ---\n ", sql)
-                    cursor.execute(sql, opCode, purchaseNum, purchasePrice, supplier, settlement,orderID, stockProductID, settlement)
+                    cursor.execute(sql, receiveOpCode, settlement, orderID, stockProductID, settlement)
                     sql = "update [FTPart_Stock_Product_Property_1] " \
                           "set [其它.采购剩余数量]=[其它.采购剩余数量] + [其它.允采购量] - ?,[其它.供应商名称]=?,[其它.业务员]=? " \
                           "where [MainID]=?"
                     cursor.execute(sql, purchaseNum, supplier, opCode, stockProductID)
                     print(operate_type, "update sql2 ---\n ", sql)
+                    cursor.commit()
+                elif operate_type == "settlement":
+                    settlementOpCode = prod["settlementOpCode"]
+                    # 结算
+                    settlement = prod["settlement"]
+                    settlement = 3
+                    sql = "update Stock_Product_Order_App " \
+                          "set settlementOpCode = ?, settlement=?,settlemnetTime=getdate() " \
+                          "where orderID = ? and stockProductID = ? and settlement <> ? "
+                    print(operate_type, "update sql ---\n ", sql)
+                    cursor.execute(sql, settlementOpCode, settlement, orderID, stockProductID, settlement)
                     cursor.commit()
             cursor.close
             cnxn.close
