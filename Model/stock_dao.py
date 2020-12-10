@@ -434,8 +434,8 @@ class StockDao(object):
                 print("order product id=", prod["orderID"], prod["stockProductID"])
                 orderID = prod["orderID"]
                 stockProductID = prod["stockProductID"]
-                opCode = prod["orderOpCode"]
                 if operate_type == "cancel":
+                    opCode = prod["orderOpCode"]
                     # 插入一条 取消 订货记录进来，原订货记录保存。
                     orderStat = -1
                     # 取消订货。
@@ -472,7 +472,8 @@ class StockDao(object):
                     cursor.commit()
                 elif operate_type == "return":
                     # 插入一条 退货 记录进来，原订货记录保存。
-                    print(operate_type,"product", prod)
+                    opCode = prod["orderOpCode"]
+                    print(operate_type, "product", prod)
                     orderStat = -1
                     purchaseNum = prod["purchaseNum"]
                     purchasePrice = prod["purchasePrice"]
@@ -502,6 +503,7 @@ class StockDao(object):
                     cursor.commit()
                 elif operate_type == "undoreturn":
                     # 取消 退货。
+                    opCode = prod["orderOpCode"]
                     orderStat = 0
                     purchaseNum = prod["purchaseNum"]
                     settlement = prod["settlement"]
