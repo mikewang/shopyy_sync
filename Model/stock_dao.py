@@ -251,7 +251,7 @@ class StockDao(object):
             v_sql = "select " + topN + " "
             if ptype == "return":
                 v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] AS T1 " \
-                              "WHERE OrderStat = -1)"
+                              "WHERE OrderStat = -1 and settlement > 0)"
             else:
                 v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] AS T1 " \
                               "WHERE NOT EXISTS( SELECT 1 FROM [Stock_Product_Order_App] AS T2 " \
