@@ -220,7 +220,7 @@ class StockDao(object):
             print('traceback.print_exc(): ', traceback.print_exc())
             print('traceback.format_exc():\n%s' % traceback.format_exc())
             print('#' * 60)
-            return None
+            return None, 0
 
     def add_stock_product_enquiry_price(self, prod_dict_list):
         try:
