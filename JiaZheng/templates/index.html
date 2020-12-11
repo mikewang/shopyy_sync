@@ -145,13 +145,13 @@
                                     }
 
                                     var currentRow = $("#table_worker tbody tr:last");
-                                    currentRow.find("td:eq(0)").html(worker.);
-                                    currentRow.find("td:eq(1)").html(rental.Pickup_Location);
-                                    currentRow.find("td:eq(2)").html(rental.Dropoff_Location);
-                                    currentRow.find("td:eq(3)").html(rental.Pickup_Date);
-                                    currentRow.find("td:eq(4)").html(rental.Dropoff_Date);
-                                    currentRow.find("td:eq(5)").html(rental.Start_Odometer);
-                                    currentRow.find("td:eq(6)").html("<a href='/rentalservice?id=" + rental.rs_id + "'>" + rental.name + "</a>");
+                                    currentRow.find("td:eq(0)").html(worker.employeeno);
+                                    currentRow.find("td:eq(1)").html(worker.name);
+                                    currentRow.find("td:eq(2)").html(worker.birthday);
+                                    currentRow.find("td:eq(3)").html(worker.sex);
+                                    currentRow.find("td:eq(4)").html(worker.national);
+                                    currentRow.find("td:eq(5)").html(worker.telephone);
+                                    currentRow.find("td:eq(6)").html("<a href='/worker?no=" + worker.employeeno + "'>" + "更多 »" + "</a>");
 
 								}
 
