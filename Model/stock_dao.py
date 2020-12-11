@@ -172,7 +172,7 @@ class StockDao(object):
             v_sql = v_sql + " order by d.signdate desc,a.stockproductid desc"
             v_sql = "select  top 10 * from (" + v_sql + " ) as v1 order by v1.SignDate asc,v1.StockProductID asc"
 
-            print("select_stock_product_list sql is ", v_sql, v_sql_cc)
+            print("select_stock_product_list page sql is \n", v_sql)
             cursor.execute(v_sql)
             for row in cursor:
                 product = ProductInfo()
@@ -201,6 +201,7 @@ class StockDao(object):
                 product.priceEnquiredID = row[19]
                 product_list.append(product)
             # 总数统计
+            print("select_stock_product_list count sql is \n", v_sql_cc)
             cursor.execute(v_sql_cc)
             product_count_row = cursor.fetchone()
             product_count = product_count_row[0]
