@@ -402,7 +402,7 @@ class StockDao(object):
             cnxn = pyodbc.connect(self._conn_str)
             cursor = cnxn.cursor()
             for prod in prod_dict_list:
-                print("enquiried product is ", prod["stockProductID"], prod)
+                print("add order product is ", prod["stockProductID"], prod)
                 stockProductID = prod["stockProductID"]
                 opCode = prod["orderOpCode"]
                 purchaseNum = prod["purchaseNum"]
