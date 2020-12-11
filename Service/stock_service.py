@@ -138,7 +138,7 @@ class StockService(UserInfo):
         user = self.get_checked_user(OpCode, timestamp, token)
         if user is not None:
             if operate == "cancel" or operate == "complete" or operate == "return" or operate == "receive" \
-                    or operate == "undoreturn":
+                    or operate == "undoreturn" or operate == "settlement":
                 result = self._dao.update_stock_product_order(prod_dict_list, operate)
             else:
                 result = self.add_order_product(OpCode, timestamp, token, prod_dict_list)
