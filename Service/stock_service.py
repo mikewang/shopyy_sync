@@ -141,9 +141,13 @@ class StockService(UserInfo):
                     or operate == "undoreturn" or operate == "settlement":
                 result = self._dao.update_stock_product_order(prod_dict_list, operate)
             else:
+                print("--" * 50)
+                print(operate, " maybe wrong.")
+                print("--" * 50)
                 result = self.add_order_product(OpCode, timestamp, token, prod_dict_list)
             return result
         else:
+
             print(self.get_now_str(), "Error, ", operate, " product order is failure.", prod_dict_list)
             return None
 
