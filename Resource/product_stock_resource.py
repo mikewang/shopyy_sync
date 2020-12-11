@@ -77,8 +77,8 @@ class ProductStockResource(Resource):
                 filter_stock['end'] = None
             print("filter_stock is ", filter_stock)
             user_service = StockService()
-            prod_list = user_service.get_stock_product(OpCode, timestamp, token, pageNo, filter_stock, ptype)
-            result = {"code": 200, "msg": ""}
+            prod_list, prod_count = user_service.get_stock_product(OpCode, timestamp, token, pageNo, filter_stock, ptype)
+            result = {"code": 200, "msg": "", "count": prod_count}
             if prod_list is not None:
                 json_list = []
                 for prod in prod_list:
@@ -86,7 +86,7 @@ class ProductStockResource(Resource):
                 result["data"] = json_list
             else:
                 result["data"] = []
-                result = {"code": 201, "msg": "product.py is not existed."}
+                result = {"code": 201, "msg": "stock product is not existed."}
             return result, result["code"]
         except Exception as e:
             print('str(Exception):\t', str(Exception))

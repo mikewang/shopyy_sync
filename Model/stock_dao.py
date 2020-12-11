@@ -127,13 +127,13 @@ class StockDao(object):
             topN = " top " + str(page_no*10)
             # 采购人	StockProductID	ProductID	SignDate	GoodsCode	SpecNo	GoodsSpec	GoodsUnit	_ImageID	ImageGuid	ImageFmt	ModuleID	FileDate	ThumbImage	其它.供应商名称	其它.允采购量	其它.应采购价	其它.商品品牌
             # 数据源
-            v_sql = "select " + topN + " "
-            v_sql = v_sql + "e.[采购人], a.StockProductID,a.ProductID,CONVERT(varchar, d.SignDate, 120 ) as SignDate," \
+
+            v_sql_columns = "e.[采购人], a.StockProductID,a.ProductID,CONVERT(varchar, d.SignDate, 120 ) as SignDate," \
                             "a.GoodsCode,a.SpecNo,f.GoodsCDesc, a.GoodsUnit, b._ImageID,c.ImageGuid,c.ImageFmt," \
                             "c.ModuleID,CONVERT(varchar, c.FileDate, 120 ) as FileDate,c.ThumbImage,b.[其它.供应商名称]," \
                             "b.[其它.允采购量],b.[其它.应采购价],b.[其它.商品品牌], " \
-                            "coalesce(g.ordernum,0) as ordernum, coalesce(h.id,0) as priceEnquiredID  " \
-                            "FROM [Stock_Product_Info] as a " \
+                            "coalesce(g.ordernum,0) as ordernum, coalesce(h.id,0) as priceEnquiredID  "
+            v_sql_fromtab = "FROM [Stock_Product_Info] as a " \
                             "join FTPart_Stock_Product_Property_1 as b on a.StockProductID=b.MainID " \
                             "join Product_Image as c on b._ImageID=c.ProductImageID " \
                             "join stock_info d on d.ID=a.StockID " \
@@ -141,7 +141,8 @@ class StockDao(object):
                             "left join [Stock_Product_Info_Desc] f on a.StockProductID=f.StockProductID " \
                             "left join (select [StockProductID], sum([OrderNum]*[OrderStat]) as ordernum from [Stock_Product_Order_App] group by [StockProductID]) g on a.StockProductID=g.StockProductID  " \
                             "left join (select max(id) as id, StockProductID from [Stock_Product_EnquiryPrice_App] group by StockProductID ) h on  a.StockProductID=h.StockProductID "
-            v_sql = v_sql + "  where b.[其它.允采购量] > coalesce(g.ordernum,0) "
+            v_sql = "select " + topN + " " + v_sql_columns + v_sql_fromtab + "  where b.[其它.允采购量] > coalesce(g.ordernum,0) "
+            v_sql_cc = "select count(*) as cc " + v_sql_fromtab + "  where b.[其它.允采购量] > coalesce(g.ordernum,0) "
 
             filter_brand = filter_stock["brand"]
             if filter_brand is not None:
@@ -150,22 +151,28 @@ class StockDao(object):
                     filter_sql = filter_sql + "'" + b + "',"
                 filter_sql = filter_sql.rstrip(',')
                 v_sql = v_sql + " and b.[其它.商品品牌] in (" + filter_sql + ")"
+                v_sql_cc = v_sql_cc + " and b.[其它.商品品牌] in (" + filter_sql + ")"
             filter_enquriy = filter_stock["enquiry"]
             if filter_enquriy is not None:
                 if filter_enquriy == '未询价':
                     v_sql = v_sql + " and  coalesce(h.id,0) = 0 "
+                    v_sql_cc = v_sql_cc + " and  coalesce(h.id,0) = 0 "
                 elif filter_enquriy == '已询价':
-                    v_sql = v_sql + " and  coalesce(h.id,0) > 0 "
+                    v_sql_cc = v_sql_cc + " and  coalesce(h.id,0) > 0 "
+                    v_sql_cc = v_sql_cc + " and  coalesce(h.id,0) > 0 "
             filter_begin = filter_stock["begin"]
             if filter_begin is not None:
                 v_sql = v_sql + " and d.SignDate >= '" + filter_begin + "'"
+                v_sql_cc = v_sql_cc + " and d.SignDate >= '" + filter_begin + "'"
             filter_end = filter_stock["end"]
             if filter_end is not None:
                 v_sql = v_sql + " and d.SignDate <= '" + filter_end + " 23:59:59'"
+                v_sql_cc = v_sql_cc + " and d.SignDate <= '" + filter_end + " 23:59:59'"
+
             v_sql = v_sql + " order by d.signdate desc,a.stockproductid desc"
             v_sql = "select  top 10 * from (" + v_sql + " ) as v1 order by v1.SignDate asc,v1.StockProductID asc"
 
-            print("select_stock_product_list sql is ", v_sql)
+            print("select_stock_product_list sql is ", v_sql, v_sql_cc)
             cursor.execute(v_sql)
             for row in cursor:
                 product = ProductInfo()
@@ -193,9 +200,13 @@ class StockDao(object):
                 product.orderNum = row[18]
                 product.priceEnquiredID = row[19]
                 product_list.append(product)
+            # 总数统计
+            cursor.execute(v_sql_cc)
+            product_count_row = cursor.fetchone()
+            product_count = product_count_row[0]
             cursor.close()
             cnxn.close()
-            return product_list
+            return product_list, product_count
         except Exception as e:
             print('str(Exception):\t', str(Exception))
             print('str(e):\t\t', str(e))

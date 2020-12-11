@@ -91,12 +91,13 @@ class StockService(UserInfo):
 
         print(self.get_now_str(), ptype, "PageNo=", pageNo, filter_stock, "get stock product by " + OpCode, "-"*30)
         product_list = None
+        product_count = 0
         user = self.get_checked_user(OpCode, timestamp, token)
         if user is not None:
-            product_list = self._dao.select_stock_product_list(pageNo, filter_stock)
+            product_list, product_count = self._dao.select_stock_product_list(pageNo, filter_stock)
         else:
             print(self.get_now_str(), "Error, get stockproduct is failure.", OpCode, "PageNo=", pageNo)
-        return product_list
+        return product_list, product_count
 
     def get_order_product(self, OpCode, timestamp, token, pageNo, filter_stock, ptype):
         print(self.get_now_str(), "PageNo=", pageNo, filter_stock, "get order product by " + OpCode, "-"*30)
