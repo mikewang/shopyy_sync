@@ -564,7 +564,7 @@ class StockDao(object):
                     settlement = prod["settlement"]
                     settlement = 3
                     sql = "update Stock_Product_Order_App " \
-                          "set settlementOpCode = ?, settlement=?,settlemnetTime=getdate() " \
+                          "set settlementOpCode = ?, settlement=?,settlementTime=getdate() " \
                           "where orderID = ? and stockProductID = ? and settlement <> ? "
                     print(operate_type, "update sql ---\n ", sql)
                     cursor.execute(sql, settlementOpCode, settlement, orderID, stockProductID, settlement)
