@@ -12,7 +12,7 @@
     <title>家政服务</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/bootstrap.css') }}" rel="stylesheet">
 
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <link href="{{ url_for('static', filename='css/ie10-viewport-bug-workaround.css') }}" rel="stylesheet">
@@ -130,14 +130,14 @@
 		  $.ajax({
                         type: "GET",
                         url: "/worker_list",
-			  			data:args_data
+			  			data:args_data,
                         dataType: "json",
                         success: function(result) {
                             $("#table_worker tbody").html('');
-                            var r = JSON.parse(result);
+                            var r = result
                             var stat = r["stat"];
                             if (stat == 1) {
-                                let worker_list = r["worker_list"];
+                                let worker_list = r["data"];
                                 for(let i=0; i<worker_list.length; i++) {
 
                                 	let worker = worker_list[i];
