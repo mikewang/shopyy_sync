@@ -56,7 +56,7 @@ class JiaZhengDao(object):
             if p_employeeno is not None:
                 sql = "SELECT USER_ID,USER_NAME, USER_TYPE, PASSWORD, DATE_FORMAT(CREATED,'%%Y-%%m-%%d %%H:%%i:%%s') as CREATED FROM User_Info where User_ID=%s"
                 cursor.execute(sql, p_userID)
-            elif p_name is not None:
+            elif p_userName is not None:
                 sql = "SELECT USER_ID,USER_NAME, USER_TYPE, PASSWORD, DATE_FORMAT(CREATED,'%%Y-%%m-%%d %%H:%%i:%%s') as CREATED FROM User_Info where User_Name=%s"
                 cursor.execute(sql, p_userName)
             row = cursor.fetchone()
