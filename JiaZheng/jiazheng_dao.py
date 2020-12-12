@@ -50,26 +50,33 @@ class JiaZhengDao(object):
 
     def select_employee(self, p_employeeno, p_name):
         try:
-            employee = None
+            employee_list = []
             conn = self.conn_mysql()
             cursor = conn.cursor()
             if p_employeeno is not None:
-                sql = "SELECT USER_ID,USER_NAME, USER_TYPE, PASSWORD, DATE_FORMAT(CREATED,'%%Y-%%m-%%d %%H:%%i:%%s') as CREATED FROM User_Info where User_ID=%s"
-                cursor.execute(sql, p_userID)
-            elif p_userName is not None:
-                sql = "SELECT USER_ID,USER_NAME, USER_TYPE, PASSWORD, DATE_FORMAT(CREATED,'%%Y-%%m-%%d %%H:%%i:%%s') as CREATED FROM User_Info where User_Name=%s"
-                cursor.execute(sql, p_userName)
-            row = cursor.fetchone()
-            if row is not None:
-                userInfo = UserInfo()
-                userInfo.UserID = row[0]
-                userInfo.UserName = row[1]
-                userInfo.UserType = row[2]
-                userInfo.Password = row[3]
-                userInfo.Created = row[4]
-                #userInfo.Created = datetime.datetime.strptime(row[4], '%Y-%m-%d %H:%M:%S')
+                sql = "SELECT employeeno, name, sex,DATE_FORMAT(birthday,'%%Y-%%m-%%d') as birthday, national,  degree, telephone, address, salary,  language, certificate FROM employee where employeeno=%s"
+                cursor.execute(sql, p_employeeno)
+            elif p_name is not None:
+                sql = "SELECT employeeno, name, sex,DATE_FORMAT(birthday,'%%Y-%%m-%%d') as birthday, national,  degree, telephone, address, salary,  language, certificate FROM employee where name like '%s"
+                cursor.execute(sql, p_name)
             else:
-                print("User:  Not Existed.")
+                sql = "SELECT employeeno, name, sex,DATE_FORMAT(birthday,'%Y-%m-%d') as birthday, national,  degree, telephone, address, salary,  language, certificate FROM employee"
+                cursor.execute(sql)
+            for row in cursor:
+                employee = Employee()
+                employee.employeeno = row[0]
+                employee.name = row[1]
+                employee.sex = row[2]
+                employee.birthday = row[3]
+                employee.national = row[4]
+                employee.degree = row[5]
+                employee.telephone = row[6]
+                employee.address = row[7]
+                employee.salary = row[8]
+                employee.language = row[9]
+                employee.certificate = row[10]
+                print("employee", employee.desc())
+                employee_list.append(employee)
             cursor.close()
             conn.close()
         except Exception as e:
@@ -85,23 +92,23 @@ class JiaZhengDao(object):
             print('traceback.format_exc():\n%s' % traceback.format_exc())
             print('#' * 60)
         else:
-            print("done", userInfo)
+            print("done", employee_list)
         finally:
-            return userInfo
+            return employee_list
 
     def add_employee(self, p_employee):
         try:
-            userInfo = p_userInfo
+            employee = p_employee
             conn = self.conn_mysql()
             cursor = conn.cursor()
-            sql = "insert into user_info(USER_NAME, USER_TYPE, PASSWORD, created) values(%s, %s, %s, now()) "
-            values = (userInfo.UserName, userInfo.UserType, userInfo.Password)
+            sql = "insert into employee( name, sex, birthday, national,  degree, telephone, address, salary,  language, certificate) values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) "
+            values = (employee.name, employee.sex ,employee.birthday.strftime('%Y-%m-%d'),employee.national,  employee.degree,employee.telephone , employee.address,employee.salary, employee.language,employee.certificate )
             cursor.execute(sql, values)
-            userInfo.UserID = cursor.lastrowid
+            employee.employeeno = cursor.lastrowid
             cursor.close()
             conn.commit()
             conn.close()
-            return userInfo
+            return employee
         except Exception as e:
             print('str(Exception):\t', str(Exception))
             print('str(e):\t\t', str(e))

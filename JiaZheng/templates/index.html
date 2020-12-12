@@ -120,10 +120,17 @@
 
 	 $("#btn_search_worker").on("click",function () {
 		 const worker_name = $("#input_worker_name").val();
+		 if(worker_name == "") {
+		 	args_data = {}
+		 }
+		 else {
+		 	args_data = {"name": worker_name}
+		 }
 		 console.log("worker name is ", worker_name);
 		  $.ajax({
                         type: "GET",
-                        url: "/worker_list/" + username,
+                        url: "/worker_list",
+			  			data:args_data
                         dataType: "json",
                         success: function(result) {
                             $("#table_worker tbody").html('');
