@@ -22,3 +22,52 @@ class JiaZhengService(object):
         dao = JiaZhengDao()
         employee_list = dao.select_employee(p_employeeno, p_name)
         return employee_list
+
+    def getCert(self):
+        dao = JiaZhengDao()
+        cert_list = dao.select_certificate()
+        return cert_list
+
+    def mergeWorker(self, args):
+        employeeno = args["employeeno"]
+        dao = JiaZhengDao()
+        employee_list = dao.select_employee(employeeno, None)
+        if len(employee_list) > 0:
+            #update
+            employee = Employee()
+            employee.employeeno = args["employeeno"]
+            employee.name = args["name"]
+            employee.sex = args["sex"]
+            employee.birthday = args["birthday"]
+            employee.national = args["national"]
+            employee.degree = args["degree"]
+            employee.telephone = args["telephone"]
+            employee.address = args["address"]
+            employee.salary = args["salary"]
+            employee.language = args["language"]
+            employee.certificate = args["certificate"]
+            print("update employee is ", employee.desc())
+            employee = dao.update_employee(employee)
+            return employee
+        else:
+            #insert
+            employee = Employee()
+            employee.employeeno = args["employeeno"]
+            employee.name = args["name"]
+            employee.sex = args["sex"]
+            employee.birthday = args["birthday"]
+            employee.national = args["national"]
+            employee.degree = args["degree"]
+            employee.telephone = args["telephone"]
+            employee.address = args["address"]
+            employee.salary = args["salary"]
+            employee.language = args["language"]
+            employee.certificate = args["certificate"]
+            print("insert employee is ", employee.desc())
+            employee = dao.insert_employee(employee)
+            return employee
+
+    def deleteWorker(self, args):
+        employeeno = args["employeeno"]
+        dao = JiaZhengDao()
+        return dao.delete_employee(employeeno)

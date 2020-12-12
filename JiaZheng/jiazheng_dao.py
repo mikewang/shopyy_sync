@@ -48,6 +48,34 @@ class JiaZhengDao(object):
                                port=mysql_port)
         return conn
 
+    def select_certificate(self):
+        try:
+            cert_list = []
+            conn = self.conn_mysql()
+            cursor = conn.cursor()
+            sql = "SELECT sevicetype FROM jiazheng.sevicetype order by sevicetype desc"
+            cursor.execute(sql)
+            for row in cursor:
+                cert_list.append(row[0])
+            cursor.close()
+            conn.close()
+        except Exception as e:
+            print('str(Exception):\t', str(Exception))
+            print('str(e):\t\t', str(e))
+            print('repr(e):\t', repr(e))
+            # Get information about the exception that is currently being handled
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            print('e.message:\t', exc_value)
+            print("Note, object e and exc of Class %s is %s the same." %
+                  (type(exc_value), ('not', '')[exc_value is e]))
+            print('traceback.print_exc(): ', traceback.print_exc())
+            print('traceback.format_exc():\n%s' % traceback.format_exc())
+            print('#' * 60)
+        else:
+            print("done", cert_list)
+        finally:
+            return cert_list
+
     def select_employee(self, p_employeeno, p_name):
         try:
             employee_list = []
@@ -57,8 +85,8 @@ class JiaZhengDao(object):
                 sql = "SELECT employeeno, name, sex,DATE_FORMAT(birthday,'%%Y-%%m-%%d') as birthday, national,  degree, telephone, address, salary,  language, certificate FROM employee where employeeno=%s"
                 cursor.execute(sql, p_employeeno)
             elif p_name is not None:
-                sql = "SELECT employeeno, name, sex,DATE_FORMAT(birthday,'%%Y-%%m-%%d') as birthday, national,  degree, telephone, address, salary,  language, certificate FROM employee where name like '%s"
-                cursor.execute(sql, p_name)
+                sql = "SELECT employeeno, name, sex,DATE_FORMAT(birthday,'%%Y-%%m-%%d') as birthday, national,  degree, telephone, address, salary,  language, certificate FROM employee where name like %s"
+                cursor.execute(sql, '%' + p_name + '%')
             else:
                 sql = "SELECT employeeno, name, sex,DATE_FORMAT(birthday,'%Y-%m-%d') as birthday, national,  degree, telephone, address, salary,  language, certificate FROM employee"
                 cursor.execute(sql)
@@ -96,13 +124,13 @@ class JiaZhengDao(object):
         finally:
             return employee_list
 
-    def add_employee(self, p_employee):
+    def insert_employee(self, p_employee):
         try:
             employee = p_employee
             conn = self.conn_mysql()
             cursor = conn.cursor()
             sql = "insert into employee( name, sex, birthday, national,  degree, telephone, address, salary,  language, certificate) values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) "
-            values = (employee.name, employee.sex ,employee.birthday.strftime('%Y-%m-%d'),employee.national,  employee.degree,employee.telephone , employee.address,employee.salary, employee.language,employee.certificate )
+            values = (employee.name, employee.sex ,employee.birthday,employee.national,  employee.degree,employee.telephone , employee.address,employee.salary, employee.language,employee.certificate )
             cursor.execute(sql, values)
             employee.employeeno = cursor.lastrowid
             cursor.close()
@@ -121,9 +149,57 @@ class JiaZhengDao(object):
             print('traceback.print_exc(): ', traceback.print_exc())
             print('traceback.format_exc():\n%s' % traceback.format_exc())
             print('#' * 60)
-            userInfo = None
+            return None
 
 
+    def update_employee(self, p_employee):
+        try:
+            employee = p_employee
+            conn = self.conn_mysql()
+            cursor = conn.cursor()
+            sql = "update employee set name =%s, sex=%s, birthday=%s, national=%s,  degree=%s, telephone=%s, address=%s, salary=%s,  language=%s, certificate=%s where employeeno=%s"
+            values = (employee.name, employee.sex ,employee.birthday,employee.national,  employee.degree,employee.telephone , employee.address,employee.salary, employee.language,employee.certificate,employee.employeeno )
+            cursor.execute(sql, values)
+            cursor.close()
+            conn.commit()
+            conn.close()
+            return employee
+        except Exception as e:
+            print('str(Exception):\t', str(Exception))
+            print('str(e):\t\t', str(e))
+            print('repr(e):\t', repr(e))
+            # Get information about the exception that is currently being handled
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            print('e.message:\t', exc_value)
+            print("Note, object e and exc of Class %s is %s the same." %
+                  (type(exc_value), ('not', '')[exc_value is e]))
+            print('traceback.print_exc(): ', traceback.print_exc())
+            print('traceback.format_exc():\n%s' % traceback.format_exc())
+            print('#' * 60)
+            return None
 
-
+    def delete_employee(self, employeeno):
+        try:
+            conn = self.conn_mysql()
+            cursor = conn.cursor()
+            sql = "delete from  employee  where employeeno=%s"
+            values = (employeeno)
+            cursor.execute(sql, values)
+            cursor.close()
+            conn.commit()
+            conn.close()
+            return "1"
+        except Exception as e:
+            print('str(Exception):\t', str(Exception))
+            print('str(e):\t\t', str(e))
+            print('repr(e):\t', repr(e))
+            # Get information about the exception that is currently being handled
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            print('e.message:\t', exc_value)
+            print("Note, object e and exc of Class %s is %s the same." %
+                  (type(exc_value), ('not', '')[exc_value is e]))
+            print('traceback.print_exc(): ', traceback.print_exc())
+            print('traceback.format_exc():\n%s' % traceback.format_exc())
+            print('#' * 60)
+            return None
 

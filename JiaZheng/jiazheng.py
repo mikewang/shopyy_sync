@@ -4,7 +4,7 @@ from waitress import serve
 from JiaZheng.jiazheng_service import JiaZhengService
 from flask import request, jsonify, Response
 import json
-from JiaZheng.jiazheng_resource import WorkerListResource
+from JiaZheng.jiazheng_resource import WorkerListResource, CertListResource, WorkerResource
 
 app = Flask(__name__)
 api = Api(app)
@@ -17,16 +17,22 @@ def index():
 
 
 @app.route('/worker', methods=['GET'])
-def signin():
-    return render_template('worker.html')
+def workder():
+    employeeno = request.args.get('employeeno')
+    print("request parameter employeeno is ", employeeno)
+    if employeeno is None:
+        employeeno = 0
+    return render_template('worker.html', employeeno=employeeno)
 
 
 @app.route('/about', methods=['GET'])
-def signup():
+def about():
     return render_template('about.html')
 
 
 api.add_resource(WorkerListResource, '/worker_list')
+api.add_resource(CertListResource, '/cert_list')
+api.add_resource(WorkerResource, '/worker', '/worker/<int:employeeno>')
 
 
 if __name__ == '__main__':

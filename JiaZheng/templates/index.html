@@ -60,7 +60,7 @@
 			<div class="row clearfix">
 		<div class="col-md-12 column">
 			<h3>
-				家政人员信息管理系统.
+				家政人员信息管理系统
 			</h3>
 			<label for="input_worker_name">人员名称</label><input type="search" class="form-control" name="input_worker_name" id="input_worker_name" />
 			<button type="button" class="btn btn-default" id="btn_search_worker">检索</button>
@@ -143,7 +143,7 @@
                                         console.log(`${key}: ${value}`);
                                     });
 
-                                    if (((i + 2) % 2) == 0) {
+                                    if ((i % 2) == 0) {
                                         $("#table_worker tbody").append("<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>")
                                     } else {
                                         $("#table_worker tbody").append("<tr class=\"info\"><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>")
@@ -156,7 +156,8 @@
                                     currentRow.find("td:eq(3)").html(worker.sex);
                                     currentRow.find("td:eq(4)").html(worker.national);
                                     currentRow.find("td:eq(5)").html(worker.telephone);
-                                    currentRow.find("td:eq(6)").html("<a href='/worker?no=" + worker.employeeno + "'>" + "更多 »" + "</a>");
+                                    currentRow.find("td:eq(6)").html("<a href='/worker?employeeno=" + worker.employeeno + "'>" + "更多 »" + "</a>");
+                                    console.log(currentRow);
 
 								}
 
@@ -168,9 +169,6 @@
                     });
 
 	 });
-
-
-
 });
 </script>
   </body>
