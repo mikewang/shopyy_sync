@@ -24,7 +24,6 @@ class Employee(object):
         self.salary = 0.00
         self.language = ''
         self.certificate = ''
-        self.seviceno = ''
         self.jobs = []
 
     def desc(self):

@@ -8,7 +8,7 @@ from PIL import Image, ImageDraw
 from flask import send_file, render_template
 from flask_restful import reqparse, Resource
 import json
-from wow_service import WowService
+from JiaZheng.jiazheng_service import JiaZhengService
 
 
 class UserResource(Resource):
