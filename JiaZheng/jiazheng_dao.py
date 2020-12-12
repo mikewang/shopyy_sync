@@ -50,20 +50,19 @@ class JiaZhengDao(object):
 
     def select_employee(self, p_employeeno, p_name):
         try:
-            employee = None
+            employee_list = []
             conn = self.conn_mysql()
             cursor = conn.cursor()
             if p_employeeno is not None:
                 sql = "SELECT employeeno, name, sex,DATE_FORMAT(birthday,'%%Y-%%m-%%d') as birthday, national,  degree, telephone, address, salary,  language, certificate FROM employee where employeeno=%s"
                 cursor.execute(sql, p_employeeno)
             elif p_name is not None:
-                sql = "SELECT employeeno, name, sex,DATE_FORMAT(birthday,'%%Y-%%m-%%d') as birthday, national,  degree, telephone, address, salary,  language, certificate FROM employee where name like '%%%s%%"
+                sql = "SELECT employeeno, name, sex,DATE_FORMAT(birthday,'%%Y-%%m-%%d') as birthday, national,  degree, telephone, address, salary,  language, certificate FROM employee where name like '%s"
                 cursor.execute(sql, p_name)
             else:
                 sql = "SELECT employeeno, name, sex,DATE_FORMAT(birthday,'%Y-%m-%d') as birthday, national,  degree, telephone, address, salary,  language, certificate FROM employee"
                 cursor.execute(sql)
-            row = cursor.fetchone()
-            if row is not None:
+            for row in cursor:
                 employee = Employee()
                 employee.employeeno = row[0]
                 employee.name = row[1]
@@ -76,8 +75,8 @@ class JiaZhengDao(object):
                 employee.salary = row[8]
                 employee.language = row[9]
                 employee.certificate = row[10]
-            else:
-                print("employee:  Not Existed.")
+                print("employee", employee.desc())
+                employee_list.append(employee)
             cursor.close()
             conn.close()
         except Exception as e:
@@ -93,9 +92,9 @@ class JiaZhengDao(object):
             print('traceback.format_exc():\n%s' % traceback.format_exc())
             print('#' * 60)
         else:
-            print("done", employee)
+            print("done", employee_list)
         finally:
-            return employee
+            return employee_list
 
     def add_employee(self, p_employee):
         try:

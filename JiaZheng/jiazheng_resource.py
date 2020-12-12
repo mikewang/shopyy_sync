@@ -11,28 +11,28 @@ import json
 from JiaZheng.jiazheng_service import JiaZhengService
 
 
-class UserResource(Resource):
+class WorkerListResource(Resource):
 
-    def get(self, username):
+    def get(self):
         try:
             parser = reqparse.RequestParser()
-            #parser.add_argument('username', location='headers')
-            parser.add_argument('token', location='headers')
-            parser.add_argument('timestamp', location='headers')
+            parser.add_argument('name')
             # 分析请求
             args = parser.parse_args()
-            token = args["token"]
-            timestamp = args["timestamp"]
-            print("UserResource get is ", args)
+            name = args["name"]
 
-            userinfo = WowService().getUser(username, token, timestamp)
-            print("get userinfo is ", userinfo)
-            if userinfo is not None:
-                result = {"stat": 1}
-                return json.dumps(result), 201
+            employee_list = JiaZhengService().getEmployee(None, name)
+            print("get employee_list is ", employee_list)
+            if employee_list is not None:
+                emp_ss = []
+                for employee in employee_list:
+                    emp_ss.append(employee.desc())
+                result = {"stat": 1, "data": emp_ss}
+                return result, 200
             else:
                 result = {"stat": 0}
-                return json.dumps(result), 201
+                return result, 201
+                #return json.dumps(result), 201
         except Exception as e:
             print('str(Exception):\t', str(Exception))
             print('str(e):\t\t', str(e))
@@ -45,57 +45,16 @@ class UserResource(Resource):
             print('traceback.format_exc():\n%s' % traceback.format_exc())
             print('#' * 60)
             result = {"stat": 0}
-            return json.dumps(result), 201
+            return result, 201
 
 
-    def post(self):
+class WorkerDetailResource(Resource):
+
+    def get(self, employeeno):
         try:
             parser = reqparse.RequestParser()
-            parser.add_argument('timestamp', location='headers')
-            parser.add_argument('username', location=['json', 'form'])
-            parser.add_argument('password', location=['json', 'form'])
-
             # 分析请求
             args = parser.parse_args()
-            timestamp = args["timestamp"]
-            username = args["username"]
-            password = args["password"]
-
-            print("parser is ", args)
-            p_user_info = {"UserName": username, "UserType": "Customer", "Password": password}
-            add_userinfo = WowService().addUser(p_user_info)
-            result = json.dumps('{"stat": 0}')
-            if add_userinfo is not None:
-                result = {"stat": 1}
-                result = json.dumps(result)
-            print(self, result)
-            return result
-        except Exception as e:
-            print('str(Exception):\t', str(Exception))
-            print('str(e):\t\t', str(e))
-            print('repr(e):\t', repr(e))
-            # Get information about the exception that is currently being handled
-            exc_type, exc_value, exc_traceback = sys.exc_info()
-            print('e.message:\t', exc_value)
-            print("Note, object e and exc of Class %s is %s the same." % (type(exc_value), ('not', '')[exc_value is e]))
-            print('traceback.print_exc(): ', traceback.print_exc())
-            print('traceback.format_exc():\n%s' % traceback.format_exc())
-            print('#' * 60)
-            result = {"stat": 0}
-            return json.dumps(result), 201
-
-
-class ProfileResource(Resource):
-
-    def get(self, username):
-        try:
-            parser = reqparse.RequestParser()
-            parser.add_argument('token', location='headers')
-            parser.add_argument('timestamp', location='headers')
-            # 分析请求
-            args = parser.parse_args()
-            token = args["token"]
-            timestamp = args["timestamp"]
             userprofile = WowService().getUserProfile(username, token, timestamp)
             if userprofile is not None:
                 result = {"stat": 1, "customer": userprofile.desc()}

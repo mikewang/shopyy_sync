@@ -18,7 +18,7 @@ class JiaZhengService(object):
         time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         return time_str
 
-    def getEmployee(self, p_employee, p_name):
+    def getEmployee(self, p_employeeno, p_name):
         dao = JiaZhengDao()
-        employee_list = dao.select_employee(p_employee, p_name)
+        employee_list = dao.select_employee(p_employeeno, p_name)
         return employee_list
