@@ -132,7 +132,8 @@ class StockDao(object):
                             "a.GoodsCode,a.SpecNo,f.GoodsCDesc, a.GoodsUnit, b._ImageID,c.ImageGuid,c.ImageFmt," \
                             "c.ModuleID,CONVERT(varchar, c.FileDate, 120 ) as FileDate,c.ThumbImage,b.[其它.供应商名称]," \
                             "b.[其它.允采购量],b.[其它.应采购价],b.[其它.商品品牌], " \
-                            "coalesce(g.ordernum,0) as ordernum, coalesce(h.id,0) as priceEnquiredID  "
+                            "coalesce(g.ordernum,0) as ordernum, coalesce(h.id,0) as priceEnquiredID," \
+                            "CONVERT(varchar, h.enquirydate, 120 ) as enquirydate  "
             v_sql_fromtab = "FROM [Stock_Product_Info] as a " \
                             "join FTPart_Stock_Product_Property_1 as b on a.StockProductID=b.MainID " \
                             "join Product_Image as c on b._ImageID=c.ProductImageID " \
@@ -140,7 +141,7 @@ class StockDao(object):
                             "join [FTPart_Stock_Property_1] e on e.[MainID] = d.ID " \
                             "left join [Stock_Product_Info_Desc] f on a.StockProductID=f.StockProductID " \
                             "left join (select [StockProductID], sum([OrderNum]*[OrderStat]) as ordernum from [Stock_Product_Order_App] group by [StockProductID]) g on a.StockProductID=g.StockProductID  " \
-                            "left join (select max(id) as id, StockProductID from [Stock_Product_EnquiryPrice_App] group by StockProductID ) h on  a.StockProductID=h.StockProductID "
+                            "left join (select max(id) as id, max(createtime) as enquirydate, StockProductID from [Stock_Product_EnquiryPrice_App] group by StockProductID ) h on  a.StockProductID=h.StockProductID "
             v_sql = "select " + topN + " " + v_sql_columns + v_sql_fromtab + "  where b.[其它.允采购量] > coalesce(g.ordernum,0) "
             v_sql_cc = "select count(*) as cc " + v_sql_fromtab + "  where b.[其它.允采购量] > coalesce(g.ordernum,0) "
 
@@ -168,9 +169,13 @@ class StockDao(object):
             if filter_end is not None:
                 v_sql = v_sql + " and d.SignDate <= '" + filter_end + " 23:59:59'"
                 v_sql_cc = v_sql_cc + " and d.SignDate <= '" + filter_end + " 23:59:59'"
-
-            v_sql = v_sql + " order by d.signdate desc,a.stockproductid desc"
-            v_sql = "select  top 10 * from (" + v_sql + " ) as v1 order by v1.SignDate asc,v1.StockProductID asc"
+            if filter_enquriy is not None and filter_enquriy == '已询价':
+                v_sql = v_sql + " order by h.enquirydate desc,a.stockproductid desc"
+                v_sql = "select  top 10 * from (" + v_sql + " ) as v1 order by v1.enquirydate asc,v1.StockProductID asc"
+            else:
+                # 未询价
+                v_sql = v_sql + " order by d.signdate desc,a.stockproductid desc"
+                v_sql = "select  top 10 * from (" + v_sql + " ) as v1 order by v1.SignDate asc,v1.StockProductID asc"
 
             print("select_stock_product_list page sql is \n", v_sql)
             cursor.execute(v_sql)
@@ -308,6 +313,9 @@ class StockDao(object):
                 v_sql = v_sql + "  where 1=1 and g.settlement >=2"
             else:
                 v_sql = v_sql + "  where 1=1 "
+            filter_settlement = filter_stock["settlement"]
+            if filter_settlement is None:
+                v_sql = v_sql + "  and g.settlement == " + filter_settlement + " "
 
             filter_brand = filter_stock["brand"]
             if filter_brand is not None:
