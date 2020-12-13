@@ -163,12 +163,23 @@ class StockDao(object):
                     v_sql_cc = v_sql_cc + " and  coalesce(h.id,0) > 0 "
             filter_begin = filter_stock["begin"]
             if filter_begin is not None:
-                v_sql = v_sql + " and d.SignDate >= '" + filter_begin + "'"
-                v_sql_cc = v_sql_cc + " and d.SignDate >= '" + filter_begin + "'"
+                if filter_enquriy is not None and filter_enquriy == '已询价':
+                    v_sql = v_sql + " and h.enquirydate >= '" + filter_begin + "'"
+                    v_sql_cc = v_sql_cc + " and h.enquirydate >= '" + filter_begin + "'"
+                else:
+                    # 未询价
+                    v_sql = v_sql + " and d.SignDate >= '" + filter_begin + "'"
+                    v_sql_cc = v_sql_cc + " and d.SignDate >= '" + filter_begin + "'"
             filter_end = filter_stock["end"]
             if filter_end is not None:
-                v_sql = v_sql + " and d.SignDate <= '" + filter_end + " 23:59:59'"
-                v_sql_cc = v_sql_cc + " and d.SignDate <= '" + filter_end + " 23:59:59'"
+                if filter_enquriy is not None and filter_enquriy == '已询价':
+                    v_sql = v_sql + " and h.enquirydate <= '" + filter_end + " 23:59:59'"
+                    v_sql_cc = v_sql_cc + " and h.enquirydate <= '" + filter_end + " 23:59:59'"
+                else:
+                    # 未询价
+                    v_sql = v_sql + " and d.SignDate <= '" + filter_end + " 23:59:59'"
+                    v_sql_cc = v_sql_cc + " and d.SignDate <= '" + filter_end + " 23:59:59'"
+
             if filter_enquriy is not None and filter_enquriy == '已询价':
                 v_sql = v_sql + " order by h.enquirydate desc,a.stockproductid desc"
                 v_sql = "select  top 10 * from (" + v_sql + " ) as v1 order by v1.enquirydate desc,v1.StockProductID desc"
@@ -319,6 +330,9 @@ class StockDao(object):
             filter_settlement = filter_stock["settlement"]
             if filter_settlement is not None:
                 v_sql = v_sql + "  and g.settlement = " + filter_settlement + " "
+            else:
+                print("*"*1000, "\n settlement is none , critical.")
+                print("*"*30)
 
             filter_brand = filter_stock["brand"]
             if filter_brand is not None:
@@ -332,12 +346,58 @@ class StockDao(object):
                 v_sql = v_sql + " and  coalesce(h.id,0) = 0 "
             elif filter_enquriy == '已询价':
                 v_sql = v_sql + " and  coalesce(h.id,0) > 0 "
+            # begin date
             filter_begin = filter_stock["begin"]
             if filter_begin is not None:
-                v_sql = v_sql + " and g.CreateTime >= '" + filter_begin + "'"
+                if ptype == "order":
+                    # 去掉订货，订货，订货完成三个状态的查询
+                    if filter_settlement == 0:
+                        v_sql = v_sql + " and g.CreateTime >= '" + filter_begin + "'"
+                    else:
+                        v_sql = v_sql + " and g.ensureTime >= '" + filter_begin + "'"
+                elif ptype == "receive":
+                    # 收货，状态的查询
+                    if filter_settlement == 1:
+                        v_sql = v_sql + " and g.ensureTime >= '" + filter_begin + "'"
+                    else:
+                        v_sql = v_sql + " and g.receiveGoodsTime >= '" + filter_begin + "'"
+                elif ptype == "return":
+                    # 退货, 状态的查询
+                    v_sql = v_sql + " and g.CreateTime >= '" + filter_begin + "'"
+                elif ptype == "settlement":
+                    # 结算, 状态的查询
+                    if filter_settlement == 2:
+                        v_sql = v_sql + " and g.receiveGoodsTime >= '" + filter_begin + "'"
+                    else:
+                        v_sql = v_sql + " and g.settlementTime >= '" + filter_begin + "'"
+                else:
+                    v_sql = v_sql + " and g.CreateTime >= '" + filter_begin + "'"
+            # end data
             filter_end = filter_stock["end"]
             if filter_end is not None:
-                v_sql = v_sql + " and g.CreateTime <= '" + filter_end + " 23:59:59'"
+                if ptype == "order":
+                    # 去掉订货，订货，订货完成三个状态的查询
+                    if filter_settlement == 0:
+                        v_sql = v_sql + " and g.CreateTime <= '" + filter_end + " 23:59:59'"
+                    else:
+                        v_sql = v_sql + " and g.ensureTime <= '" + filter_end + " 23:59:59'"
+                elif ptype == "receive":
+                    # 收货，状态的查询
+                    if filter_settlement == 1:
+                        v_sql = v_sql + " and g.ensureTime <= '" + filter_end + " 23:59:59'"
+                    else:
+                        v_sql = v_sql + " and g.receiveGoodsTime <= '" + filter_end + " 23:59:59'"
+                elif ptype == "return":
+                    # 退货, 状态的查询
+                    v_sql = v_sql + " and g.CreateTime <= '" + filter_end + " 23:59:59'"
+                elif ptype == "settlement":
+                    # 结算, 状态的查询
+                    if filter_settlement == 2:
+                        v_sql = v_sql + " and g.receiveGoodsTime <= '" + filter_end + " 23:59:59'"
+                    else:
+                        v_sql = v_sql + " and g.settlementTime <= '" + filter_end + " 23:59:59'"
+                else:
+                    v_sql = v_sql + " and g.CreateTime <= '" + filter_end + " 23:59:59'"
             filter_supplier = filter_stock["supplier"]
             if filter_supplier is not None:
                 filter_sql = ''
@@ -348,7 +408,7 @@ class StockDao(object):
             # 增加排序功能
             if ptype == "order":
                 # 去掉订货，订货，订货完成三个状态的查询
-                if filter_settlement is not None and filter_settlement == 1:
+                if filter_settlement == 1:
                     v_sql = v_sql + " order by g.ensureTime desc,a.stockproductid desc, g.orderID desc"
                     sql = "select  top 10 * from (" + v_sql + " ) as v1 order by v1.ensureTime desc,v1.StockProductID desc, v1.product_order_id asc"
                 else:
@@ -356,7 +416,7 @@ class StockDao(object):
                     sql = "select  top 10 * from (" + v_sql + " ) as v1 order by v1.CreateTime desc,v1.StockProductID desc, v1.product_order_id asc"
             elif ptype == "receive":
                 # 收货，状态的查询
-                if filter_settlement is not None and filter_settlement == 2:
+                if filter_settlement == 2:
                     v_sql = v_sql + " order by g.receiveGoodsTime desc,a.stockproductid desc, g.orderID desc"
                     sql = "select  top 10 * from (" + v_sql + " ) as v1 order by v1.receiveGoodsTime desc,v1.StockProductID desc, v1.product_order_id asc"
                 else:
@@ -364,7 +424,7 @@ class StockDao(object):
                     sql = "select  top 10 * from (" + v_sql + " ) as v1 order by v1.ensureTime desc,v1.StockProductID desc, v1.product_order_id asc"
             elif ptype == "settlement":
                 # 结算, 状态的查询
-                if filter_settlement is not None and filter_settlement == 2:
+                if filter_settlement == 2:
                     v_sql = v_sql + " order by g.settlementTime desc,a.stockproductid desc, g.orderID desc"
                     sql = "select  top 10 * from (" + v_sql + " ) as v1 order by v1.settlementTime desc,v1.StockProductID desc, v1.product_order_id asc"
                 else:
