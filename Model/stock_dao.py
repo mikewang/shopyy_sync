@@ -163,12 +163,23 @@ class StockDao(object):
                     v_sql_cc = v_sql_cc + " and  coalesce(h.id,0) > 0 "
             filter_begin = filter_stock["begin"]
             if filter_begin is not None:
-                v_sql = v_sql + " and d.SignDate >= '" + filter_begin + "'"
-                v_sql_cc = v_sql_cc + " and d.SignDate >= '" + filter_begin + "'"
+                if filter_enquriy is not None and filter_enquriy == '已询价':
+                    v_sql = v_sql + " and h.enquirydate >= '" + filter_begin + "'"
+                    v_sql_cc = v_sql_cc + " and h.enquirydate >= '" + filter_begin + "'"
+                else:
+                    # 未询价
+                    v_sql = v_sql + " and d.SignDate >= '" + filter_begin + "'"
+                    v_sql_cc = v_sql_cc + " and d.SignDate >= '" + filter_begin + "'"
             filter_end = filter_stock["end"]
             if filter_end is not None:
-                v_sql = v_sql + " and d.SignDate <= '" + filter_end + " 23:59:59'"
-                v_sql_cc = v_sql_cc + " and d.SignDate <= '" + filter_end + " 23:59:59'"
+                if filter_enquriy is not None and filter_enquriy == '已询价':
+                    v_sql = v_sql + " and h.enquirydate <= '" + filter_end + " 23:59:59'"
+                    v_sql_cc = v_sql_cc + " and h.enquirydate <= '" + filter_end + " 23:59:59'"
+                else:
+                    # 未询价
+                    v_sql = v_sql + " and d.SignDate <= '" + filter_end + " 23:59:59'"
+                    v_sql_cc = v_sql_cc + " and d.SignDate <= '" + filter_end + " 23:59:59'"
+
             if filter_enquriy is not None and filter_enquriy == '已询价':
                 v_sql = v_sql + " order by h.enquirydate desc,a.stockproductid desc"
                 v_sql = "select  top 10 * from (" + v_sql + " ) as v1 order by v1.enquirydate desc,v1.StockProductID desc"
