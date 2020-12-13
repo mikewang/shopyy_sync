@@ -28,6 +28,7 @@ class ProductOrderResource(Resource):
             # parser.add_argument('timestamp', location=['headers', 'args'])
             parser.add_argument('t')
             parser.add_argument('ptype')
+            parser.add_argument('settlement')
             parser.add_argument('brand')
             parser.add_argument('enquiry')
             parser.add_argument('begin')
@@ -39,6 +40,7 @@ class ProductOrderResource(Resource):
             token = args["token"]
             timestamp = args["timestamp"]
             ptype = args["ptype"]
+            settlement = args["settlement"]
             # 收货， 退货 两个状态的查询
             print("request args is ", args)
             filter_stock = {}
@@ -84,6 +86,7 @@ class ProductOrderResource(Resource):
                 print("supplier key is ", args["supplier"], supplier)
             else:
                 filter_stock['supplier'] = None
+            filter_stock['settlement'] = settlement
             print("filter_stock is ", filter_stock)
             user_service = StockService()
             prod_list = user_service.get_order_product(OpCode, timestamp, token, pageNo, filter_stock, ptype)
