@@ -313,6 +313,9 @@ class StockDao(object):
                 v_sql = v_sql + "  where 1=1 and g.settlement >=2"
             else:
                 v_sql = v_sql + "  where 1=1 "
+            filter_settlement = filter_stock["settlement"]
+            if filter_settlement is None:
+                v_sql = v_sql + "  and g.settlement == " + filter_settlement + " "
 
             filter_brand = filter_stock["brand"]
             if filter_brand is not None:
