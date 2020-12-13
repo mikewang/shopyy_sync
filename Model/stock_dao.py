@@ -171,11 +171,11 @@ class StockDao(object):
                 v_sql_cc = v_sql_cc + " and d.SignDate <= '" + filter_end + " 23:59:59'"
             if filter_enquriy is not None and filter_enquriy == '已询价':
                 v_sql = v_sql + " order by h.enquirydate desc,a.stockproductid desc"
-                v_sql = "select  top 10 * from (" + v_sql + " ) as v1 order by v1.enquirydate asc,v1.StockProductID asc"
+                v_sql = "select  top 10 * from (" + v_sql + " ) as v1 order by v1.enquirydate desc,v1.StockProductID asc"
             else:
                 # 未询价
                 v_sql = v_sql + " order by d.signdate desc,a.stockproductid desc"
-                v_sql = "select  top 10 * from (" + v_sql + " ) as v1 order by v1.SignDate asc,v1.StockProductID asc"
+                v_sql = "select  top 10 * from (" + v_sql + " ) as v1 order by v1.SignDate desc,v1.StockProductID asc"
 
             print("select_stock_product_list page sql is \n", v_sql)
             cursor.execute(v_sql)
@@ -184,7 +184,10 @@ class StockDao(object):
                 product.OpCode = row[0]
                 product.StockProductID = row[1]
                 product.ProductID = row[2]
-                product.SignDate = row[3]
+                if filter_enquriy is not None and filter_enquriy == '已询价':
+                    product.SignDate = row[20]
+                else:
+                    product.SignDate = row[3]
                 product.GoodsCode = row[4]
                 product.SpecNo = row[5]
                 product.GoodsCDesc = row[6]
