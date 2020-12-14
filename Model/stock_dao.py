@@ -437,7 +437,7 @@ class StockDao(object):
                 # 去掉订货，订货，订货完成三个状态的查询
                 if filter_settlement == 1:
                     v_sql = "select top " + str(topN) + v_sql + " order by g.ensureTime asc,a.stockproductid desc, g.orderID desc"
-                    sql = "select  top " + str(page_prod_count) + " * " + from (" + v_sql + " ) as v1 order by v1.ensureTime desc,v1.StockProductID desc, v1.product_order_id asc"
+                    sql = "select  top " + str(page_prod_count) + " * " + " from (" + v_sql + " ) as v1 order by v1.ensureTime desc,v1.StockProductID desc, v1.product_order_id asc"
                 else:
                     v_sql = v_sql + " order by g.CreateTime asc,a.stockproductid desc, g.orderID desc"
                     sql = "select  top " + str(page_prod_count) + " * " + "from (" + v_sql + " ) as v1 order by v1.CreateTime desc,v1.StockProductID desc, v1.product_order_id asc"
