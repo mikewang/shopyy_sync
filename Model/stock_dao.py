@@ -184,21 +184,14 @@ class StockDao(object):
             product_count_row = cursor.fetchone()
             product_count = product_count_row[0]
             topN = page_no * page_prod_count
-            if product_count < topN:
-                topN = product_count
-                page_prod_count = topN - (page_no - 1) * page_prod_count
-            if page_prod_count < 0:
-                page_prod_count = 0
             # 增加排序功能
 
             if filter_enquriy is not None and filter_enquriy == '已询价':
-                v_sql = "select top " + str(topN) + v_sql + " order by h.enquirydate asc,a.stockproductid desc"
-                v_sql = "select  top " + str(page_prod_count) + " * from (" + v_sql + " ) as v1 order by v1.enquirydate desc,v1.StockProductID desc"
+                v_sql = "select row_number() over(order by h.enquirydate desc,a.stockproductid desc) as rownumber, " + v_sql + ""
             else:
                 # 未询价
-                v_sql = "select top " + str(topN) + v_sql + " order by d.signdate asc,a.stockproductid desc"
-                v_sql = "select  top " + str(page_prod_count) + " * from (" + v_sql + " ) as v1 order by v1.SignDate desc,v1.StockProductID desc"
-
+                v_sql = "select row_number() over(order by h.enquirydate desc,a.stockproductid desc) as rownumber, " + v_sql + ""
+            v_sql = "select  * " + " from (" + v_sql + " ) as v1 where v1.rownumber > " + str(topN - page_prod_count) + " and v1.rownumber <= " + str(topN) + " order by v1.rownumber"
             print("select_stock_product_list page sql is \n", v_sql)
             cursor.execute(v_sql)
             for row in cursor:
@@ -427,40 +420,29 @@ class StockDao(object):
             row = cursor.fetchone()
             product_count = row[0]
             topN = page_no*page_prod_count
-            if product_count < topN:
-                topN = product_count
-                page_prod_count = topN - (page_no-1)*page_prod_count
-            if page_prod_count < 0:
-                page_prod_count = 0
             # 增加排序功能
             if ptype == "order":
                 # 去掉订货，订货，订货完成三个状态的查询
                 if filter_settlement == 1:
-                    v_sql = "select top " + str(topN) + v_sql + " order by g.ensureTime asc,a.stockproductid desc, g.orderID desc"
-                    sql = "select  top " + str(page_prod_count) + " * " + " from (" + v_sql + " ) as v1 order by v1.ensureTime desc,v1.StockProductID desc, v1.product_order_id asc"
+                    v_sql = "select row_number() over(order by g.ensureTime desc,a.stockproductid desc, g.orderID desc) as rownumber, " + v_sql + ""
                 else:
-                    v_sql = v_sql + " order by g.CreateTime asc,a.stockproductid desc, g.orderID desc"
-                    sql = "select  top " + str(page_prod_count) + " * " + "from (" + v_sql + " ) as v1 order by v1.CreateTime desc,v1.StockProductID desc, v1.product_order_id asc"
+                    v_sql = "select row_number() over(order by g.CreateTime desc,a.stockproductid desc, g.orderID desc) as rownumber, " + v_sql + ""
             elif ptype == "receive":
                 # 收货，状态的查询
                 if filter_settlement == 2:
-                    v_sql = "select top " + str(topN) + v_sql + " order by g.receiveGoodsTime asc,a.stockproductid desc, g.orderID desc"
-                    sql = "select  top " + str(page_prod_count) + " * " + "from (" + v_sql + " ) as v1 order by v1.receiveGoodsTime desc,v1.StockProductID desc, v1.product_order_id asc"
+                    v_sql = "select row_number() over(order by g.receiveGoodsTime desc,a.stockproductid desc, g.orderID desc) as rownumber, " + v_sql + ""
                 else:
-                    v_sql = "select top " + str(topN) + v_sql + " order by g.ensureTime asc,a.stockproductid desc, g.orderID desc"
-                    sql = "select  top " + str(page_prod_count) + " * " + "from (" + v_sql + " ) as v1 order by v1.ensureTime desc,v1.StockProductID desc, v1.product_order_id asc"
+                    v_sql = "select row_number() over(order by g.ensureTime desc,a.stockproductid desc, g.orderID desc) as rownumber, " + v_sql + ""
             elif ptype == "settlement":
                 # 结算, 状态的查询
                 if filter_settlement == 2:
-                    v_sql = "select top " + str(topN) + v_sql + " order by g.settlementTime asc,a.stockproductid desc, g.orderID desc"
-                    sql = "select  top " + str(page_prod_count) + " * " + "from (" + v_sql + " ) as v1 order by v1.settlementTime desc,v1.StockProductID desc, v1.product_order_id asc"
+                    v_sql = "select row_number() over(order by g.settlementTime desc,a.stockproductid desc, g.orderID desc) as rownumber, " + v_sql + ""
                 else:
-                    v_sql = "select top " + str(topN) + v_sql + " order by g.receiveGoodsTime asc,a.stockproductid desc, g.orderID desc"
-                    sql = "select  top " + str(page_prod_count) + " * " + "from (" + v_sql + " ) as v1 order by v1.receiveGoodsTime desc,v1.StockProductID desc, v1.product_order_id asc"
+                    v_sql = "select row_number() over(order by g.receiveGoodsTime desc,a.stockproductid desc, g.orderID desc) as rownumber, " + v_sql + ""
             else:
-                v_sql = "select top " + str(topN) + v_sql + " order by g.CreateTime asc,a.stockproductid desc, g.orderID desc"
-                sql = "select  top " + str(page_prod_count) + " * " + "from (" + v_sql + " ) as v1 order by v1.CreateTime desc,v1.StockProductID desc, v1.product_order_id asc"
+                v_sql = "select row_number() over(order by g.CreateTime desc,a.stockproductid desc, g.orderID desc) as rownumber, " + v_sql + ""
 
+            sql = "select  * " + " from (" + v_sql + " ) as v1 where v1.rownumber > " + str(topN - page_prod_count) + " and v1.rownumber <= " + str(topN) + " order by v1.rownumber"
             print(ptype, "sql is ", sql)
             cursor.execute(sql)
             for row in cursor:
