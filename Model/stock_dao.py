@@ -199,10 +199,7 @@ class StockDao(object):
                 product.OpCode = row[1]
                 product.StockProductID = row[2]
                 product.ProductID = row[3]
-                if filter_enquriy is not None and filter_enquriy == '已询价':
-                    product.SignDate = row[21]
-                else:
-                    product.SignDate = row[4]
+                product.SignDate = row[4]
                 product.GoodsCode = row[5]
                 product.SpecNo = row[6]
                 product.GoodsCDesc = row[7]
@@ -222,6 +219,7 @@ class StockDao(object):
                 product.brand = row[18]
                 product.orderNum = row[19]
                 product.priceEnquiredID = row[20]
+                product.enquiryDate = row[21]
                 product_list.append(product)
 
             cursor.close()
