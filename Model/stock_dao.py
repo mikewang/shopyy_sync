@@ -288,7 +288,8 @@ class StockDao(object):
                             "CONVERT(varchar, g.CreateTime, 120 ) as CreateTime," \
                             "g.sourceOrderID, CONVERT(varchar, g.ensureTime, 120 ) as ensureTime, g.ensureOpCode, " \
                             "CONVERT(varchar, g.receiveGoodsTime, 120 ) as receiveGoodsTime, g.receiveOpCode," \
-                            "CONVERT(varchar, g.settlementTime, 120 ) as settlementTime, g.settlementOpCode "
+                            "CONVERT(varchar, g.settlementTime, 120 ) as settlementTime, g.settlementOpCode, " \
+                            "CONVERT(varchar, h.enquirydate, 120 ) as enquirydate "
             v_sql_fromtab = "FROM [Stock_Product_Info] as a " \
                             "join  FTPart_Stock_Product_Property_1 as b on a.StockProductID=b.MainID " \
                             "join Product_Image as c on b._ImageID=c.ProductImageID " \
@@ -304,7 +305,7 @@ class StockDao(object):
                               "WHERE NOT EXISTS( SELECT 1 FROM [Stock_Product_Order_App] AS T2 " \
                               "WHERE T1.orderID=T2.sourceOrderId and OrderStat = -1) and t1.sourceOrderId is null)  "
 
-            v_sql_tab_h = "(select max(id) as id, StockProductID " \
+            v_sql_tab_h = "(select max(id) as id, max(createtime) as enquirydate, StockProductID " \
                           "from [Stock_Product_EnquiryPrice_App] group by StockProductID) "
 
             v_sql = v_sql_columns + " " + v_sql_fromtab
@@ -483,6 +484,7 @@ class StockDao(object):
                 product.receiveOpCode = row[31]
                 product.settlementTime = row[32]
                 product.settlementOpCode = row[33]
+                product.enquiryDate = row[34]
 
                 product_list.append(product)
 
