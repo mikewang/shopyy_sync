@@ -102,12 +102,13 @@ class StockService(UserInfo):
     def get_order_product(self, OpCode, timestamp, token, pageNo, filter_stock, ptype):
         print(self.get_now_str(), "PageNo=", pageNo, filter_stock, "get order product by " + OpCode, "-"*30)
         product_list = None
+        product_count = 0
         user = self.get_checked_user(OpCode, timestamp, token)
         if user is not None:
-            product_list = self._dao.select_order_product_list(pageNo, filter_stock, ptype)
+            product_list, product_count = self._dao.select_order_product_list(pageNo, filter_stock, ptype)
         else:
             print(self.get_now_str(), "Error, get stockproduct order is failure.", OpCode, "PageNo=", pageNo)
-        return product_list
+        return product_list, product_count
 
     def get_product_image(self, OpCode, timestamp, token, imageGuid, year, month, module):
         print(self.get_now_str(), "get product big image by " + OpCode, "-"*30)
