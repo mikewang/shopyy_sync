@@ -122,9 +122,9 @@ class StockDao(object):
     def select_stock_product_list(self, page_no, filter_stock):
         try:
             product_list = []
+            page_prod_count = 10
             cnxn = pyodbc.connect(self._conn_str)
             cursor = cnxn.cursor()
-            topN = " top " + str(page_no*10)
             # 数据源
 
             v_sql_columns = "e.[采购人], a.StockProductID,a.ProductID,CONVERT(varchar, d.SignDate, 120 ) as SignDate," \
@@ -141,7 +141,7 @@ class StockDao(object):
                             "left join [Stock_Product_Info_Desc] f on a.StockProductID=f.StockProductID " \
                             "left join (select [StockProductID], sum([OrderNum]*[OrderStat]) as ordernum from [Stock_Product_Order_App] group by [StockProductID]) g on a.StockProductID=g.StockProductID  " \
                             "left join (select max(id) as id, max(createtime) as enquirydate, StockProductID from [Stock_Product_EnquiryPrice_App] group by StockProductID ) h on  a.StockProductID=h.StockProductID "
-            v_sql = "select " + topN + " " + v_sql_columns + v_sql_fromtab + "  where b.[其它.允采购量] > coalesce(g.ordernum,0) "
+            v_sql = v_sql_columns + v_sql_fromtab + "  where b.[其它.允采购量] > coalesce(g.ordernum,0) "
             v_sql_cc = "select count(*) as cc " + v_sql_fromtab + "  where b.[其它.允采购量] > coalesce(g.ordernum,0) "
 
             filter_brand = filter_stock["brand"]
@@ -178,14 +178,27 @@ class StockDao(object):
                     # 未询价
                     v_sql = v_sql + " and d.SignDate <= '" + filter_end + " 23:59:59'"
                     v_sql_cc = v_sql_cc + " and d.SignDate <= '" + filter_end + " 23:59:59'"
+                    # 总数统计
+                    print("select_stock_product_list count sql is \n", v_sql_cc)
+            cursor.execute(v_sql_cc)
+            product_count_row = cursor.fetchone()
+            product_count = product_count_row[0]
+            topN = page_no * page_prod_count
+            if product_count < topN:
+                topN = product_count
+                page_prod_count = topN - (page_no - 1) * page_prod_count
+            if page_prod_count < 0:
+                page_prod_count = 0
+            # 增加排序功能
 
             if filter_enquriy is not None and filter_enquriy == '已询价':
-                v_sql = v_sql + " order by h.enquirydate desc,a.stockproductid desc"
-                v_sql = "select  top 10 * from (" + v_sql + " ) as v1 order by v1.enquirydate desc,v1.StockProductID desc"
+                v_sql = "select top " + str(topN) + v_sql + " order by h.enquirydate desc,a.stockproductid desc"
+                v_sql = "select  top " + str(page_prod_count) + " * from (" + v_sql + " ) as v1 order by v1.enquirydate desc,v1.StockProductID desc"
             else:
                 # 未询价
                 v_sql = v_sql + " order by d.signdate desc,a.stockproductid desc"
-                v_sql = "select  top 10 * from (" + v_sql + " ) as v1 order by v1.SignDate desc,v1.StockProductID desc"
+                v_sql = "select  top " + str(page_prod_count) + " * from (" + v_sql + " ) as v1 order by v1.SignDate desc,v1.StockProductID desc"
+
 
             print("select_stock_product_list page sql is \n", v_sql)
             cursor.execute(v_sql)
@@ -218,11 +231,7 @@ class StockDao(object):
                 product.orderNum = row[18]
                 product.priceEnquiredID = row[19]
                 product_list.append(product)
-            # 总数统计
-            print("select_stock_product_list count sql is \n", v_sql_cc)
-            cursor.execute(v_sql_cc)
-            product_count_row = cursor.fetchone()
-            product_count = product_count_row[0]
+
             cursor.close()
             cnxn.close()
             return product_list, product_count
@@ -273,9 +282,9 @@ class StockDao(object):
         # 检索 所有的 订货商品
         try:
             product_list = []
+            page_prod_count = 10
             cnxn = pyodbc.connect(self._conn_str)
             cursor = cnxn.cursor()
-            topN = " top " + str(page_no * 10)
             # 数据源
             v_sql_columns = "e.[采购人], a.StockProductID,a.ProductID,CONVERT(varchar, d.SignDate, 120 ) as SignDate," \
                             "a.GoodsCode,a.SpecNo,f.GoodsCDesc, a.GoodsUnit, b._ImageID,c.ImageGuid,c.ImageFmt," \
@@ -308,7 +317,7 @@ class StockDao(object):
             v_sql_tab_h = "(select max(id) as id, StockProductID " \
                           "from [Stock_Product_EnquiryPrice_App] group by StockProductID) "
 
-            v_sql = "select " + topN + " " + v_sql_columns + " " + v_sql_fromtab
+            v_sql = v_sql_columns + " " + v_sql_fromtab
             v_sql_cc = "select count(*) " + v_sql_fromtab
             v_sql = v_sql + " join " + v_sql_tab_g + "as g on a.StockProductID=g.StockProductID"
             v_sql_cc = v_sql_cc + " join " + v_sql_tab_g + "as g on a.StockProductID=g.StockProductID"
@@ -414,34 +423,44 @@ class StockDao(object):
                 v_sql_filter = v_sql_filter + " and g.supplier in (" + filter_sql + ")"
             v_sql = v_sql + v_sql_filter
             v_sql_cc = v_sql_cc + v_sql_filter
+            print(ptype, "sql is ", v_sql_cc)
+            cursor.execute(v_sql_cc)
+            row = cursor.fetchone()
+            product_count = row[0]
+            topN = page_no*page_prod_count
+            if product_count < topN:
+                topN = product_count
+                page_prod_count = topN - (page_no-1)*page_prod_count
+            if page_prod_count < 0:
+                page_prod_count = 0
             # 增加排序功能
             if ptype == "order":
                 # 去掉订货，订货，订货完成三个状态的查询
                 if filter_settlement == 1:
-                    v_sql = v_sql + " order by g.ensureTime desc,a.stockproductid desc, g.orderID desc"
-                    sql = "select  top 10 * from (" + v_sql + " ) as v1 order by v1.ensureTime desc,v1.StockProductID desc, v1.product_order_id asc"
+                    v_sql = "select top " + str(topN) + v_sql + " order by g.ensureTime desc,a.stockproductid desc, g.orderID desc"
+                    sql = "select  top " + str(page_prod_count) + " * from (" + v_sql + " ) as v1 order by v1.ensureTime desc,v1.StockProductID desc, v1.product_order_id asc"
                 else:
                     v_sql = v_sql + " order by g.CreateTime desc,a.stockproductid desc, g.orderID desc"
-                    sql = "select  top 10 * from (" + v_sql + " ) as v1 order by v1.CreateTime desc,v1.StockProductID desc, v1.product_order_id asc"
+                    sql = "select  top " + str(page_prod_count) + " from (" + v_sql + " ) as v1 order by v1.CreateTime desc,v1.StockProductID desc, v1.product_order_id asc"
             elif ptype == "receive":
                 # 收货，状态的查询
                 if filter_settlement == 2:
-                    v_sql = v_sql + " order by g.receiveGoodsTime desc,a.stockproductid desc, g.orderID desc"
-                    sql = "select  top 10 * from (" + v_sql + " ) as v1 order by v1.receiveGoodsTime desc,v1.StockProductID desc, v1.product_order_id asc"
+                    v_sql = "select top " + str(topN) + v_sql + " order by g.receiveGoodsTime desc,a.stockproductid desc, g.orderID desc"
+                    sql = "select  top " + str(page_prod_count) + " from (" + v_sql + " ) as v1 order by v1.receiveGoodsTime desc,v1.StockProductID desc, v1.product_order_id asc"
                 else:
-                    v_sql = v_sql + " order by g.ensureTime desc,a.stockproductid desc, g.orderID desc"
-                    sql = "select  top 10 * from (" + v_sql + " ) as v1 order by v1.ensureTime desc,v1.StockProductID desc, v1.product_order_id asc"
+                    v_sql = "select top " + str(topN) + v_sql + " order by g.ensureTime desc,a.stockproductid desc, g.orderID desc"
+                    sql = "select  top " + str(page_prod_count) + " from (" + v_sql + " ) as v1 order by v1.ensureTime desc,v1.StockProductID desc, v1.product_order_id asc"
             elif ptype == "settlement":
                 # 结算, 状态的查询
                 if filter_settlement == 2:
-                    v_sql = v_sql + " order by g.settlementTime desc,a.stockproductid desc, g.orderID desc"
-                    sql = "select  top 10 * from (" + v_sql + " ) as v1 order by v1.settlementTime desc,v1.StockProductID desc, v1.product_order_id asc"
+                    v_sql = "select top " + str(topN) + v_sql + " order by g.settlementTime desc,a.stockproductid desc, g.orderID desc"
+                    sql = "select  top " + str(page_prod_count) + " from (" + v_sql + " ) as v1 order by v1.settlementTime desc,v1.StockProductID desc, v1.product_order_id asc"
                 else:
-                    v_sql = v_sql + " order by g.receiveGoodsTime desc,a.stockproductid desc, g.orderID desc"
-                    sql = "select  top 10 * from (" + v_sql + " ) as v1 order by v1.receiveGoodsTime desc,v1.StockProductID desc, v1.product_order_id asc"
+                    v_sql = "select top " + str(topN) + v_sql + " order by g.receiveGoodsTime desc,a.stockproductid desc, g.orderID desc"
+                    sql = "select  top " + str(page_prod_count) + " from (" + v_sql + " ) as v1 order by v1.receiveGoodsTime desc,v1.StockProductID desc, v1.product_order_id asc"
             else:
-                v_sql = v_sql + " order by g.CreateTime desc,a.stockproductid desc, g.orderID desc"
-                sql = "select  top 10 * from (" + v_sql + " ) as v1 order by v1.CreateTime desc,v1.StockProductID desc, v1.product_order_id asc"
+                v_sql = "select top " + str(topN) + v_sql + " order by g.CreateTime desc,a.stockproductid desc, g.orderID desc"
+                sql = "select  top " + str(page_prod_count) + " from (" + v_sql + " ) as v1 order by v1.CreateTime desc,v1.StockProductID desc, v1.product_order_id asc"
 
             print(ptype, "sql is ", sql)
             cursor.execute(sql)
@@ -487,10 +506,7 @@ class StockDao(object):
                 product.settlementOpCode = row[32]
 
                 product_list.append(product)
-            print(ptype, "sql is ", v_sql_cc)
-            cursor.execute(v_sql_cc)
-            row = cursor.fetchone()
-            product_count = row[0]
+
             cursor.close()
             cnxn.close()
             return product_list, product_count
