@@ -199,7 +199,6 @@ class StockDao(object):
                 v_sql = v_sql + " order by d.signdate desc,a.stockproductid desc"
                 v_sql = "select  top " + str(page_prod_count) + " * from (" + v_sql + " ) as v1 order by v1.SignDate desc,v1.StockProductID desc"
 
-
             print("select_stock_product_list page sql is \n", v_sql)
             cursor.execute(v_sql)
             for row in cursor:
