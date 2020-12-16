@@ -34,6 +34,7 @@ class ProductOrderResource(Resource):
             parser.add_argument('begin')
             parser.add_argument('end')
             parser.add_argument('supplier')
+            parser.add_argument('specno')
             # 分析请求
             args = parser.parse_args()
             OpCode = args["OpCode"]
@@ -86,7 +87,17 @@ class ProductOrderResource(Resource):
                 print("supplier key is ", args["supplier"], supplier)
             else:
                 filter_stock['supplier'] = None
+            # set settlement
             filter_stock['settlement'] = settlement
+            specno_base64 = args["specno"]
+            if specno_base64 is not None:
+                specno_base64 = base64Replace(specno_base64)
+                specno = base64.b64decode(specno_base64).decode('utf-8')
+                filter_stock['specno'] = specno
+                print("specno key is ", args["specno"], specno)
+            else:
+                filter_stock['specno'] = None
+
             print("filter_stock is ", filter_stock)
             user_service = StockService()
             prod_list, prod_count = user_service.get_order_product(OpCode, timestamp, token, pageNo, filter_stock, ptype)

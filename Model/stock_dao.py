@@ -328,6 +328,9 @@ class StockDao(object):
             elif ptype == "settlement":
                 # 结算, 状态的查询
                 v_sql_where = "where 1=1 and g.settlement >=2"
+            elif ptype == "history":
+                # 结算, 状态的查询
+                v_sql_where = "where 1=1 "
             else:
                 v_sql_where = "where 1=1 "
             v_sql = v_sql + " " + v_sql_where
@@ -349,10 +352,11 @@ class StockDao(object):
                 filter_sql = filter_sql.rstrip(',')
                 v_sql_filter = v_sql_filter + " and b.[其它.商品品牌] in (" + filter_sql + ")"
             filter_enquriy = filter_stock["enquiry"]
-            if filter_enquriy == '未询价':
-                v_sql_filter = v_sql_filter + " and  coalesce(h.id,0) = 0 "
-            elif filter_enquriy == '已询价':
-                v_sql_filter = v_sql_filter + " and  coalesce(h.id,0) > 0 "
+            if filter_enquriy is not None:
+                if filter_enquriy == '未询价':
+                    v_sql_filter = v_sql_filter + " and  coalesce(h.id,0) = 0 "
+                elif filter_enquriy == '已询价':
+                    v_sql_filter = v_sql_filter + " and  coalesce(h.id,0) > 0 "
             # begin date
             filter_begin = filter_stock["begin"]
             if filter_begin is not None:
@@ -412,6 +416,10 @@ class StockDao(object):
                     filter_sql = filter_sql + "'" + b + "',"
                 filter_sql = filter_sql.rstrip(',')
                 v_sql_filter = v_sql_filter + " and g.supplier in (" + filter_sql + ")"
+            filter_specno = filter_stock["specno"]
+            if filter_specno is not None:
+                v_sql_filter = v_sql_filter + " and a.SpecNo = '" + filter_specno + "'"
+
             v_sql = v_sql + v_sql_filter
             v_sql_cc = v_sql_cc + v_sql_filter
             print(ptype, "sql is ", v_sql_cc)
