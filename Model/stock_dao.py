@@ -296,8 +296,10 @@ class StockDao(object):
                             "join stock_info d on d.ID=a.StockID " \
                             "join [FTPart_Stock_Property_1] e on e.[MainID] = d.ID " \
                             "left join [Stock_Product_Info_Desc] f on a.StockProductID=f.StockProductID "
-
-            if ptype == "return":
+            if ptype == "history":
+                v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] AS T1 " \
+                              "WHERE settlement > 0)"
+            elif ptype == "return":
                 v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] AS T1 " \
                               "WHERE OrderStat = -1 and settlement > 0)"
             else:
