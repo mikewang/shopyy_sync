@@ -299,6 +299,9 @@ class StockDao(object):
             if ptype == "history":
                 v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] AS T1 " \
                               "WHERE settlement > 0)"
+            elif ptype == "settlement":
+                v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] AS T1 " \
+                              "WHERE (OrderStat = -1 or OrderStat = 1) and settlement > 1)"
             elif ptype == "return":
                 v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] AS T1 " \
                               "WHERE OrderStat = -1 and settlement > 0)"
