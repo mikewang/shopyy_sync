@@ -301,10 +301,10 @@ class StockDao(object):
                               "WHERE settlement > 0)"
             elif ptype == "settlement":
                 v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] AS T1 " \
-                              "WHERE (OrderStat = -1 or OrderStat = 1) and settlement > 1)"
+                              "WHERE OrderStat = 1 and settlement > 1)"
             elif ptype == "return":
                 v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] AS T1 " \
-                              "WHERE OrderStat = -1 and settlement > 0)"
+                              "WHERE (OrderStat = -1 or OrderStat = 1) and settlement > 0)"
             else:
                 v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] AS T1 " \
                               "WHERE NOT EXISTS( SELECT 1 FROM [Stock_Product_Order_App] AS T2 " \
@@ -400,22 +400,13 @@ class StockDao(object):
             # 增加排序功能
             if ptype == "order":
                 # 去掉订货，订货，订货完成三个状态的查询
-                if filter_settlement == 1:
-                    v_sql = "select row_number() over(order by g.ensureTime desc,a.stockproductid desc, g.orderID desc) as rownumber, " + v_sql + ""
-                else:
-                    v_sql = "select row_number() over(order by g.CreateTime desc,a.stockproductid desc, g.orderID desc) as rownumber, " + v_sql + ""
+                v_sql = "select row_number() over(order by g.ensureTime desc,a.stockproductid desc, g.orderID desc) as rownumber, " + v_sql + ""
             elif ptype == "receive":
                 # 收货，状态的查询
-                if filter_settlement == 2:
-                    v_sql = "select row_number() over(order by g.receiveGoodsTime desc,a.stockproductid desc, g.orderID desc) as rownumber, " + v_sql + ""
-                else:
-                    v_sql = "select row_number() over(order by g.ensureTime desc,a.stockproductid desc, g.orderID desc) as rownumber, " + v_sql + ""
+                v_sql = "select row_number() over(order by g.receiveGoodsTime desc,a.stockproductid desc, g.orderID desc) as rownumber, " + v_sql + ""
             elif ptype == "settlement":
                 # 结算, 状态的查询
-                if filter_settlement == 2:
-                    v_sql = "select row_number() over(order by g.settlementTime desc,a.stockproductid desc, g.orderID desc) as rownumber, " + v_sql + ""
-                else:
-                    v_sql = "select row_number() over(order by g.receiveGoodsTime desc,a.stockproductid desc, g.orderID desc) as rownumber, " + v_sql + ""
+                v_sql = "select row_number() over(order by g.settlementTime desc,a.stockproductid desc, g.orderID desc) as rownumber, " + v_sql + ""
             else:
                 v_sql = "select row_number() over(order by g.CreateTime desc,a.stockproductid desc, g.orderID desc) as rownumber, " + v_sql + ""
 
