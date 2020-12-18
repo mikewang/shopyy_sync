@@ -321,23 +321,6 @@ class StockDao(object):
             v_sql_cc = v_sql_cc + " left join " + v_sql_tab_h + " h on  a.StockProductID=h.StockProductID"
 
             v_sql_where = "where 1=1"
-            if ptype == "order":
-                # 去掉订货，订货，订货完成三个状态的查询
-                v_sql_where = "where 1=1 and g.settlement <=1"
-            elif ptype == "receive":
-                # 收货，状态的查询
-                v_sql_where = "where 1=1 and g.settlement >=1 and g.settlement <=2"
-            elif ptype == "return":
-                # 退货, 状态的查询
-                v_sql_where = "where 1=1 and g.settlement >=1 and g.settlement <=2"
-            elif ptype == "settlement":
-                # 结算, 状态的查询
-                v_sql_where = "where 1=1 and g.settlement >=2"
-            elif ptype == "history":
-                # 结算, 状态的查询
-                v_sql_where = "where 1=1 "
-            else:
-                v_sql_where = "where 1=1 "
             v_sql = v_sql + " " + v_sql_where
             v_sql_cc = v_sql_cc + " " + v_sql_where
 
@@ -366,26 +349,17 @@ class StockDao(object):
             filter_begin = filter_stock["begin"]
             if filter_begin is not None:
                 if ptype == "order":
+                    v_sql_filter = v_sql_filter + " and g.CreateTime >= '" + filter_begin + "'"
                     # 去掉订货，订货，订货完成三个状态的查询
-                    if filter_settlement == 0:
-                        v_sql_filter = v_sql_filter + " and g.CreateTime >= '" + filter_begin + "'"
-                    else:
-                        v_sql_filter = v_sql_filter + " and g.ensureTime >= '" + filter_begin + "'"
                 elif ptype == "receive":
                     # 收货，状态的查询
-                    if filter_settlement == 1:
-                        v_sql_filter = v_sql_filter + " and g.ensureTime >= '" + filter_begin + "'"
-                    else:
-                        v_sql_filter = v_sql_filter + " and g.receiveGoodsTime >= '" + filter_begin + "'"
+                    v_sql_filter = v_sql_filter + " and g.ensureTime >= '" + filter_begin + "'"
                 elif ptype == "return":
                     # 退货, 状态的查询
                     v_sql_filter = v_sql_filter + " and g.CreateTime >= '" + filter_begin + "'"
                 elif ptype == "settlement":
                     # 结算, 状态的查询
-                    if filter_settlement == 2:
-                        v_sql_filter = v_sql_filter + " and g.receiveGoodsTime >= '" + filter_begin + "'"
-                    else:
-                        v_sql_filter = v_sql_filter + " and g.settlementTime >= '" + filter_begin + "'"
+                    v_sql_filter = v_sql_filter + " and g.receiveGoodsTime >= '" + filter_begin + "'"
                 else:
                     v_sql_filter = v_sql_filter + " and g.CreateTime >= '" + filter_begin + "'"
             # end data
@@ -393,25 +367,16 @@ class StockDao(object):
             if filter_end is not None:
                 if ptype == "order":
                     # 去掉订货，订货，订货完成三个状态的查询
-                    if filter_settlement == 0:
-                        v_sql_filter = v_sql_filter + " and g.CreateTime <= '" + filter_end + " 23:59:59'"
-                    else:
-                        v_sql_filter = v_sql_filter + " and g.ensureTime <= '" + filter_end + " 23:59:59'"
+                    v_sql_filter = v_sql_filter + " and g.CreateTime <= '" + filter_end + " 23:59:59'"
                 elif ptype == "receive":
                     # 收货，状态的查询
-                    if filter_settlement == 1:
-                        v_sql_filter = v_sql_filter + " and g.ensureTime <= '" + filter_end + " 23:59:59'"
-                    else:
-                        v_sql_filter = v_sql_filter + " and g.receiveGoodsTime <= '" + filter_end + " 23:59:59'"
+                    v_sql_filter = v_sql_filter + " and g.ensureTime <= '" + filter_end + " 23:59:59'"
                 elif ptype == "return":
                     # 退货, 状态的查询
                     v_sql_filter = v_sql_filter + " and g.CreateTime <= '" + filter_end + " 23:59:59'"
                 elif ptype == "settlement":
                     # 结算, 状态的查询
-                    if filter_settlement == 2:
-                        v_sql_filter = v_sql_filter + " and g.receiveGoodsTime <= '" + filter_end + " 23:59:59'"
-                    else:
-                        v_sql_filter = v_sql_filter + " and g.settlementTime <= '" + filter_end + " 23:59:59'"
+                    v_sql_filter = v_sql_filter + " and g.receiveGoodsTime <= '" + filter_end + " 23:59:59'"
                 else:
                     v_sql_filter = v_sql_filter + " and g.CreateTime <= '" + filter_end + " 23:59:59'"
             filter_supplier = filter_stock["supplier"]
