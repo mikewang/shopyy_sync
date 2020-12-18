@@ -41,7 +41,7 @@ class ProductInfo(object):
         # orderStat = 1 ，订货，-1 退货。和ordernum 组合使用，决定允许采购量, 0 为 取消退货
         self.orderStat = 1
         # settlement = 1， 确认订货成功，并没有现实收货，0，默认值，未确认订货成功。2, 收到货（写入erp）。3，结算。
-        self.settlement = 0
+        self.settlement = -1
         self.orderID = 0
         # 订货时间/取消订货时间
         self.createTime = ''
