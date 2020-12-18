@@ -158,7 +158,7 @@ class StockDao(object):
                     v_sql = v_sql + " and  coalesce(h.id,0) = 0 "
                     v_sql_cc = v_sql_cc + " and  coalesce(h.id,0) = 0 "
                 elif filter_enquriy == '已询价':
-                    v_sql_cc = v_sql_cc + " and  coalesce(h.id,0) > 0 "
+                    v_sql = v_sql + " and  coalesce(h.id,0) > 0 "
                     v_sql_cc = v_sql_cc + " and  coalesce(h.id,0) > 0 "
             filter_begin = filter_stock["begin"]
             if filter_begin is not None:
