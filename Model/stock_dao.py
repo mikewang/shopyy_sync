@@ -308,7 +308,8 @@ class StockDao(object):
             else:
                 v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] AS T1 " \
                               "WHERE NOT EXISTS( SELECT 1 FROM [Stock_Product_Order_App] AS T2 " \
-                              "WHERE T1.orderID=T2.sourceOrderId and OrderStat = -1) and t1.sourceOrderId is null)  "
+                              "WHERE T1.orderID=T2.sourceOrderId and OrderStat = -1) and t1.sourceOrderId is null) and " \
+                              "settlement < 3 "
 
             v_sql_tab_h = "(select max(id) as id, max(createtime) as enquirydate, StockProductID " \
                           "from [Stock_Product_EnquiryPrice_App] group by StockProductID) "
@@ -328,9 +329,6 @@ class StockDao(object):
             if filter_settlement is not None:
                 v_sql = v_sql + "  and g.settlement = " + filter_settlement + " "
                 v_sql_cc = v_sql_cc + "  and g.settlement = " + filter_settlement + " "
-            else:
-                print("*"*1000, "\n settlement is none , critical.")
-                print("*"*30)
             v_sql_filter = ""
             filter_brand = filter_stock["brand"]
             if filter_brand is not None:
