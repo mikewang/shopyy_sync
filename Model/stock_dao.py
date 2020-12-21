@@ -543,12 +543,28 @@ class StockDao(object):
                         sql = "delete from Stock_Product_Order_App where sourceOrderID=?"
                         print(operate_type, "delete sql --- \n ", sql)
                         cursor.execute(sql, orderID)
-                    sql = "insert into Stock_Product_Order_App(stockProductID,opCode, OrderNum, OrderPrice," \
-                          "orderStat,supplier, settlement,sourceOrderID,createTime)  " \
-                          "select stockProductID,?, OrderNum, OrderPrice,?,supplier, settlement, orderID, getdate() " \
+                    sql = "select stockProductID, OrderNum, OrderPrice,supplier, settlement " \
                           "from Stock_Product_Order_App where orderID=?"
-                    print(operate_type, "insert sql --- \n ", sql)
-                    cursor.execute(sql, opCode, orderStat, orderID)
+                    cursor.execute(sql, orderID)
+                    row = cursor.fetchone()
+                    if row is not None:
+                        stockProductID = row[0]
+                        purchaseNum = row[1]
+                        purchasePrice = row[2]
+                        supplier = row[3]
+                        settlement = row[4]
+                        sql = "insert into Stock_Product_Order_App" \
+                              "(stockProductID,opCode, OrderNum, OrderPrice,orderStat,supplier," \
+                              " settlement,sourceOrderID)  values(?,?,?,?,?,?,?,?) " \
+
+                        print(operate_type, "insert sql --- \n ", sql)
+                        cursor.execute(sql, stockProductID, opCode, purchaseNum,purchasePrice, orderStat,supplier,settlement, orderID)
+                        # insert history row
+                        sql = "insert INTO Stock_Product_Order_App_hist(StockProductID, OpCode, OrderNum,OrderPrice," \
+                              " supplier, OperateType, orderId, note) VALUES(?,?,?,?,?,?,?,?)"
+                        print(operate_type, "insert hist sql --- \n ", sql)
+                        cursor.execute(sql, stockProductID, opCode, purchaseNum, purchasePrice,
+                                       supplier, 'cancel', orderID, '')
                     cursor.commit()
 
                 elif operate_type == "complete":
@@ -561,10 +577,18 @@ class StockDao(object):
                     settlement = prod["settlement"]
                     settlement = 1
                     sql = "update Stock_Product_Order_App " \
-                          "set ensureOpCode = ?, OrderNum = ? , OrderPrice=?, supplier=? , settlement=?, ensureTime=getdate() " \
+                          "set ensureOpCode = ?, OrderNum = ? , OrderPrice=?, supplier=? , settlement=?," \
+                          " ensureTime=getdate() " \
                           "where orderID = ? and stockProductID = ? and settlement <> ? "
                     print(operate_type, "update sql ---\n ", sql)
-                    cursor.execute(sql, ensureOpCode, purchaseNum, purchasePrice, supplier, settlement, orderID, stockProductID, settlement)
+                    cursor.execute(sql, ensureOpCode, purchaseNum, purchasePrice, supplier, settlement, orderID,
+                                   stockProductID, settlement)
+                    # insert history row
+                    sql = "insert INTO Stock_Product_Order_App_hist(StockProductID, OpCode, OrderNum," \
+                          "OrderPrice, supplier, OperateType, orderId, note) " \
+                          "VALUES(?,?,?,?,?,?,?,?)"
+                    cursor.execute(sql, stockProductID, ensureOpCode, purchaseNum, purchasePrice, supplier, 'complete',
+                                   orderID, '')
                     sql = "update [FTPart_Stock_Product_Property_1] " \
                           "set [其它.采购剩余数量]=[其它.采购剩余数量] + [其它.允采购量] - ?,[其它.供应商名称]=?,[其它.业务员]=? " \
                           "where [MainID]=?"
@@ -589,13 +613,27 @@ class StockDao(object):
                         print(operate_type, "delete sql --- \n ", sql)
                         cursor.execute(sql, orderID)
                         print(operate_type, stockProductID, " product has been returned, delete it now.")
-                    sql = "insert into Stock_Product_Order_App(stockProductID,opCode, OrderNum, OrderPrice," \
-                          "orderStat,supplier, settlement,sourceOrderID,createTime)  " \
-                          "select stockProductID,?, ?, ?, ? ,supplier, settlement, orderID, getdate() " \
+                    sql = "select stockProductID, supplier, settlement " \
                           "from Stock_Product_Order_App where orderID=?"
-                    print(operate_type, "insert sql --- \n ", sql)
-                    cursor.execute(sql, opCode, purchaseNum, purchasePrice, orderStat, orderID)
-                    if settlement == 2:
+                    cursor.execute(sql, orderID)
+                    row = cursor.fetchone()
+                    if row is not None:
+                        stockProductID = row[0]
+                        supplier = row[1]
+                        settlement = row[2]
+                        sql = "insert into Stock_Product_Order_App(stockProductID,opCode, OrderNum, OrderPrice," \
+                              "orderStat,supplier, settlement,sourceOrderID,createTime) " \
+                              " values(?,?,?,?,?,?,?,?,getdate()) " \
+
+                        print(operate_type, "insert sql --- \n ", sql)
+                        cursor.execute(sql, stockProductID, opCode, purchaseNum, purchasePrice, orderStat, supplier, settlement, orderID)
+                        # insert history row
+                        sql = "insert INTO Stock_Product_Order_App_hist(StockProductID, OpCode, OrderNum,OrderPrice," \
+                              " supplier, OperateType, orderId, note) VALUES(?,?,?,?,?,?,?,?)"
+                        print(operate_type, "insert hist sql --- \n ", sql)
+                        cursor.execute(sql, stockProductID, opCode, purchaseNum, purchasePrice,
+                                       supplier, 'return', orderID, '')
+                    if settlement == 1 or settlement == 2:
                         sql = "update [FTPart_Stock_Product_Property_1] " \
                               "set [其它.采购剩余数量] = [其它.采购剩余数量] + ? " \
                               "where [MainID]=?"
@@ -607,23 +645,29 @@ class StockDao(object):
                     opCode = prod["orderOpCode"]
                     orderStat = 0
                     purchaseNum = prod["purchaseNum"]
+                    purchasePrice = prod["purchasePrice"]
+                    supplier = prod["supplier"]
                     settlement = prod["settlement"]
                     # 退货。
                     sql = "select count(*) from Stock_Product_Order_App where orderID=? and orderStat = -1"
                     cursor.execute(sql, orderID)
                     row = cursor.fetchone()
                     cc = row[0]
-                    if cc == 0:
+                    if cc == 1:
                         sql = "update Stock_Product_Order_App set orderStat = ? where orderID=?"
                         print(operate_type, "update sql --- \n ", sql)
                         cursor.execute(sql,  orderStat, orderID)
-                        if settlement == 2:
+                        if settlement == 1 or settlement == 2:
                             sql = "update [FTPart_Stock_Product_Property_1] " \
                                   "set [其它.采购剩余数量] = [其它.采购剩余数量] - ? " \
                                   "where [MainID]=?"
                             cursor.execute(sql, purchaseNum, stockProductID)
                             print(operate_type, "update sql2 ---\n ", sql)
-
+                        # insert history row
+                        sql = "insert INTO Stock_Product_Order_App_hist(StockProductID, OpCode, OrderNum,OrderPrice," \
+                              " supplier, OperateType, orderId, note) VALUES(?,?,?,?,?,?,?,?)"
+                        print(operate_type, "insert hist sql --- \n ", sql)
+                        cursor.execute(sql, stockProductID, opCode, purchaseNum, 0.0, '', 'undoreturn', orderID, '')
                         cursor.commit()
                     else:
                         result = "-1"
@@ -641,10 +685,19 @@ class StockDao(object):
                           "where orderID = ? and stockProductID = ? and settlement <> ? "
                     print(operate_type, "update sql ---\n ", sql)
                     cursor.execute(sql, receiveOpCode, settlement, orderID, stockProductID, settlement)
+                    # insert history row
+                    sql = "insert INTO Stock_Product_Order_App_hist(StockProductID, OpCode, OrderNum,OrderPrice," \
+                          " supplier, OperateType, orderId, note) VALUES(?,?,?,?,?,?,?,?)"
+                    print(operate_type, "insert hist sql --- \n ", sql)
+                    cursor.execute(sql, stockProductID, receiveOpCode, purchaseNum, purchasePrice, supplier,
+                                   'receive', orderID, '')
                     cursor.commit()
                 elif operate_type == "settlement":
                     settlementOpCode = prod["settlementOpCode"]
                     # 结算
+                    purchaseNum = prod["purchaseNum"]
+                    purchasePrice = prod["purchasePrice"]
+                    supplier = prod["supplier"]
                     settlement = prod["settlement"]
                     settlement = 3
                     sql = "update Stock_Product_Order_App " \
@@ -652,6 +705,12 @@ class StockDao(object):
                           "where orderID = ? and stockProductID = ? and settlement <> ? "
                     print(operate_type, "update sql ---\n ", sql)
                     cursor.execute(sql, settlementOpCode, settlement, orderID, stockProductID, settlement)
+                    # insert history row
+                    sql = "insert INTO Stock_Product_Order_App_hist(StockProductID, OpCode, OrderNum,OrderPrice," \
+                          " supplier, OperateType, orderId, note) VALUES(?,?,?,?,?,?,?,?)"
+                    print(operate_type, "insert hist sql --- \n ", sql)
+                    cursor.execute(sql, stockProductID, settlementOpCode, purchaseNum, purchasePrice, supplier,
+                                   'settlement', orderID, '')
                     cursor.commit()
             cursor.close
             cnxn.close
