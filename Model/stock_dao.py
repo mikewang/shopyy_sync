@@ -493,6 +493,13 @@ class StockDao(object):
                       " values(?,?,?,?,?,?,?)"
                 print("add order", "insert Stock_Product_Order_App sql is ", sql)
                 cursor.execute(sql, stockProductID, opCode, purchaseNum, purchasePrice, orderStat, supplier, settlement)
+                sql = "select @@IDENTITY"
+                cursor.execute(sql)
+                lastOrderID = cursor.fetchone()[0]
+                sql = "insert INTO Stock_Product_Order_App_hist(StockProductID, OpCode, OrderNum," \
+                      "OrderPrice, supplier, OperateType, orderId, note) " \
+                      "VALUES(?,?,?,?,?,?,?,?)"
+                cursor.execute(sql, stockProductID, opCode, purchaseNum, purchasePrice, supplier, 'order', lastOrderID, '')
                 # myTableId = cursor.fetchone()[0]
                 # print("Stock_Product_Order_App id is ", myTableId)
                 #  last row id 不生效。
