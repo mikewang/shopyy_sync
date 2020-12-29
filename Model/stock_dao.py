@@ -588,10 +588,33 @@ class StockDao(object):
                     cursor.execute(sql, stockProductID, ensureOpCode, purchaseNum, purchasePrice, supplier, 'complete',
                                    orderID, '')
                     sql = "update [FTPart_Stock_Product_Property_1] " \
-                          "set [其它.采购剩余数量]=[其它.采购剩余数量] + [其它.允采购量] - ?,[其它.供应商名称]=?,[其它.业务员]=? " \
+                          "set [其它.app采购量] = coalesce([其它.app采购量], 0) + ?,[其它.供应商名称]=coalesce([其它.供应商名称],?),[其它.业务员]=? " \
                           "where [MainID]=?"
                     cursor.execute(sql, purchaseNum, supplier, ensureOpCode, stockProductID)
                     print(operate_type, "update sql2 ---\n ", sql)
+                    # [Stock_Product_InfoBase].unitprice 更新单价
+                    # [Stock_Product_Info].goodsnum 更新采购量，为0是要设置为允采购量，因为系统不能设置为0。
+                    sql = "select sum(ordernum*orderStat) as goodsnum,sum(ordernum*orderprice*orderStat) as allprice " \
+                          "from Stock_Product_Order_App " \
+                          "where stockProductID = ? and (orderStat = -1 or orderStat = 1)"
+                    cursor.execute(sql, stockProductID)
+                    row = cursor.fetchone()
+                    goodsnum = row[0]
+                    allprice = row[1]
+                    if goodsnum == 0:
+                        unitprice = 0
+                    else:
+                        unitprice = allprice/goodsnum
+                    sql = "select [其它.允采购量] from FTPart_Stock_Product_Property_1 where [MainID]=?"
+                    cursor.execute(sql, stockProductID)
+                    row = cursor.fetchone()
+                    permittedNum = row[0]
+                    if goodsnum == 0:
+                        goodsnum = permittedNum
+                    sql = "update Stock_Product_InfoBase set unitprice=? where stockProductID = ?"
+                    cursor.execute(sql, unitprice, stockProductID)
+                    sql = "update Stock_Product_Info set goodsnum=? where stockProductID = ?"
+                    cursor.execute(sql, goodsnum, stockProductID)
                     cursor.commit()
                 elif operate_type == "return":
                     # 插入一条 退货 记录进来，原订货记录保存。
@@ -633,10 +656,34 @@ class StockDao(object):
                                        supplier, 'return', orderID, '')
                     if settlement == 1 or settlement == 2:
                         sql = "update [FTPart_Stock_Product_Property_1] " \
-                              "set [其它.采购剩余数量] = [其它.采购剩余数量] + ? " \
+                              "set [其它.app采购量] = [其它.app采购量] - ? " \
                               "where [MainID]=?"
                         cursor.execute(sql, purchaseNum, stockProductID)
                         print(operate_type, "update sql2 ---\n ", sql)
+                        # [Stock_Product_InfoBase].unitprice 更新单价
+                        # [Stock_Product_Info].goodsnum 更新采购量，为0是要设置为允采购量，因为系统不能设置为0。
+                        sql = "select sum(ordernum*orderStat) as goodsnum,sum(ordernum*orderprice*orderStat) as allprice " \
+                              "from Stock_Product_Order_App " \
+                              "where stockProductID = ? and (orderStat = -1 or orderStat = 1)"
+                        cursor.execute(sql, stockProductID)
+                        row = cursor.fetchone()
+                        goodsnum = row[0]
+                        allprice = row[1]
+                        if goodsnum == 0:
+                            unitprice = 0
+                        else:
+                            unitprice = allprice / goodsnum
+                        sql = "select [其它.允采购量] from FTPart_Stock_Product_Property_1 where [MainID]=?"
+                        cursor.execute(sql, stockProductID)
+                        row = cursor.fetchone()
+                        permittedNum = row[0]
+                        if goodsnum == 0:
+                            goodsnum = permittedNum
+                        sql = "update Stock_Product_InfoBase set unitprice=? where stockProductID = ?"
+                        cursor.execute(sql, unitprice, stockProductID)
+                        sql = "update Stock_Product_Info set goodsnum=? where stockProductID = ?"
+                        cursor.execute(sql, goodsnum, stockProductID)
+
                     cursor.commit()
                 elif operate_type == "undoreturn":
                     # 取消 退货。
@@ -657,10 +704,33 @@ class StockDao(object):
                         cursor.execute(sql,  orderStat, orderID)
                         if settlement == 1 or settlement == 2:
                             sql = "update [FTPart_Stock_Product_Property_1] " \
-                                  "set [其它.采购剩余数量] = [其它.采购剩余数量] - ? " \
+                                  "set [其它.app采购量] = [其它.app采购量] + ? " \
                                   "where [MainID]=?"
                             cursor.execute(sql, purchaseNum, stockProductID)
                             print(operate_type, "update sql2 ---\n ", sql)
+                            # [Stock_Product_InfoBase].unitprice 更新单价
+                            # [Stock_Product_Info].goodsnum 更新采购量，为0是要设置为允采购量，因为系统不能设置为0。
+                            sql = "select sum(ordernum*orderStat) as goodsnum,sum(ordernum*orderprice*orderStat) as allprice " \
+                                  "from Stock_Product_Order_App " \
+                                  "where stockProductID = ? and (orderStat = -1 or orderStat = 1)"
+                            cursor.execute(sql, stockProductID)
+                            row = cursor.fetchone()
+                            goodsnum = row[0]
+                            allprice = row[1]
+                            if goodsnum == 0:
+                                unitprice = 0
+                            else:
+                                unitprice = allprice / goodsnum
+                            sql = "select [其它.允采购量] from FTPart_Stock_Product_Property_1 where [MainID]=?"
+                            cursor.execute(sql, stockProductID)
+                            row = cursor.fetchone()
+                            permittedNum = row[0]
+                            if goodsnum == 0:
+                                goodsnum = permittedNum
+                            sql = "update Stock_Product_InfoBase set unitprice=? where stockProductID = ?"
+                            cursor.execute(sql, unitprice, stockProductID)
+                            sql = "update Stock_Product_Info set goodsnum=? where stockProductID = ?"
+                            cursor.execute(sql, goodsnum, stockProductID)
                         # insert history row
                         sql = "insert INTO Stock_Product_Order_App_hist(StockProductID, OpCode, OrderNum,OrderPrice," \
                               " supplier, OperateType, orderId, note) VALUES(?,?,?,?,?,?,?,?)"
