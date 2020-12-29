@@ -8,6 +8,7 @@ py_files = ['app.py', 'Model/user.py','Model/product.py','Model/stock_dao.py','S
 
 add_files = [('templates\\*.html', 'templates')]
 
+
 a = Analysis(py_files,
              pathex=['C:\\Users\\wfg.langfang\\PycharmProjects\\shopyy_sync\\StockAPI'],
              binaries=[],
