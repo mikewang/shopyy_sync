@@ -605,6 +605,7 @@ class StockDao(object):
                         unitprice = 0
                     else:
                         unitprice = allprice/goodsnum
+                    print("写入erp数据库", stockProductID, unitprice, goodsnum)
                     sql = "select [其它.允采购量] from FTPart_Stock_Product_Property_1 where [MainID]=?"
                     cursor.execute(sql, stockProductID)
                     row = cursor.fetchone()
@@ -673,6 +674,7 @@ class StockDao(object):
                             unitprice = 0
                         else:
                             unitprice = allprice / goodsnum
+                        print("写入erp数据库", stockProductID, unitprice, goodsnum)
                         sql = "select [其它.允采购量] from FTPart_Stock_Product_Property_1 where [MainID]=?"
                         cursor.execute(sql, stockProductID)
                         row = cursor.fetchone()
@@ -721,6 +723,7 @@ class StockDao(object):
                                 unitprice = 0
                             else:
                                 unitprice = allprice / goodsnum
+                            print("写入erp数据库", stockProductID, unitprice, goodsnum)
                             sql = "select [其它.允采购量] from FTPart_Stock_Product_Property_1 where [MainID]=?"
                             cursor.execute(sql, stockProductID)
                             row = cursor.fetchone()
