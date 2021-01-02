@@ -5,6 +5,7 @@ import sys
 import os
 import datetime
 import base64
+import decimal
 from JiaZheng.jiazheng_model import Employee, Job
 import pymysql
 
@@ -130,7 +131,7 @@ class JiaZhengDao(object):
             conn = self.conn_mysql()
             cursor = conn.cursor()
             sql = "insert into employee( name, sex, birthday, national,  degree, telephone, address, salary,  language, certificate) values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) "
-            values = (employee.name, employee.sex ,employee.birthday,employee.national,  employee.degree,employee.telephone , employee.address,employee.salary, employee.language,employee.certificate )
+            values = (employee.name, employee.sex ,employee.birthday,employee.national,  employee.degree,employee.telephone , employee.address, employee.salary, employee.language,employee.certificate )
             cursor.execute(sql, values)
             employee.employeeno = cursor.lastrowid
             cursor.close()
@@ -150,7 +151,6 @@ class JiaZhengDao(object):
             print('traceback.format_exc():\n%s' % traceback.format_exc())
             print('#' * 60)
             return None
-
 
     def update_employee(self, p_employee):
         try:

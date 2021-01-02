@@ -84,7 +84,7 @@ class Toplevel1:
         self.Canvas1.configure(selectbackground="#c4c4c4")
         self.Canvas1.configure(selectforeground="black")
         self.Canvas1 = tk.Canvas(root, height=100, width=500)  # 创建画布
-        self.image_file = tk.PhotoImage(file="背景图.gif")  # 加载图片文件
+        self.image_file = tk.PhotoImage(file="bj.jpg")  # 加载图片文件
         self.image = self.Canvas1.create_image(0, 0, anchor='nw', image=self.image_file)  # 将图片置于画布上
         self.Canvas1.pack(side='top', fill='both', expand=1)  # 放置画布（为上端）
         root.attributes("-alpha", 1)
