@@ -1,0 +1,117 @@
+{% extends "basic.html" %}
+{% block body %}
+  <div class="container">
+   <div class="row clearfix">
+    <div class="col-md-12 column">
+     <table class="table table-hover" id="rentalTable">
+      <thead>
+       <tr>
+        <th> ID </th>
+        <th> Pickup Location </th>
+        <th> Dropoff Location </th>
+        <th> Pickup Date </th>
+        <th> Dropoff Date </th>
+        <th> Start Odometer </th>
+        <th> End Odometer </th>
+        <th> </th>
+       </tr>
+      </thead>
+     <tbody></tbody>
+     </table>
+    </div>
+   </div>
+  </div>
+
+<script>
+ $(document).ready(function() {
+    var d = new Date();
+    var t = d.getTime();
+    var timestamp = Math.round(d / 1000);
+    var username = $.cookie("username");
+    var password = $.cookie("password");
+    var token = $.md5(username + password + timestamp);
+    if (username != null && password != null) {
+        $.ajax({
+            type: "GET",
+            url: "/user/" + username,
+            beforeSend: function(request) {
+                request.setRequestHeader("token", token);
+                request.setRequestHeader("timestamp", timestamp);
+            },
+            data: {},
+            dataType: 'json',
+            success: function(result) {
+                var r = JSON.parse(result);
+                console.log("get rental service is ", r);
+                var stat = r["stat"];
+                if (stat == 1) {
+                    // login success.
+                    $.ajax({
+                        type: "GET",
+                        url: "/rental/" + username,
+                        beforeSend: function(request) {
+                            request.setRequestHeader("token", token);
+                            request.setRequestHeader("timestamp", timestamp);
+                        },
+                        dataType: "json",
+                        success: function(result) {
+                            $("#rentalTable tbody").html('');
+                            var r = JSON.parse(result);
+                            var stat = r["stat"];
+                            if (stat == 1) {
+                                var rs_list = r["rs_list"];
+
+                                //alert("rental service length is " + rs_list.length);
+                                for (keys in rs_list) {
+                                    var rental = rs_list[keys];
+                                    // `forEach()` method
+                                    Object.entries(rental).forEach(([key, value]) =>{
+                                        console.log(`${key}: ${value}`);
+                                    });
+
+                                    if (((keys + 1) % 2) == 0) {
+                                        $("#rentalTable tbody").append("<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>")
+                                    } else {
+                                        $("#rentalTable tbody").append("<tr class=\"error\"><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>")
+                                    }
+
+                                    var currentRow = $("#rentalTable tbody tr:last");
+                                    currentRow.find("td:eq(0)").html(rental.rs_id);
+                                    currentRow.find("td:eq(1)").html(rental.Pickup_Location);
+                                    currentRow.find("td:eq(2)").html(rental.Dropoff_Location);
+                                    currentRow.find("td:eq(3)").html(rental.Pickup_Date);
+                                    currentRow.find("td:eq(4)").html(rental.Dropoff_Date);
+                                    currentRow.find("td:eq(5)").html(rental.Start_Odometer);
+                                    currentRow.find("td:eq(6)").html(rental.End_Odometer);
+                                    currentRow.find("td:eq(7)").html("<a href='/rentalservice?id=" + rental.rs_id + "'>" + rental.name + "</a>");
+
+                                }
+                            } else {
+                                alert("token is ok , but rental service is null.")
+
+                            }
+                        }
+                    });
+                } else {
+                    $(location).attr('href', '/signin');
+                }
+            }
+        });
+
+    } else {
+        // redirect to sign in page.
+        $(location).attr('href', '/signin');
+    }
+
+    $("#signout").on('click',
+    function() {
+        $.cookie("username", null);
+        $.cookie("password", null);
+        $(location).attr('href', '/');
+    });
+
+});
+</script>
+
+{% endblock %}
+

@@ -1,0 +1,12 @@
+#title, #title::placeholder, #content, #content::placeholder {
+	color: grey;
+	font-size: 1.6em;
+	font-weight: bold;
+	font-family: 'Fondamento', cursive;
+}
+/*#content, #content::placeholder {
+	color: grey;
+	font-size: 1.6em;
+	font-weight: bold;
+	font-family: 'Fondamento', cursive;
+}*/
