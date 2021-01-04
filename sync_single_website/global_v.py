@@ -5,6 +5,7 @@ pf_token = "core_45915_011a09d6d07263e1b246d"
 ls_token = "core_32676_5e2af9603e582e602db63"
 single_website_domain = "http://45915.us01.ymcart.com/"
 single_website_token = "core_45915_011a09d6d07263e1b246d"
+single_website_name = "批发"
 recent_minutes = 1440
 write_database = False
 worker_thread_isRunning = False

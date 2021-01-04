@@ -105,7 +105,91 @@ class SyncDao(QObject):
             # print(merge_product_info, info)
             cnxn = pyodbc.connect(self._conn_str)
             cursor = cnxn.cursor()
-            if domain_name == gl.pf_domain:
+            if domain_name == gl.single_website_domain:
+                sql = "select TypeID,GoodsCode, GoodsEName,CONVERT(varchar, CreateDate, 120 ) as CreateDate," \
+                      "CONVERT(varchar, EditDate, 120 ) as EditDate, Status, ProductActive from Product_Info where ProductID=?"
+                # print("ProductID", info["ProductID"])
+                cursor.execute(sql, info["ProductID"])
+                row = cursor.fetchone()
+                if row is None:
+                    sql = "select ProductID, TypeID,GoodsCode, GoodsEName,CONVERT(varchar, CreateDate, 120 ) as CreateDate," \
+                          "CONVERT(varchar, EditDate, 120 ) as EditDate, Status, ProductActive from Product_Info where GoodsCode=?"
+                    # print("ProductID", info["ProductID"], info["GoodsCode"])
+                    cursor.execute(sql, info["GoodsCode"])
+                    row = cursor.fetchone()
+                    if row is not None:
+                        sql = "delete from Product_Info where GoodsCode = ?"
+                        cursor.execute(sql, info["GoodsCode"])
+                        cursor.commit()
+                        # 规格等附加记录的删除后面完善
+                    sql = "set identity_insert Product_Info on"
+                    cursor.execute(sql)
+                    sql = "Insert into Product_Info(ProductID, TypeID, GoodsCode, GoodsEName, CreateDate, EditDate," \
+                          "SchemeID,ShopTypeID,HSCode,GoodsCName,CustGoodsCode,GoodsMemo,ImageNum,IsAutoCode," \
+                          "ProductCustID, ProductCustName,ProductActive,Status,EditNum,OpCode,OpName, EditOpCode, EditOpName)" \
+                          " values(?,?,?,?,?,?,0,0,'','','','',1,'',0,'',?,'0',1,'delong','梁德龙','delong','梁德龙')"
+                    cursor.execute(sql, info["ProductID"], info["TypeID"], info["GoodsCode"], info["GoodsEName"],
+                                   datetime.datetime.strptime(info["CreateDate"], '%Y-%m-%d %H:%M:%S'),
+                                   datetime.datetime.strptime(info["EditDate"], '%Y-%m-%d %H:%M:%S'),
+                                   info["ProductActive"])
+                    print("新增", info["GoodsCode"])
+                    sql = "set identity_insert Product_Info off"
+                    cursor.execute(sql)
+                    cursor.commit()
+                else:
+                    TypeID = row[0]
+                    GoodsCode = row[1]
+                    GoodsEName = row[2]
+                    CreateDate = row[3]
+                    EditDate = row[4]
+                    Status = row[5]
+                    ProductActive = row[6]
+                    if TypeID != info["TypeID"] or GoodsCode != info["GoodsCode"] or GoodsEName != info["GoodsEName"] \
+                            or CreateDate != info["CreateDate"] or EditDate != info["EditDate"] \
+                            or ProductActive != info["ProductActive"]:
+                        # print("更新", info["CreateDate"], info["EditDate"])
+                        sql = "update Product_Info " \
+                              "set ProductActive=?, TypeID=?, GoodsCode=?, GoodsEName=?, CreateDate=?, EditDate=? " \
+                              "where ProductID=?"
+                        cursor.execute(sql, info["ProductActive"], info["TypeID"], info["GoodsCode"], info["GoodsEName"],
+                                       datetime.datetime.strptime(info["CreateDate"], '%Y-%m-%d %H:%M:%S'),
+                                       datetime.datetime.strptime(info["EditDate"], '%Y-%m-%d %H:%M:%S'),
+                                       info["ProductID"])
+                        print("更新", info["GoodsCode"])
+                        cursor.commit()
+                    else:
+                        pass
+                        # print("不需要更新", GoodsEName)
+                # 补充字段 品牌.商品品牌 自定义
+                body_product_spec = info["body_product_spec"]
+                # print("补充字段 品牌.商品品牌", body_product_spec)
+                sql = "SELECT [品牌.商品品牌], [品牌.domain], [品牌.来源]" \
+                      "FROM [FTPart_Product_Info_property_1] WHERE [MainID] = ?"
+                cursor.execute(sql, info["ProductID"])
+                record = cursor.fetchone()
+                product_source = gl.single_website_name
+                if record is None:
+                    sql = "insert into [FTPart_Product_Info_property_1]" \
+                          "([MainID], [ExtendID], [_SelfImageType], [_ImageID], [_LineColor],[_PrintNum]," \
+                          "[_FaxNum], [_EmailNum], [_CheckResult], [品牌.商品品牌], [品牌.domain],[品牌.来源]) " \
+                          "values(?,1,0,0,0,0,0,0,0,?,?,?)"
+                    cursor.execute(sql, info["ProductID"], body_product_spec["brand_name"], domain_name,
+                                   product_source)
+                    print("新增 品牌.商品品牌,domain,来源", info["GoodsCode"])
+                    cursor.commit()
+                else:
+                    brand_name = record[0]
+                    domain_name = record[1]
+                    product_source_name = record[2]
+                    if brand_name != body_product_spec["brand_name"]:
+                        sql = "update [FTPart_Product_Info_property_1] set [品牌.商品品牌]=? " \
+                              "where [MainID]=? "
+                        cursor.execute(sql, body_product_spec["brand_name"], info["ProductID"])
+                        print("更新 品牌.商品品牌", info["GoodsCode"])
+                        cursor.commit()
+                    else:
+                        pass
+            elif domain_name == gl.pf_domain:
                 sql = "select TypeID,GoodsCode, GoodsEName,CONVERT(varchar, CreateDate, 120 ) as CreateDate," \
                       "CONVERT(varchar, EditDate, 120 ) as EditDate, Status, ProductActive from Product_Info where ProductID=?"
                 # print("ProductID", info["ProductID"])
@@ -631,7 +715,31 @@ class SyncDao(QObject):
                     self.insert_product_spec(cursor, domain_name, spec)
                     print("重置产品规格", spec["GoodsCode"], spec["SpecNo"], spec)
                 else:
-                    if domain_name == gl.pf_domain:
+                    if domain_name == gl.single_website_domain:
+                        if GoodsSpec != spec["GoodsSpec"].replace('<br />', ' ') \
+                                or OuterBulk != spec["OuterBulk"] \
+                                or GrossWeight != spec["GrossWeight"] \
+                                or FOBPrice != spec["FOBPrice"] \
+                                or MinOrder != spec["MinOrder"] or SpecActive != '0' or RecGuid != spec["RecGuid"]:
+                            if int(spec["stock_nums"]) == 0:
+                                stock_SpecActive = '1'
+                            else:
+                                stock_SpecActive = '0'
+                            sql = "update Product_Spec set SpecActive=?, GoodsSpec=?,OuterBulk=?,GrossWeight=?," \
+                                  "FOBPrice=?,MinOrder=?,RecGuid=? " \
+                                  " where SpecNo=? and ProductID in (select ProductID from product_info where GoodsCode=?)"
+                            cursor.execute(sql, stock_SpecActive, spec["GoodsSpec"].replace('<br />', ' '),
+                                           spec["OuterBulk"], spec["GrossWeight"],
+                                           spec["FOBPrice"], spec["MinOrder"], spec["RecGuid"], spec["SpecNo"],
+                                           spec["GoodsCode"])
+                            print("更新 FOBPrice价格", spec["SpecNo"], spec["ProductID"], spec["FOBPrice"])
+                            cursor.commit()
+                            # 更新 最大定购量, 批发价
+                            sql = "update [FTPart_Product_Spec_property_1] set [品牌.最大起订量]=?, [品牌.批发价]=?" \
+                                  " where [MainID]=?"
+                            cursor.execute(sql, spec["mxoq"], spec["FOBPrice"], ProductSpecID)
+                            cursor.commit()
+                    elif domain_name == gl.pf_domain:
                         sql = "select [MainID], [品牌.最大起订量], [品牌.批发价] " \
                               "from [FTPart_Product_Spec_property_1] where [MainID]=?"
                         cursor.execute(sql, spec["ProductSpecID"])
@@ -702,7 +810,10 @@ class SyncDao(QObject):
             print('#' * 60)
 
     def insert_product_spec(self, cursor, domain_name, spec):
-        if domain_name == gl.pf_domain:
+        if domain_name == gl.single_website_domain:
+            pf_price = spec["FOBPrice"]
+            ls_price = spec["FOBPrice"]
+        elif domain_name == gl.pf_domain:
             pf_price = spec["FOBPrice"]
             ls_price = 0.0
         else:

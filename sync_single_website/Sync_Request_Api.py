@@ -55,7 +55,22 @@ class SyncRequestApi(QObject):
         data_array = json_dict["data"]
         product_type_list = []
         # Insert into Product_Type(ProductTypeID,ParentID,TypeName,SortID) values()
-        if domain_name == gl.pf_domain or domain_name == gl.ls_domain:
+        if domain_name == gl.single_website_domain:
+            product_type = {'ProductTypeID': 10000, 'ParentID': -1, 'TypeName': gl.single_website_name, 'SortID': 0}
+            product_type_list.append(product_type)
+            for item in data_array:
+                category_id = item["id"]
+                category_parent_id = item["parent_id"]
+                category_base_name = item["base_name"]
+                category_listorder = item["listorder"]
+                # print(category_id, category_base_name, category_listorder)
+                if category_parent_id == "0":
+                    category_parent_id = "10000"
+                product_type = {'ProductTypeID': int(category_id), 'ParentID': int(category_parent_id),
+                                'TypeName': category_base_name,
+                                'SortID': int(category_listorder)}
+                product_type_list.append(product_type)
+        elif domain_name == gl.pf_domain or domain_name == gl.ls_domain:
             product_type = {'ProductTypeID': 10000, 'ParentID': -1, 'TypeName': "批发/零售", 'SortID': 0}
             product_type_list.append(product_type)
             for item in data_array:
