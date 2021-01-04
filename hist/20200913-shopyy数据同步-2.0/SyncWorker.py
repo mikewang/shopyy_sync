@@ -133,7 +133,7 @@ class SyncWorker(QObject):
                 # 产品检查完成
                 self.stop()
                 print("产品下架同步完成 " + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-                self.result.emit({"end": "sync goodsID"})
+                self.result.emit({"end": "sync_shopyy goodsID"})
             if self.sync_type == "export_goods_in_api":
                 self.sync_request_api("export_goods_in_api")
                 self.stop()

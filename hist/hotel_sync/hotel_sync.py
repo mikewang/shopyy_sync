@@ -158,7 +158,7 @@ if __name__ == '__main__':
     config = configparser.ConfigParser()
     config_file = os.path.normpath(os.path.join(os.curdir, "config.ini"))
     config.read(config_file)
-    interval = int(config.get("sync", "interval"))
+    interval = int(config.get("sync_shopyy", "interval"))
     default_scheduler = Scheduler.Scheduler()
     default_scheduler.every(interval).seconds.do(sync_romm_client)
     default_scheduler.run_continuously(1)

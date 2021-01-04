@@ -66,7 +66,7 @@ if __name__ == "__main__":
     w = QWidget()
     w.resize(800,600)
     w.move(300,300)
-    w.setWindowTitle('sync photo')
+    w.setWindowTitle('sync_shopyy photo')
     w.show()
     sys.exit(app.exec_())
 

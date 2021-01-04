@@ -182,12 +182,12 @@ class MainWindow(QMainWindow):
 
     def changeSchedule(self, state):
         if state == Qt.Checked:
-            print("sync schedule start", datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+            print("sync_shopyy schedule start", datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
             self.setWindowTitle(self._title + " 自动化运行开启，每天0点全量同步，每5分钟产品下架同步，每5分钟产品修改和上架同步")
             self.sync_scheduler()
         else:
             self.default_scheduler.clear()
-            print("sync schedule stop", datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+            print("sync_shopyy schedule stop", datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
             self.setWindowTitle(self._title)
 
     def sync_scheduler(self):

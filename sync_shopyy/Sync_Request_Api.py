@@ -6,7 +6,7 @@ import sys
 import requests
 import json
 import hashlib
-from sync import global_v as gl
+from sync_shopyy import global_v as gl
 
 
 class SyncRequestApi(QObject):
