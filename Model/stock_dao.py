@@ -10,8 +10,8 @@ from Model.user import UserInfo
 from Model.product import ProductInfo, ProductEnquiryPrice
 from Model import constant_v as cv
 
-class StockDao(object):
 
+class StockDao(object):
     def __init__(self):
         super(StockDao, self).__init__()
         try:

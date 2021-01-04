@@ -10,7 +10,7 @@ add_files = [('templates\\*.html', 'templates')]
 
 
 a = Analysis(py_files,
-             pathex=['C:\\Users\\Administrator\\PycharmProjects\\shopyy_sync\\StockAPI'],
+             pathex=['C:\\Users\\Administrator\\PycharmProjects\\shopyy_sync'],
              binaries=[],
              datas=add_files,
              hiddenimports=[],
