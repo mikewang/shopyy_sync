@@ -8,7 +8,7 @@ import datetime
 import base64
 from Model.user import UserInfo
 from Model.product import ProductInfo, ProductEnquiryPrice
-
+from Model import constant_v as cv
 
 class StockDao(object):
 
@@ -269,8 +269,56 @@ class StockDao(object):
             print('#' * 60)
             return None
 
+    def parse_product_cursor(self, row):
+        product = ProductInfo()
+        product.OpCode = row[1]
+        product.StockProductID = row[2]
+        product.ProductID = row[3]
+        product.SignDate = row[4]
+        product.GoodsCode = row[5]
+        product.SpecNo = row[6]
+        product.GoodsCDesc = row[7]
+        product.GoodsUnit = row[8]
+        ImageID = row[9]
+        product.ImageGuid = row[10]
+        product.ImageFmt = row[11]
+        product.ModuleID = row[12]
+        product.FileDate = row[13]
+        thumbImage = row[14]
+        base64_bytes = base64.b64encode(thumbImage)
+        base64_image = base64_bytes.decode("utf8")
+        product.imageBase64 = base64_image
+        product.supplier = row[15]
+        product.permittedNum = row[16]
+        product.shouldPrice = row[17]
+        product.brand = row[18]
+        product.orderNum = row[19]
+        product.orderPrice = row[20]
+        # orderStat = 1, 订货， -1 ，退货，但退货记录要保存。
+        product.orderStat = row[21]
+        # settlement = 1， 确认订货成功，并没有现实收货，0，默认值，未确认订货成功。
+        product.settlement = row[22]
+        product.orderOpCode = row[23]
+        product.orderID = row[24]
+        product.priceEnquiredID = row[25]
+        product.createTime = row[26]
+        product.sourceOrderID = row[27]
+        product.ensureTime = row[28]
+        product.ensureOpCode = row[29]
+        product.receiveGoodsTime = row[30]
+        product.receiveOpCode = row[31]
+        product.settlementTime = row[32]
+        product.settlementOpCode = row[33]
+        product.enquiryDate = row[34]
+        return product
+
     def select_order_product_list(self, page_no, filter_stock, ptype):
         # 检索 所有的 订货商品
+        # 查询的类型: 订货模块，类型有 order(已经订货,附加检索 取消订购的记录)
+        # 查询的类型: 退货模块，类型有 complete(完成订货，附加检索 已退货记录) return(已退货)
+        # 查询的类型: 结算模块，类型有 complete(完成订货，附加检索 已退货记录) settlement(已结算，附加检索 已退货记录)
+        # 查询的类型: 结算模块，类型有 history(所有状态，包括历史表订货，附加检索 已取消订货记录， 已退货记录和退货取消记录) settlement(已结算，附加检索 已退货记录)
+
         try:
             product_list = []
             page_prod_count = 10
@@ -297,40 +345,33 @@ class StockDao(object):
                             "join stock_info d on d.ID=a.StockID " \
                             "join [FTPart_Stock_Property_1] e on e.[MainID] = d.ID " \
                             "left join [Stock_Product_Info_Desc] f on a.StockProductID=f.StockProductID "
-            if ptype == "history":
-                v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] AS T1 " \
-                              "WHERE settlement > 0)"
-            elif ptype == "settlement":
-                v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] AS T1 " \
-                              "WHERE OrderStat = 1 and settlement > 1)"
-            elif ptype == "return":
-                v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] AS T1 " \
-                              "WHERE (OrderStat = -1) and settlement = 1)"
+            v_time_column = "g.CreateTime"
+            if ptype == cv.order_goods:
+                v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] WHERE settlement = 0 and  OrderStat = 1) as g"
+                v_time_column = "g.CreateTime"
+            elif ptype == cv.complete_order:
+                v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] WHERE settlement = 1 and  OrderStat = 1) as g"
+                v_time_column = "g.ensureTime"
+            elif ptype == cv.return_goods:
+                v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] WHERE settlement = 1 and  OrderStat = -1) as g"
+                v_time_column = "g.CreateTime"
+            elif ptype == cv.settlement_goods:
+                v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] WHERE settlement = 2 and  OrderStat = 1) as g"
+                v_time_column = "g.settlementTime"
+            elif ptype == cv.history_goods:
+                v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] AS T1 WHERE settlement >= 0) as g"
             else:
                 v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] AS T1 " \
                               "WHERE NOT EXISTS( SELECT 1 FROM [Stock_Product_Order_App] AS T2 " \
                               "WHERE T1.orderID=T2.sourceOrderId and OrderStat = -1) and t1.sourceOrderId is null " \
-                              "and T1.settlement < 3) "
-
+                              "and T1.settlement < 3) as g"
             v_sql_tab_h = "(select max(id) as id, max(createtime) as enquirydate, StockProductID " \
-                          "from [Stock_Product_EnquiryPrice_App] group by StockProductID) "
+                          "from [Stock_Product_EnquiryPrice_App] group by StockProductID) as h"
 
-            v_sql = v_sql_columns + " " + v_sql_fromtab
-            v_sql_cc = "select count(*) " + v_sql_fromtab
-            v_sql = v_sql + " join " + v_sql_tab_g + "as g on a.StockProductID=g.StockProductID"
-            v_sql_cc = v_sql_cc + " join " + v_sql_tab_g + "as g on a.StockProductID=g.StockProductID"
-            v_sql = v_sql + " left join " + v_sql_tab_h + " h on  a.StockProductID=h.StockProductID"
-            v_sql_cc = v_sql_cc + " left join " + v_sql_tab_h + " h on  a.StockProductID=h.StockProductID"
+            v_sql_fromtab = v_sql_fromtab + " join " + v_sql_tab_g + " on a.StockProductID=g.StockProductID"
+            v_sql_fromtab = v_sql_fromtab + " left join " + v_sql_tab_h + " on a.StockProductID=h.StockProductID"
 
-            v_sql_where = "where 1=1"
-            v_sql = v_sql + " " + v_sql_where
-            v_sql_cc = v_sql_cc + " " + v_sql_where
-
-            filter_settlement = filter_stock["settlement"]
-            if filter_settlement is not None:
-                v_sql = v_sql + "  and g.settlement = " + filter_settlement + " "
-                v_sql_cc = v_sql_cc + "  and g.settlement = " + filter_settlement + " "
-            v_sql_filter = ""
+            v_sql_filter = "where 1=1"
             filter_brand = filter_stock["brand"]
             if filter_brand is not None:
                 filter_sql = ''
@@ -347,31 +388,11 @@ class StockDao(object):
             # begin date
             filter_begin = filter_stock["begin"]
             if filter_begin is not None:
-                if ptype == "order":
-                    v_sql_filter = v_sql_filter + " and g.CreateTime >= '" + filter_begin + "'"
-                    # 取消订货，订货，订货完成三个状态的查询
-                elif ptype == "return":
-                    # 退货, 状态的查询
-                    v_sql_filter = v_sql_filter + " and g.CreateTime >= '" + filter_begin + "'"
-                elif ptype == "settlement":
-                    # 结算, 状态的查询
-                    v_sql_filter = v_sql_filter + " and g.ensureTime >= '" + filter_begin + "'"
-                else:
-                    v_sql_filter = v_sql_filter + " and g.CreateTime >= '" + filter_begin + "'"
+                v_sql_filter = v_sql_filter + " and " + v_time_column + " >= '" + filter_begin + "'"
             # end data
             filter_end = filter_stock["end"]
             if filter_end is not None:
-                if ptype == "order":
-                    # 去掉订货，订货，订货完成三个状态的查询
-                    v_sql_filter = v_sql_filter + " and g.CreateTime <= '" + filter_end + " 23:59:59'"
-                elif ptype == "return":
-                    # 退货, 状态的查询
-                    v_sql_filter = v_sql_filter + " and g.CreateTime <= '" + filter_end + " 23:59:59'"
-                elif ptype == "settlement":
-                    # 结算, 状态的查询
-                    v_sql_filter = v_sql_filter + " and g.ensureTime <= '" + filter_end + " 23:59:59'"
-                else:
-                    v_sql_filter = v_sql_filter + " and g.CreateTime <= '" + filter_end + " 23:59:59'"
+                v_sql_filter = v_sql_filter + " and " + v_time_column + "<= '" + filter_end + " 23:59:59'"
             filter_supplier = filter_stock["supplier"]
             if filter_supplier is not None:
                 filter_sql = ''
@@ -383,71 +404,41 @@ class StockDao(object):
             if filter_specno is not None:
                 v_sql_filter = v_sql_filter + " and a.SpecNo = '" + filter_specno + "'"
 
-            v_sql = v_sql + v_sql_filter
-            v_sql_cc = v_sql_cc + v_sql_filter
-            print(ptype, "sql is ", v_sql_cc)
+            v_sql_cc = "select count(*) " + v_sql_fromtab + v_sql_filter
+            print(ptype, "sql count is ", v_sql_cc)
             cursor.execute(v_sql_cc)
             row = cursor.fetchone()
             product_count = row[0]
             topN = page_no*page_prod_count
             # 增加排序功能
-            if ptype == "order":
-                # 去掉订货，订货，订货完成三个状态的查询
-                v_sql = "select row_number() over(order by g.CreateTime desc,a.stockproductid desc, g.orderID desc) as rownumber, " + v_sql + ""
-            elif ptype == "settlement":
-                # 结算, 状态的查询
-                v_sql = "select row_number() over(order by g.ensureTime desc,a.stockproductid desc, g.orderID desc) as rownumber, " + v_sql + ""
-            else:
-                v_sql = "select row_number() over(order by g.CreateTime desc,a.stockproductid desc, g.orderID desc) as rownumber, " + v_sql + ""
-
-            sql = "select  * " + " from (" + v_sql + " ) as v1 where v1.rownumber > " + str(topN - page_prod_count) + " and v1.rownumber <= " + str(topN) + " order by v1.rownumber"
-            print(ptype, "sql is ", sql)
-            cursor.execute(sql)
+            v_sql = "select row_number() over(order by " + v_time_column + " desc,a.stockproductid desc, g.orderID desc) as rownumber, " + v_sql_columns + v_sql_fromtab + v_sql_filter + ""
+            v_sql = "select  * " + " from (" + v_sql + " ) as v1 where v1.rownumber > " + str(topN - page_prod_count) + " and v1.rownumber <= " + str(topN) + " order by v1.rownumber"
+            print(ptype, "sql page is ", v_sql)
+            cursor.execute(v_sql)
             for row in cursor:
-                product = ProductInfo()
-                product.OpCode = row[1]
-                product.StockProductID = row[2]
-                product.ProductID = row[3]
-                product.SignDate = row[4]
-                product.GoodsCode = row[5]
-                product.SpecNo = row[6]
-                product.GoodsCDesc = row[7]
-                product.GoodsUnit = row[8]
-                ImageID = row[9]
-                product.ImageGuid = row[10]
-                product.ImageFmt = row[11]
-                product.ModuleID = row[12]
-                product.FileDate = row[13]
-                thumbImage = row[14]
-                base64_bytes = base64.b64encode(thumbImage)
-                base64_image = base64_bytes.decode("utf8")
-                product.imageBase64 = base64_image
-                product.supplier = row[15]
-                product.permittedNum = row[16]
-                product.shouldPrice = row[17]
-                product.brand = row[18]
-                product.orderNum = row[19]
-                product.orderPrice = row[20]
-                # orderStat = 1, 订货， -1 ，退货，但退货记录要保存。
-                product.orderStat = row[21]
-                # settlement = 1， 确认订货成功，并没有现实收货，0，默认值，未确认订货成功。
-                product.settlement = row[22]
-                product.orderOpCode = row[23]
-                product.orderID = row[24]
-                product.priceEnquiredID = row[25]
-                product.createTime = row[26]
-                product.sourceOrderID = row[27]
-                product.ensureTime = row[28]
-                product.ensureOpCode = row[29]
-                product.receiveGoodsTime = row[30]
-                product.receiveOpCode = row[31]
-                product.settlementTime = row[32]
-                product.settlementOpCode = row[33]
-                product.enquiryDate = row[34]
-
+                product = self.parse_product_cursor(row)
                 product_list.append(product)
-
             cursor.close()
+            # 二次查询有没有退货的记录
+            if ptype == cv.complete_order or ptype == cv.settlement_goods or ptype == cv.history_goods:
+                for product in product_list:
+                    return_product_list = []
+                    if ptype == cv.history_goods:
+                        v_sql_filter = " where (orderstate=-1 or orderstate=0) and stockproductid=" + product.StockProductID
+                    else:
+                        v_sql_filter = " where orderstate=-1 and stockproductid=" + product.StockProductID
+                    v_sql = "select 0 as rownumber, " + v_sql_columns + v_sql_fromtab + v_sql_filter + ""
+                    print(ptype, "sql attach is ", v_sql)
+                    cursor.execute(v_sql)
+                    for row in cursor:
+                        return_product = self.parse_product_cursor(row)
+                        return_product.product = product
+                        return_product_list.append(return_product)
+                for return_product in return_product_list:
+                    index = product_list.index(return_product.product)
+                    return_product.product = None
+                    product_list.insert(index+1, return_product)
+
             cnxn.close()
             return product_list, product_count
         except Exception as e:
@@ -466,8 +457,9 @@ class StockDao(object):
 
     def add_stock_product_order(self, prod_dict_list):
         try:
-            cnxn = pyodbc.connect(self._conn_str)
-            cursor = cnxn.cursor()
+            conn = pyodbc.connect(self._conn_str)
+            cursor = conn.cursor()
+            result_product_list = []
             for prod in prod_dict_list:
                 print("add order product is ", prod["stockProductID"], prod)
                 stockProductID = prod["stockProductID"]
@@ -479,6 +471,7 @@ class StockDao(object):
                 settlement = prod["settlement"]
                 # 訂貨
                 settlement = 0
+                # 校验购买的数量和允购买量的关系，有可能允许购买量已经不够
 
                 sql = "insert into Stock_Product_Order_App(stockProductID,opCode, OrderNum, OrderPrice,orderStat," \
                       "supplier, settlement) " \
@@ -496,13 +489,17 @@ class StockDao(object):
                 # print("Stock_Product_Order_App id is ", myTableId)
                 #  last row id 不生效。
                 cursor.commit()
+                result_product = ProductInfo()
+                result_product.StockProductID = stockProductID
+                result_product_list.append(result_product)
             cursor.close
-            cnxn.close
+            conn.close
             return "1"
         except Exception as e:
             print('str(Exception):\t', str(Exception))
             print('str(e):\t\t', str(e))
             print('repr(e):\t', repr(e))
+            conn.rollback()
             # Get information about the exception that is currently being handled
             exc_type, exc_value, exc_traceback = sys.exc_info()
             print('e.message:\t', exc_value)

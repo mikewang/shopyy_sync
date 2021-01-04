@@ -6,3 +6,145 @@
 2021-01-04 12:55:47,998 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_type', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_full', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
 2021-01-04 13:46:22,768 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_type', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_full', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
 2021-01-04 13:47:44,566 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_type', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_full', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 13:54:31,067 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 13:54:31,068 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 13:56:51,288 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 13:57:21,495 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'query_product_info', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 13:59:31,693 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 13:59:31,694 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 13:59:34,270 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 14:04:32,546 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 14:04:32,547 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 14:04:35,248 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 14:09:33,071 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 14:09:33,071 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 14:09:36,656 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 14:14:33,607 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 14:14:33,607 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 14:14:36,731 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 14:19:34,137 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 14:19:34,138 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 14:19:37,306 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 14:24:34,734 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 14:24:34,735 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 14:24:37,528 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 14:29:34,994 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 14:29:34,995 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 14:29:38,183 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 14:34:35,288 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 14:34:35,289 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 14:34:38,101 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 14:39:35,375 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 14:39:35,376 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 14:39:38,125 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 14:44:35,465 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 14:44:35,466 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 14:44:38,558 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 14:49:35,489 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 14:49:35,489 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 14:49:38,685 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 14:54:35,550 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 14:54:35,551 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 14:54:38,532 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 14:59:36,442 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 14:59:36,443 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 14:59:39,102 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 15:04:37,310 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 15:04:37,312 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 15:04:40,390 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 15:09:37,360 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 15:09:37,361 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 15:09:40,638 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 15:14:37,569 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 15:14:37,569 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 15:14:40,817 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 15:19:38,498 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 15:19:38,499 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 15:19:45,848 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 15:24:38,547 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 15:24:38,548 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 15:24:41,786 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 15:29:39,526 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 15:29:39,527 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 15:29:43,108 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 15:34:40,423 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 15:34:40,424 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 15:34:44,738 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 15:39:41,355 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 15:39:41,356 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 15:39:44,741 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 15:44:42,330 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 15:44:42,331 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 15:44:44,977 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 15:49:42,386 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 15:49:42,387 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 15:49:45,538 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 15:54:42,552 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 15:54:42,553 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 15:54:45,456 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 15:59:43,436 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 15:59:43,437 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 15:59:46,098 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 16:04:44,315 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 16:04:44,316 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 16:04:47,231 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 16:09:44,687 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 16:09:44,688 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 16:09:47,952 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 16:14:44,988 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 16:14:44,988 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 16:14:47,909 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 16:19:44,989 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 16:19:44,990 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 16:19:47,935 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 16:24:45,118 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 16:24:45,118 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 16:24:47,755 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 16:29:46,101 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 16:29:46,101 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 16:29:48,960 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 16:34:46,232 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 16:34:46,232 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 16:34:49,207 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 16:39:46,348 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 16:39:46,349 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 16:39:49,000 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 16:44:47,202 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 16:44:47,203 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 16:44:50,073 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 16:49:48,118 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 16:49:48,118 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 16:49:51,001 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 16:54:48,399 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 16:54:48,400 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 16:54:51,198 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 16:59:48,724 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 16:59:48,725 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 16:59:51,323 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 17:04:49,577 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 17:04:49,577 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 17:04:52,690 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 17:09:49,946 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 17:09:49,946 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 17:09:52,571 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 17:14:50,123 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 17:14:50,124 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 17:14:53,012 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 17:19:50,497 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 17:19:50,498 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 17:19:53,869 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 17:24:50,515 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 17:24:50,516 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 17:24:53,145 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 17:29:50,790 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 17:29:50,791 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 17:29:53,739 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 17:34:51,777 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 17:34:51,778 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 17:34:57,793 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 17:39:52,223 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 17:39:52,223 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 17:39:55,804 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]
+2021-01-04 17:44:53,092 - Sync_Main.py[line:107] - WARNING: 自动化增量同步 开始
+2021-01-04 17:44:53,092 - Sync_Main.py[line:127] - WARNING: 自动化增量同步 提交到后台线程
+2021-01-04 17:44:56,195 - Sync_Worker.py[line:406] - WARNING: 数据同步 在后台操作完成。[{'name': 'sync_product_info_recent', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}, {'name': 'sync_product_info_recent_offline', 'domain_name': 'http://45915.us01.ymcart.com/', 'token': 'core_45915_011a09d6d07263e1b246d'}]

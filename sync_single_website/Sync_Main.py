@@ -495,6 +495,9 @@ class WindowSpec(QMainWindow, SpecForm):
 
 
 if __name__ == '__main__':
+    # pds = [1,2,3]
+    # pds.insert(3,4)
+    # print(pds)
     config = configparser.ConfigParser()
     init_file = os.path.normpath(os.path.join(os.curdir, "config", "ymcart.ini"))
     config.read(init_file)
