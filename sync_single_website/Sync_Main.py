@@ -26,7 +26,7 @@ from sync.Sync_Dao import SyncDao as Dao
 
 
 class MainWindow(QMainWindow, MainForm):
-    _title = "ShopYY数据同步"
+    _title = "ShopYY单网站数据同步"
     _product_spec_first = None
     _default_scheduler = None
 
@@ -515,10 +515,8 @@ if __name__ == '__main__':
     config = configparser.ConfigParser()
     init_file = os.path.normpath(os.path.join(os.curdir, "config", "ymcart.ini"))
     config.read(init_file)
-    gl.pf_domain = config.get("api_pf", "domain_name")
-    gl.pf_token = config.get("api_pf", "core_token")
-    gl.ls_domain = config.get("api_ls", "domain_name")
-    gl.ls_token = config.get("api_ls", "core_token")
+    gl.single_website_domain = config.get("api_single_website", "domain_name")
+    gl.single_website_token = config.get("api_single_website", "core_token")
     app = QApplication(sys.argv)
     mainWindow = MainWindow()
     mainWindow.show()
