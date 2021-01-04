@@ -2,5 +2,7 @@ build
 dist
 OrderAPI/build
 OrderAPI/dist
+sync_single_website/build
+sync_single_website/dist
 config
 .idea
