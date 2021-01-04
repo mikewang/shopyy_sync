@@ -3,3 +3,4 @@ dist
 OrderAPI/build
 OrderAPI/dist
 config
+.idea
