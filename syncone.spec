@@ -2,10 +2,21 @@
 # pyinstaller -D etlyy.spec  打包方法
 
 block_cipher = None
+py_files = [
+    'SyncOne\\Sync_Main.py',
+    'SyncOne\\Sync_Main.py',
+    'SyncOne\\Sync_Main.py',
+    'SyncOne\\Sync_Main.py',
+    'SyncOne\\global_v.py',
+    'SyncOne\\Sync_Request_Api.py',
+    'SyncOne\\Sync_Worker.py',
+     'SyncOne\\Sync_Write_Erp.py',
+      'SyncOne\\Sync_Dao.py',
+       'SyncOne\\Scheduler.py'
+]
 
-
-a = Analysis(['Sync_Main.py','Sync_Main_Form.py','Spec_Form.py','Dialog_Form.py','global_v.py','Sync_Request_Api.py','Sync_Worker.py','Sync_Write_Erp.py','Sync_Dao.py','Scheduler.py'],
-             pathex=['C:\\Users\\Administrator\\PycharmProjects\\shopyy_sync\\SyncOne\\'],
+a = Analysis(py_files,
+             pathex=['C:\\Users\\Administrator\\PycharmProjects\\shopyy_sync'],
              binaries=[],
              datas=[],
              hiddenimports=[],
@@ -35,4 +46,4 @@ coll = COLLECT(exe,
                strip=False,
                upx=True,
                upx_exclude=[],
-               name='sync_single_website')
+               name='SyncOne')
