@@ -54,6 +54,7 @@ class ProductInfo(object):
         self.receiveOpCode = ''
         self.settlementTime = ''
         self.settlementOpCode = ''
+        self.note = ''
 
 
     def desc(self):
