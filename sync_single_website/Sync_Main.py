@@ -352,7 +352,7 @@ class MainWindow(QMainWindow, MainForm):
     def query_product_info(self):
         GoodsCode = self.input_goodscode.text().strip()
         self.workerThread.selected_goodscode = GoodsCode
-        worker = {"name": "query_product_info", "domain_name": gl.pf_domain, "token": gl.pf_token}
+        worker = {"name": "query_product_info", "domain_name": gl.single_website_domain, "token": gl.pf_token}
         self.workerThread.worker_list = [worker]
         self.workerThread.start()
 
