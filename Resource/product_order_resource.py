@@ -154,9 +154,14 @@ class ProductOrderResource(Resource):
                 result = {"code": 500, "msg": "prod json is error."}
                 return result, result["code"]
             user_service = StockService()
-            result_status = user_service.post_order_product(OpCode, timestamp, token, prod_dict_list, operate)
-            if result_status is not None:
-                result["data"] = result_status
+            result_product = user_service.post_order_product(OpCode, timestamp, token, prod_dict_list, operate)
+            if result_product is not None:
+                result = {"code": 200, "msg": ""}
+                json_list = []
+                for prod in result_product:
+                    # prod_json = json.dumps(prod.desc())
+                    json_list.append(prod.desc())
+                result["data"] = json_list
             else:
                 result["data"] = []
                 result = {"code": 201, "msg": "product is not existed."}

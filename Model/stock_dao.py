@@ -12,6 +12,7 @@ from Model import constant_v as cv
 
 
 class StockDao(object):
+
     def __init__(self):
         super(StockDao, self).__init__()
         try:
@@ -126,13 +127,13 @@ class StockDao(object):
             cnxn = pyodbc.connect(self._conn_str)
             cursor = cnxn.cursor()
             # 数据源
-            v_sql_g = "select [StockProductID], sum([OrderNum]*[OrderStat]) as ordernum from [Stock_Product_Order_App] group by [StockProductID]"
-            v_sql_h = "select max(id) as id, max(createtime) as enquirydate, StockProductID from [Stock_Product_EnquiryPrice_App] group by StockProductID"
+            v_sql_g = "(select [StockProductID], sum([OrderNum]*[OrderStat]) as ordernum from [Stock_Product_Order_App] group by [StockProductID]) as g"
+            v_sql_h = "(select max(id) as id, max(createtime) as enquirydate, StockProductID from [Stock_Product_EnquiryPrice_App] group by StockProductID) as h"
             v_sql_columns = "e.[采购人], a.StockProductID,a.ProductID,CONVERT(varchar, d.SignDate, 120 ) as SignDate," \
                             "a.GoodsCode,a.SpecNo,f.GoodsCDesc, a.GoodsUnit, b._ImageID,c.ImageGuid,c.ImageFmt," \
                             "c.ModuleID,CONVERT(varchar, c.FileDate, 120 ) as FileDate,c.ThumbImage,b.[其它.供应商名称]," \
                             "b.[其它.允采购量],b.[其它.应采购价],b.[其它.商品品牌], " \
-                            "g.ordernum as ordernum, coalesce(h.id,0) as priceEnquiredID," \
+                            "coalesce(g.ordernum, 0) as ordernum, coalesce(h.id,0) as priceEnquiredID," \
                             "CONVERT(varchar, h.enquirydate, 120 ) as enquirydate  "
             v_sql_fromtab = "FROM [Stock_Product_Info] as a " \
                             "join FTPart_Stock_Product_Property_1 as b on a.StockProductID=b.MainID " \
@@ -140,10 +141,10 @@ class StockDao(object):
                             "join stock_info d on d.ID=a.StockID " \
                             "join [FTPart_Stock_Property_1] e on e.[MainID] = d.ID " \
                             "left join [Stock_Product_Info_Desc] f on a.StockProductID=f.StockProductID " \
-                            "left join " + v_sql_g + " g on a.StockProductID=g.StockProductID  " \
-                            "left join " + v_sql_h + " h on  a.StockProductID=h.StockProductID "
-            v_sql = v_sql_columns + v_sql_fromtab + "  where b.[其它.允采购量] > coalesce(g.ordernum,0) "
-            v_sql_cc = "select count(*) as cc " + v_sql_fromtab + "  where b.[其它.允采购量] > coalesce(g.ordernum,0) "
+                            "left join " + v_sql_g + " on a.StockProductID=g.StockProductID  " \
+                            "left join " + v_sql_h + " on a.StockProductID=h.StockProductID "
+            v_sql = v_sql_columns + v_sql_fromtab + "  where b.[其它.允采购量] > coalesce(g.ordernum, 0) "
+            v_sql_cc = "select count(*) as cc " + v_sql_fromtab + "  where b.[其它.允采购量] > coalesce(g.ordernum, 0) "
 
             filter_brand = filter_stock["brand"]
             if filter_brand is not None:
@@ -225,6 +226,7 @@ class StockDao(object):
 
             cursor.close()
             cnxn.close()
+            print(product_list, product_count)
             return product_list, product_count
         except Exception as e:
             print('str(Exception):\t', str(Exception))
@@ -371,7 +373,7 @@ class StockDao(object):
             v_sql_fromtab = v_sql_fromtab + " join " + v_sql_tab_g + " on a.StockProductID=g.StockProductID"
             v_sql_fromtab = v_sql_fromtab + " left join " + v_sql_tab_h + " on a.StockProductID=h.StockProductID"
 
-            v_sql_filter = "where 1=1"
+            v_sql_filter = " where 1=1"
             filter_brand = filter_stock["brand"]
             if filter_brand is not None:
                 filter_sql = ''
@@ -479,9 +481,15 @@ class StockDao(object):
                 sql = "select [其它.允采购量] from FTPart_Stock_Product_Property_1 where MainID=?"
                 cursor.execute(sql, stockProductID)
                 permitNum = cursor.fetchone()[0]
+                if permitNum is None:
+                    print("*error*"*10, "url is wrong.")
+                    permitNum = -1
                 sql = "select sum(OrderNum*OrderStat) from Stock_Product_Order_App where StockProductID=?"
                 cursor.execute(sql, stockProductID)
                 hadPurchasedNum = cursor.fetchone()[0]
+                print("hadPurchasedNum is ", hadPurchasedNum)
+                if hadPurchasedNum is None:
+                    hadPurchasedNum = 0
                 permitNum = permitNum - hadPurchasedNum
                 if permitNum >= purchaseNum:
                     sql = "insert into Stock_Product_Order_App(stockProductID,opCode, OrderNum, OrderPrice,orderStat," \
@@ -500,9 +508,9 @@ class StockDao(object):
                     # print("Stock_Product_Order_App id is ", myTableId)
                     #  last row id 不生效。
                     cursor.commit()
-                    result_product.note = "1:订购成功"
+                    result_product.note = "1:采购成功"
                 else:
-                    result_product.note = "0:订购失败，允购量 " + str(permitNum) + ", 订购量 " + str(purchaseNum)
+                    result_product.note = "0:采购失败，允购量 " + str(permitNum) + ", 采购量 " + str(purchaseNum)
                 result_product_list.append(result_product)
 
             cursor.close

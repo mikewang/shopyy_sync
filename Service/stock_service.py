@@ -4,6 +4,7 @@ import os
 import base64, datetime
 from Model.user import UserInfo
 from Model.stock_dao import StockDao
+from Model import constant_v as cv
 
 
 class StockService(UserInfo):
@@ -138,10 +139,11 @@ class StockService(UserInfo):
         print(self.get_now_str(),  operate, "product order by " + OpCode, "-"*30)
         user = self.get_checked_user(OpCode, timestamp, token)
         if user is not None:
-            if operate is None:
+            if operate is None or operate == cv.order_goods:
                 result = self.add_order_product(OpCode, timestamp, token, prod_dict_list)
-            elif operate == "cancel" or operate == "complete" or operate == "return" or operate == "receive" \
-                    or operate == "undoreturn" or operate == "settlement":
+                print("post_order_product result is ", result)
+            elif operate == cv.cancel_order or operate == cv.complete_order or operate == cv.return_goods \
+                    or operate == cv.undo_return or operate == cv.settlement_goods:
                 result = self._dao.update_stock_product_order(prod_dict_list, operate)
             else:
                 print("--" * 50)

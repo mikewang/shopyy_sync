@@ -22,7 +22,7 @@ api.add_resource(ProductResource, '/Product', '/Product/<int:pageNo>')
 api.add_resource(ImageResource, '/Image', '/Image/<string:guid>')
 api.add_resource(DictResource, '/Dict', '/Dict/<string:item_type>')
 api.add_resource(EnquiryResource, '/Enquiry')
-api.add_resource(OrderResource, '/Order', '/Order/<int:pageNo>')
+api.add_resource(OrderResource, '/order', '/order/<int:pageNo>')
 
 
 @api.representation('text/html')  # 当要返回的数据类型是这里定义的content-type的时候，会执行这里的函数
