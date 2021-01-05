@@ -57,10 +57,10 @@ class SyncWorker(QThread):
         write_erp.signal.connect(self.callback_write_erp)
         self._product_info_list_write_erp = []
         page_no = 1
-        page_cc = 0;
+        page_cc = 0
         while True:
             if gl.worker_thread_isRunning == False:
-                break;
+                break
             json_dict = request_api.request_goods_list_full(domain_name, token, page_no)
             
             if "count" in json_dict:
@@ -105,10 +105,10 @@ class SyncWorker(QThread):
         recent_time_str = recent_time.strftime('%Y-%m-%d %H:%M:%S')
         recent_type = "modify"
         page_no = 1
-        page_cc = 0;
+        page_cc = 0
         while True:
             if gl.worker_thread_isRunning == False:
-                break;
+                break
             json_dict = request_api.request_goods_list_recent(domain_name, token, recent_time_str, recent_type)
             
             if "count" in json_dict:
@@ -138,10 +138,10 @@ class SyncWorker(QThread):
                 break
         recent_type = "create"
         page_no = 1
-        page_cc = 0;
+        page_cc = 0
         while True:
             if gl.worker_thread_isRunning == False:
-                break;
+                break
             json_dict = request_api.request_goods_list_recent(domain_name, token, recent_time_str, recent_type)
             
             if "count" in json_dict:
@@ -160,7 +160,7 @@ class SyncWorker(QThread):
                             for prod2 in recent_prod_info_list:
                                 if prod["ProductID"] == prod2["ProductID"]:
                                     prod_info_list.remove(prod)
-                                    break;
+                                    break
                         # 校验后剩余的产品
                         
                         recent_prod_info_list = recent_prod_info_list + prod_info_list
@@ -187,7 +187,7 @@ class SyncWorker(QThread):
         write_erp = WriteErp()
         write_erp.signal.connect(self.callback_write_erp)
         self._product_info_list_write_erp = []
-        page_cc = 0;
+        page_cc = 0
         json_dict = request_api.request_goods_list_selected(domain_name, token, goodscode)
         print("api json_dict", json_dict)
         if "count" in json_dict:
@@ -218,10 +218,10 @@ class SyncWorker(QThread):
             self._product_info_list_write_erp = []
             api_product_info_list = []
             page_no = 1
-            page_cc = 0;
+            page_cc = 0
             while True:
                 if gl.worker_thread_isRunning == False:
-                    break;
+                    break
                 json_dict = request_api.request_goods_list_full(domain_name, token, page_no)
                 
                 if "count" in json_dict:
@@ -268,10 +268,10 @@ class SyncWorker(QThread):
         recent_time_str = recent_time.strftime('%Y-%m-%d %H:%M:%S')
         recent_type = "modify"
         page_no = 1
-        page_cc = 0;
+        page_cc = 0
         while True:
             if gl.worker_thread_isRunning == False:
-                break;
+                break
             json_dict = request_api.request_goods_list_recent_offline(domain_name, token, recent_time_str, recent_type)
             
             if "count" in json_dict:
@@ -301,10 +301,10 @@ class SyncWorker(QThread):
                 break
         recent_type = "create"
         page_no = 1
-        page_cc = 0;
+        page_cc = 0
         while True:
             if gl.worker_thread_isRunning == False:
-                break;
+                break
             json_dict = request_api.request_goods_list_recent_offline(domain_name, token, recent_time_str, recent_type)
             
             if "count" in json_dict:

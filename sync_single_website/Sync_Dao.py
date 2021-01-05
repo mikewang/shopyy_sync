@@ -727,11 +727,10 @@ class SyncDao(QObject):
                                 stock_SpecActive = '0'
                             sql = "update Product_Spec set SpecActive=?, GoodsSpec=?,OuterBulk=?,GrossWeight=?," \
                                   "FOBPrice=?,MinOrder=?,RecGuid=? " \
-                                  " where SpecNo=? and ProductID in (select ProductID from product_info where GoodsCode=?)"
+                                  " where ProductSpecID=?"
                             cursor.execute(sql, stock_SpecActive, spec["GoodsSpec"].replace('<br />', ' '),
                                            spec["OuterBulk"], spec["GrossWeight"],
-                                           spec["FOBPrice"], spec["MinOrder"], spec["RecGuid"], spec["SpecNo"],
-                                           spec["GoodsCode"])
+                                           spec["FOBPrice"], spec["MinOrder"], spec["RecGuid"], spec["ProductSpecID"])
                             print("更新 FOBPrice价格", spec["SpecNo"], spec["ProductID"], spec["FOBPrice"])
                             cursor.commit()
                             # 更新 最大定购量, 批发价
