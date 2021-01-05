@@ -17,12 +17,12 @@ from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5.QtGui import QPixmap
 #导入designer工具生成的login模块
-from sync_shopyy.Sync_Main_Form import Ui_Form as MainForm
-from sync_shopyy.Dialog_Form import Ui_Dialog as DialogForm
-from sync_shopyy.Spec_Form import Ui_Form as SpecForm
-from sync_shopyy.Sync_Worker import SyncWorker as Worker
-from sync_shopyy import Scheduler, global_v as gl
-from sync_shopyy.Sync_Dao import SyncDao as Dao
+from sync_single_website.Sync_Main_Form import Ui_Form as MainForm
+from sync_single_website.Dialog_Form import Ui_Dialog as DialogForm
+from sync_single_website.Spec_Form import Ui_Form as SpecForm
+from sync_single_website.Sync_Worker import SyncWorker as Worker
+from sync_single_website import Scheduler, global_v as gl
+from sync_single_website.Sync_Dao import SyncDao as Dao
 
 
 class MainWindow(QMainWindow, MainForm):
@@ -53,12 +53,12 @@ class MainWindow(QMainWindow, MainForm):
 
     def start_auto_sync(self, state):
         if state == Qt.Checked:
-            print("sync_shopyy schedule start", datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+            print("sync_single_website schedule start", datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
             self.setWindowTitle(self._title + " 自动化开启，每天0点全量同步，每5分钟增量同步")
             self.sync_scheduler()
         else:
             self._default_scheduler.clear()
-            print("sync_shopyy schedule stop", datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+            print("sync_single_website schedule stop", datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
             self.setWindowTitle(self._title)
 
     def sync_scheduler(self):
