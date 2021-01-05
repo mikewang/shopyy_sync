@@ -22,12 +22,13 @@ class SyncDao(QObject):
         super(SyncDao, self).__init__()
         try:
             config = configparser.ConfigParser()
-            configure_file = 'ymcart.ini'
-            configure_filepath = os.path.join(os.curdir, 'config', configure_file)
-            config.read(configure_filepath, encoding='UTF-8')
-            file_existed = os.path.exists(configure_filepath)
+            init_file = os.path.normpath(os.path.join(os.curdir, "config", "ymcart.ini"))
+            config.read(init_file)
+            # configure_filepath = os.path.join(os.curdir, 'config', configure_file)
+            # config.read(configure_filepath, encoding='UTF-8')
+            file_existed = os.path.exists(init_file)
             if file_existed == False:
-                print("config file path is ", os.path.abspath(configure_filepath))
+                print("config file path is ", os.path.abspath(init_file))
             for each_section in config.sections():
                 for (each_key, each_val) in config.items(each_section):
                     # print(each_key, each_val)
