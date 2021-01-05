@@ -16,7 +16,7 @@ py_files = [
 ]
 
 a = Analysis(py_files,
-             pathex=['D:\\PycharmProjects\\shopyy_sync'],
+             pathex=['C:\\Users\\Administrator\\PycharmProjects\\shopyy_sync'],
              binaries=[],
              datas=[],
              hiddenimports=[],
