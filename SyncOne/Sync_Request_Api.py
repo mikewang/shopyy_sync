@@ -6,7 +6,7 @@ import sys
 import requests
 import json
 import hashlib
-from sync_single_website import global_v as gl
+from SyncOne import global_v as gl
 
 
 class SyncRequestApi(QObject):

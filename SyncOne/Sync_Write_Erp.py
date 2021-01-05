@@ -3,8 +3,8 @@ from PyQt5.QtCore import QObject, pyqtSignal
 import os
 import time
 import requests
-from sync_single_website.Sync_Dao import SyncDao as Dao
-from sync_single_website import global_v as gl
+from SyncOne.Sync_Dao import SyncDao as Dao
+from SyncOne import global_v as gl
 
 
 class SyncWriteErp(QObject):
@@ -59,7 +59,7 @@ class SyncWriteErp(QObject):
                 dao.merge_product_info(domain_name, product_info)
                 self.signal.emit({"product.py": product_info})
                 # write product.py image
-                if domain_name == gl.pf_domain:
+                if domain_name == gl.single_website_domain:
                     product_image = dao.generate_product_image(product_info, None)
                     if product_image is not None:
                         self.write_product_image(product_info, product_image, dao)
@@ -67,15 +67,6 @@ class SyncWriteErp(QObject):
                         message = "产品:" + product_info["GoodsCode"] + " 主图为空，请检查网站"
                         self.signal.emit({"message": message})
                         print(message, product_info)
-                elif domain_name == gl.ls_domain:
-                    prod_list = dao.select_product_info(domain_name, product_info["GoodsCode"])
-                    if len(prod_list) > 0:
-                        product_image = dao.generate_product_image(product_info, None)
-                        if product_image is not None:
-                            self.write_product_image(product_info, product_image, dao)
-                        else:
-                            message = "产品:" + product_info["GoodsCode"] + " 主图为空，请检查网站"
-                            self.signal.emit({"message": message})
                 # write spec
                 for product_spec in product_info["product_spec"]:
                     # print("product_spec",product_spec)
@@ -97,22 +88,13 @@ class SyncWriteErp(QObject):
                 # write spec image
                 for spec_image in product_info["product_image"]:
                     # print("spec_image", spec_image)
-                    if domain_name == gl.pf_domain:
+                    if domain_name == gl.single_website_domain:
                         product_image = dao.generate_product_image(product_info, spec_image)
                         if product_image is not None:
                             self.write_product_image(product_info, product_image, dao)
                         else:
                             message = "产品:" + product_info["GoodsCode"] + "  规格" + spec_image["sku_value"] + "的图为空，请检查网站"
                             self.signal.emit({"message": message})
-                    elif domain_name == gl.ls_domain:
-                        prod_list = dao.select_product_info(domain_name, product_info["GoodsCode"])
-                        if len(prod_list) > 0:
-                            product_image = dao.generate_product_image(product_info, spec_image)
-                            if product_image is not None:
-                                self.write_product_image(product_info, product_image, dao)
-                            else:
-                                message =  "产品:" + product_info["GoodsCode"] + "  规格" + spec_image["sku_value"] + "的图为空，请检查网站"
-                                self.signal.emit({"message": message})
                 # 单规格产品的规格图没有，需要从主图上复制一份。
                 spec_mode = (product_info["body_product_spec"])["spec_mode"]
                 if spec_mode != "1":
