@@ -10,6 +10,7 @@ from Model.user import UserInfo
 from Model.product import ProductInfo, ProductEnquiryPrice
 from Model import constant_v as cv
 
+
 class StockDao(object):
 
     def __init__(self):
@@ -480,9 +481,15 @@ class StockDao(object):
                 sql = "select [其它.允采购量] from FTPart_Stock_Product_Property_1 where MainID=?"
                 cursor.execute(sql, stockProductID)
                 permitNum = cursor.fetchone()[0]
+                if permitNum is None:
+                    print("*error*"*10, "url is wrong.")
+                    permitNum = -1
                 sql = "select sum(OrderNum*OrderStat) from Stock_Product_Order_App where StockProductID=?"
                 cursor.execute(sql, stockProductID)
                 hadPurchasedNum = cursor.fetchone()[0]
+                print("hadPurchasedNum is ", hadPurchasedNum)
+                if hadPurchasedNum is None:
+                    hadPurchasedNum = 0
                 permitNum = permitNum - hadPurchasedNum
                 if permitNum >= purchaseNum:
                     sql = "insert into Stock_Product_Order_App(stockProductID,opCode, OrderNum, OrderPrice,orderStat," \
@@ -501,9 +508,9 @@ class StockDao(object):
                     # print("Stock_Product_Order_App id is ", myTableId)
                     #  last row id 不生效。
                     cursor.commit()
-                    result_product.note = "1:订购成功"
+                    result_product.note = "1:采购成功"
                 else:
-                    result_product.note = "0:订购失败，允购量 " + str(permitNum) + ", 订购量 " + str(purchaseNum)
+                    result_product.note = "0:采购失败，允购量 " + str(permitNum) + ", 采购量 " + str(purchaseNum)
                 result_product_list.append(result_product)
 
             cursor.close
