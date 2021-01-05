@@ -420,15 +420,15 @@ class StockDao(object):
             for row in cursor:
                 product = self.parse_product_cursor(row)
                 product_list.append(product)
-            cursor.close()
+
             # 二次查询有没有退货的记录
             if ptype == cv.complete_order or ptype == cv.settlement_goods or ptype == cv.history_goods:
                 for product in product_list:
                     return_product_list = []
                     if ptype == cv.history_goods:
-                        v_sql_filter = " where (orderstate=-1 or orderstate=0) and stockproductid=" + product.StockProductID
+                        v_sql_filter = " where (g.orderstat=-1 or g.orderstat=0) and a.stockproductid=" + str(product.StockProductID)
                     else:
-                        v_sql_filter = " where orderstate=-1 and stockproductid=" + product.StockProductID
+                        v_sql_filter = " where g.orderstat=-1 and a.stockproductid=" + str(product.StockProductID)
                     v_sql = "select 0 as rownumber, " + v_sql_columns + v_sql_fromtab + v_sql_filter + ""
                     print(ptype, "sql attach is ", v_sql)
                     cursor.execute(v_sql)
@@ -440,7 +440,7 @@ class StockDao(object):
                     index = product_list.index(return_product.product)
                     return_product.product = None
                     product_list.insert(index+1, return_product)
-
+            cursor.close()
             cnxn.close()
             return product_list, product_count
         except Exception as e:
@@ -563,7 +563,7 @@ class StockDao(object):
                     row = cursor.fetchone()
                     if row is not None:
                         stockProductID = row[0]
-                        purchaseNum = row[1]
+                        orderNum = row[1]
                         purchasePrice = row[2]
                         supplier = row[3]
                         settlement = row[4]
@@ -571,7 +571,7 @@ class StockDao(object):
                         sql = "insert INTO Stock_Product_Order_App_hist(StockProductID, OpCode, OrderNum,OrderPrice," \
                               " supplier, OperateType, orderId, note) VALUES(?,?,?,?,?,?,?,?)"
                         print(operate_type, "insert hist sql --- \n ", sql)
-                        cursor.execute(sql, stockProductID, opCode, purchaseNum, purchasePrice,
+                        cursor.execute(sql, stockProductID, opCode, orderNum, purchasePrice,
                                        supplier, cv.cancel_order, orderID, '')
                         cursor.commit()
                         result_product.note = "1:" + operate_type + " ok."
@@ -591,9 +591,12 @@ class StockDao(object):
                           "set ensureOpCode = ?, OrderNum = ? , OrderPrice=?, supplier=? , settlement=?," \
                           " ensureTime=getdate() " \
                           "where orderID = ? and stockProductID = ? and settlement <> ? "
+                    sql = "update Stock_Product_Order_App " \
+                          "set ensureOpCode = ?,settlement=?," \
+                          " ensureTime=getdate() " \
+                          "where orderID = ? and stockProductID = ? and settlement <> ? "
                     print(operate_type, "update sql ---\n ", sql)
-                    cursor.execute(sql, ensureOpCode, purchaseNum, purchasePrice, supplier, settlement, orderID,
-                                   stockProductID, settlement)
+                    cursor.execute(sql, ensureOpCode, settlement, orderID, stockProductID, settlement)
                     # insert history row
                     sql = "insert INTO Stock_Product_Order_App_hist(StockProductID, OpCode, OrderNum," \
                           "OrderPrice, supplier, OperateType, orderId, note) " \
