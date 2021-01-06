@@ -633,7 +633,7 @@ class StockDao(object):
                     sql = "update Stock_Product_Info set goodsnum=? where stockProductID = ?"
                     cursor.execute(sql, goodsnum, stockProductID)
                     cursor.commit()
-                    result_product.note = "1:" + operate_type + " ok."
+                    result_product.note = "1:订购成功"
                 elif operate_type == cv.return_goods:
                     # 插入一条 退货 记录进来，原订货记录保存。
                     opCode = prod["orderOpCode"]
@@ -644,7 +644,7 @@ class StockDao(object):
                     settlement = prod["settlement"]
                     # 退货。
 
-                    sql = "select stockProductID, supplier, settlement from Stock_Product_Order_App " \
+                    sql = "select stockProductID, supplier, settlement,orderNum from Stock_Product_Order_App " \
                           "where orderID=? and orderStat = 1"
                     cursor.execute(sql, orderID)
                     row = cursor.fetchone()
@@ -652,6 +652,7 @@ class StockDao(object):
                         stockProductID = row[0]
                         supplier = row[1]
                         settlement = row[2]
+                        doneOrderNum = row[3]
                         sql = "insert into Stock_Product_Order_App(stockProductID,opCode, OrderNum, OrderPrice," \
                               "orderStat,supplier, settlement,sourceOrderID,createTime) " \
                               " values(?,?,?,?,?,?,?,?,getdate()) "
@@ -692,9 +693,14 @@ class StockDao(object):
                         sql = "update Stock_Product_Info set goodsnum=? where stockProductID = ?"
                         cursor.execute(sql, goodsnum, stockProductID)
                         cursor.commit()
-                        result_product.note = "1:" + operate_type + " ok."
+                        sql = "select stockProductID, sum(orderNum) from Stock_Product_Order_App " \
+                              "where sourceOrderID=? and orderStat = -1 group by stockProductID"
+                        cursor.execute(sql, orderID)
+                        returnOrderNum = cursor.fetchone()[1]
+
+                        result_product.note = "1:退货成功，采购量 " + str(doneOrderNum) + ", 退货量 "+str(purchaseNum) + ", 共退货 " + str(returnOrderNum)
                     else:
-                        result_product.note = "0:" + operate_type + " 没有记录."
+                        result_product.note = "0:退货失败，没有记录."
                 elif operate_type == cv.undo_return:
                     # 取消 退货。
                     opCode = prod["orderOpCode"]
