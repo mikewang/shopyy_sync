@@ -534,7 +534,6 @@ class StockDao(object):
     def update_stock_product_order(self, prod_dict_list, operate_type):
         try:
             result_product_list = []
-            result = "1"
             cnxn = pyodbc.connect(self._conn_str)
             cursor = cnxn.cursor()
             for prod in prod_dict_list:
@@ -701,9 +700,10 @@ class StockDao(object):
                             cursor.execute(sql, goodsnum, stockProductID)
                             cursor.commit()
 
-                            result_product.note = "1:退货成功，采购量 " + str(doneOrderNum) + ", 退货量 "+str(purchaseNum) + ", 共退货 " + str(returnOrderNum+purchaseNum)
+                            result_product.note = "1:退货成功，采购量 " + str(doneOrderNum) + ", 退货量 "+str(purchaseNum) + ", 共退货 " + str(returnOrderNum+purchaseNum) + ":" + str(doneOrderNum-returnOrderNum-purchaseNum)
                     else:
                         result_product.note = "0:退货失败，没有记录."
+                    print(result_product.note)
                 elif operate_type == cv.undo_return:
                     # 取消 退货。
                     opCode = prod["orderOpCode"]
