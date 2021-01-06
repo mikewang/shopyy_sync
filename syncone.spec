@@ -3,16 +3,16 @@
 
 block_cipher = None
 py_files = [
-    'SyncOne\\Sync_Main.py',
-    'SyncOne\\Sync_Main.py',
-    'SyncOne\\Sync_Main.py',
-    'SyncOne\\Sync_Main.py',
-    'SyncOne\\global_v.py',
-    'SyncOne\\Sync_Request_Api.py',
-    'SyncOne\\Sync_Worker.py',
-    'SyncOne\\Sync_Write_Erp.py',
-    'SyncOne\\Sync_Dao.py',
-    'SyncOne\\Scheduler.py'
+    'SyncOne//Sync_Main.py',
+    'SyncOne//Sync_Main.py',
+    'SyncOne//Sync_Main.py',
+    'SyncOne//Sync_Main.py',
+    'SyncOne//global_v.py',
+    'SyncOne//Sync_Request_Api.py',
+    'SyncOne//Sync_Worker.py',
+    'SyncOne//Sync_Write_Erp.py',
+    'SyncOne//Sync_Dao.py',
+    'SyncOne//Scheduler.py'
 ]
 
 a = Analysis(py_files,
