@@ -504,6 +504,7 @@ if __name__ == '__main__':
     gl.single_website_domain = config.get("api_single_website", "domain_name")
     gl.single_website_token = config.get("api_single_website", "core_token")
     gl.single_website_name = config.get("api_single_website", "website_name")
+    gl.offline_limit = config.get("api_single_website", "offline_limit")
 
     app = QApplication(sys.argv)
     mainWindow = MainWindow()

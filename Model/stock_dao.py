@@ -697,7 +697,6 @@ class StockDao(object):
                               "where sourceOrderID=? and orderStat = -1 group by stockProductID"
                         cursor.execute(sql, orderID)
                         returnOrderNum = cursor.fetchone()[1]
-
                         result_product.note = "1:退货成功，采购量 " + str(doneOrderNum) + ", 退货量 "+str(purchaseNum) + ", 共退货 " + str(returnOrderNum)
                     else:
                         result_product.note = "0:退货失败，没有记录."
