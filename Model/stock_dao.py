@@ -578,7 +578,7 @@ class StockDao(object):
                         cursor.execute(sql, stockProductID, opCode, orderNum, purchasePrice,
                                        supplier, cv.cancel_order, orderID, '')
                         cursor.commit()
-                        result_product.note = "1:" + operate_type + " ok."
+                        result_product.note = "1:取消订货成功"
 
                 elif operate_type == cv.complete_order:
                     # 确认订货，完成采购
@@ -761,7 +761,7 @@ class StockDao(object):
                         print(operate_type, "insert hist sql --- \n ", sql)
                         cursor.execute(sql, stockProductID, opCode, purchaseNum, 0.0, '', cv.undo_return, orderID, '')
                         cursor.commit()
-                        result_product.note = "1:" + operate_type + " ok."
+                        result_product.note = "1:取消退货成功"
                     else:
                         result_product.note = "0:" + operate_type + " 没有记录."
                 elif operate_type == cv.settlement_goods:
@@ -784,7 +784,7 @@ class StockDao(object):
                     cursor.execute(sql, stockProductID, settlementOpCode, purchaseNum, purchasePrice, supplier,
                                    cv.settlement_goods, orderID, '')
                     cursor.commit()
-                    result_product.note = "1:" + operate_type + " ok."
+                    result_product.note = "1:结算成功"
                 result_product_list.append(result_product)
             cursor.close
             cnxn.close
