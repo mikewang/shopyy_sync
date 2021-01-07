@@ -31,7 +31,7 @@ def mod(PORT="com10"):
     return red, alarm      ##如果异常就返回[],故障信息
 
 
-def ip(ip="11.101.102.181"):
+def ip(ip="11.101.102.180"):
     print("加载modbus_tk 完成")
     red = []
     alarm = ""
