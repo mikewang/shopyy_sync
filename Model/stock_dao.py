@@ -428,8 +428,8 @@ class StockDao(object):
 
             # 二次查询有没有退货的记录
             if ptype == cv.complete_order or ptype == cv.settlement_goods or ptype == cv.history_goods:
+                return_product_list = []
                 for product in product_list:
-                    return_product_list = []
                     if ptype == cv.history_goods:
                         v_sql_filter = " where (g.orderstat=-1 or g.orderstat=0) and a.stockproductid=" + str(product.StockProductID)
                     else:
@@ -660,7 +660,10 @@ class StockDao(object):
                         sql = "select stockProductID, sum(orderNum) from Stock_Product_Order_App " \
                               "where sourceOrderID=? and orderStat = -1 group by stockProductID"
                         cursor.execute(sql, orderID)
-                        returnOrderNum = cursor.fetchone()[1]
+                        returnOrderNum = 0
+                        row = cursor.fetchone()
+                        if row is not None:
+                            returnOrderNum = row[1]
                         if doneOrderNum <  returnOrderNum + purchaseNum:
                             result_product.note = "0:退货失败，采购量 " + str(doneOrderNum) + ", 已退货 " + str(returnOrderNum) + ", 本次退货 " + str(purchaseNum)
                         else:
