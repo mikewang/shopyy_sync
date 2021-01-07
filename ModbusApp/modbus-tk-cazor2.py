@@ -45,7 +45,7 @@ def main():
         master.set_timeout(5.0)
         logger.info("connected")
 
-        logger.info(master.execute(1, cst.READ_HOLDING_REGISTERS, 0, 3))
+        logger.info(master.execute(1, cst.READ_HOLDING_REGISTERS, 40104, 2))
 
         # logger.info(master.execute(1, cst.READ_HOLDING_REGISTERS, 0, 2, data_format='f'))
 
