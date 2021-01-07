@@ -348,18 +348,23 @@ class StockDao(object):
                             "join [FTPart_Stock_Property_1] e on e.[MainID] = d.ID " \
                             "left join [Stock_Product_Info_Desc] f on a.StockProductID=f.StockProductID "
             v_time_column = "g.CreateTime"
+            v_sql_filter = " where 1=1"
             if ptype == cv.order_goods:
-                v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] WHERE settlement = 0 and  OrderStat = 1) as g"
+                v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] WHERE settlement = 0) as g"
                 v_time_column = "g.CreateTime"
+                v_sql_filter = v_sql_filter + " and  OrderStat = 1"
             elif ptype == cv.complete_order:
-                v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] WHERE settlement = 1 and  OrderStat = 1) as g"
+                v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] WHERE settlement = 1 ) as g"
                 v_time_column = "g.ensureTime"
+                v_sql_filter = v_sql_filter + " and  OrderStat = 1"
             elif ptype == cv.return_goods:
-                v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] WHERE settlement = 1 and  OrderStat = -1) as g"
+                v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] WHERE settlement = 1 ) as g"
                 v_time_column = "g.CreateTime"
+                v_sql_filter = v_sql_filter + " and  OrderStat = -1"
             elif ptype == cv.settlement_goods:
-                v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] WHERE settlement = 2 and  OrderStat = 1) as g"
+                v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] WHERE settlement = 2 ) as g"
                 v_time_column = "g.settlementTime"
+                v_sql_filter = v_sql_filter + " and  OrderStat = 1"
             elif ptype == cv.history_goods:
                 v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] AS T1 WHERE settlement >= 0) as g"
             else:
@@ -373,7 +378,7 @@ class StockDao(object):
             v_sql_fromtab = v_sql_fromtab + " join " + v_sql_tab_g + " on a.StockProductID=g.StockProductID"
             v_sql_fromtab = v_sql_fromtab + " left join " + v_sql_tab_h + " on a.StockProductID=h.StockProductID"
 
-            v_sql_filter = " where 1=1"
+
             filter_brand = filter_stock["brand"]
             if filter_brand is not None:
                 filter_sql = ''
@@ -534,7 +539,6 @@ class StockDao(object):
     def update_stock_product_order(self, prod_dict_list, operate_type):
         try:
             result_product_list = []
-            result = "1"
             cnxn = pyodbc.connect(self._conn_str)
             cursor = cnxn.cursor()
             for prod in prod_dict_list:
@@ -574,7 +578,7 @@ class StockDao(object):
                         cursor.execute(sql, stockProductID, opCode, orderNum, purchasePrice,
                                        supplier, cv.cancel_order, orderID, '')
                         cursor.commit()
-                        result_product.note = "1:" + operate_type + " ok."
+                        result_product.note = "1:取消订货成功"
 
                 elif operate_type == cv.complete_order:
                     # 确认订货，完成采购
@@ -657,7 +661,7 @@ class StockDao(object):
                               "where sourceOrderID=? and orderStat = -1 group by stockProductID"
                         cursor.execute(sql, orderID)
                         returnOrderNum = cursor.fetchone()[1]
-                        if doneOrderNum > returnOrderNum + purchaseNum:
+                        if doneOrderNum <  returnOrderNum + purchaseNum:
                             result_product.note = "0:退货失败，采购量 " + str(doneOrderNum) + ", 已退货 " + str(returnOrderNum) + ", 本次退货 " + str(purchaseNum)
                         else:
                             sql = "insert into Stock_Product_Order_App(stockProductID,opCode, OrderNum, OrderPrice," \
@@ -701,9 +705,10 @@ class StockDao(object):
                             cursor.execute(sql, goodsnum, stockProductID)
                             cursor.commit()
 
-                            result_product.note = "1:退货成功，采购量 " + str(doneOrderNum) + ", 退货量 "+str(purchaseNum) + ", 共退货 " + str(returnOrderNum+purchaseNum)
+                            result_product.note = "1:退货成功，采购量 " + str(doneOrderNum) + ", 退货量 "+str(purchaseNum) + ", 共退货 " + str(returnOrderNum+purchaseNum) + ":" + str(doneOrderNum-returnOrderNum-purchaseNum)
                     else:
                         result_product.note = "0:退货失败，没有记录."
+                    print(result_product.note)
                 elif operate_type == cv.undo_return:
                     # 取消 退货。
                     opCode = prod["orderOpCode"]
@@ -756,7 +761,7 @@ class StockDao(object):
                         print(operate_type, "insert hist sql --- \n ", sql)
                         cursor.execute(sql, stockProductID, opCode, purchaseNum, 0.0, '', cv.undo_return, orderID, '')
                         cursor.commit()
-                        result_product.note = "1:" + operate_type + " ok."
+                        result_product.note = "1:取消退货成功"
                     else:
                         result_product.note = "0:" + operate_type + " 没有记录."
                 elif operate_type == cv.settlement_goods:
@@ -779,7 +784,7 @@ class StockDao(object):
                     cursor.execute(sql, stockProductID, settlementOpCode, purchaseNum, purchasePrice, supplier,
                                    cv.settlement_goods, orderID, '')
                     cursor.commit()
-                    result_product.note = "1:" + operate_type + " ok."
+                    result_product.note = "1:结算成功"
                 result_product_list.append(result_product)
             cursor.close
             cnxn.close
