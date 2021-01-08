@@ -31,7 +31,7 @@ def mod(PORT="com10"):
     return red, alarm      ##如果异常就返回[],故障信息
 
 
-def ip(ip="11.101.102.181"):
+def ip(ip="11.101.102.180"):
     print("加载modbus_tk 完成")
     red = []
     alarm = ""
@@ -40,7 +40,7 @@ def ip(ip="11.101.102.181"):
         master = modbus_tcp.TcpMaster(host=ip)
         master.set_timeout(5.0)
         master.set_verbose(True)
-        red = master.execute(1, cst.READ_HOLDING_REGISTERS, 100, 2) #这里可以修改需要读取的功能码
+        red = master.execute(1, cst.READ_HOLDING_REGISTERS, 40100, 2) #这里可以修改需要读取的功能码
         #print(red)
         alarm="正常"
         return list(red),alarm

@@ -5,7 +5,7 @@ logger = modbus_tk.utils.create_logger("console")
 if __name__ == "__main__":
     try:
         # 连接MODBUS TCP从机
-        master = modbus_tcp.TcpMaster(host="11.101.102.181")
+        master = modbus_tcp.TcpMaster(host="11.101.102.180")
         master.set_timeout(5.0)
         logger.info("connected")
         # 读保持寄存器
