@@ -367,6 +367,7 @@ class StockDao(object):
                 v_sql_filter = v_sql_filter + " and  OrderStat = 1"
             elif ptype == cv.history_goods:
                 v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] AS T1 WHERE settlement >= 0) as g"
+                v_sql_filter = v_sql_filter + " and  OrderStat = 1"
             else:
                 v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] AS T1 " \
                               "WHERE NOT EXISTS( SELECT 1 FROM [Stock_Product_Order_App] AS T2 " \
