@@ -41,11 +41,11 @@ def main():
         hooks.install_hook("modbus_tcp.TcpMaster.after_recv", on_after_recv)
 
         # Connect to the slave
-        master = modbus_tcp.TcpMaster(host="11.101.102.181")
+        master = modbus_tcp.TcpMaster()
         master.set_timeout(5.0)
         logger.info("connected")
 
-        logger.info(master.execute(1, cst.READ_HOLDING_REGISTERS, 40102, 2))
+        logger.info(master.execute(1, cst.READ_HOLDING_REGISTERS, 40100, 2, data_format='f'))
 
         # logger.info(master.execute(1, cst.READ_HOLDING_REGISTERS, 0, 2, data_format='f'))
 
