@@ -135,7 +135,7 @@ class StockDao(object):
                             "b.[其它.允采购量],b.[其它.应采购价],b.[其它.商品品牌], " \
                             "coalesce(g.ordernum, 0) as ordernum, coalesce(h.id,0) as priceEnquiredID," \
                             "CONVERT(varchar, h.enquirydate, 120 ) as enquirydate  "
-            v_sql_fromtab = "FROM (select * from  [Stock_Product_Info] where [StockID] in (SELECT [StockID] from [Stock_InfoBase] where [ExecStatus] = 1)) as a " \
+            v_sql_fromtab = "FROM (select * from  [Stock_Product_Info] where status = 0 and [StockID] in (SELECT [StockID] from [Stock_InfoBase] where [ExecStatus] = 1)) as a " \
                             "join FTPart_Stock_Product_Property_1 as b on a.StockProductID=b.MainID " \
                             "join Product_Image as c on b._ImageID=c.ProductImageID " \
                             "join stock_info d on d.ID=a.StockID " \

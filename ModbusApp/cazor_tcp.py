@@ -39,23 +39,19 @@ def ip(ip="11.101.102.180"):
         #设定串口为从站
         master = modbus_tcp.TcpMaster()
         master.set_timeout(5.0)
-        #master.set_verbose(True)
-        red = master.execute(1, cst.READ_HOLDING_REGISTERS, 40100, 2) #这里可以修改需要读取的功能码
-        red2 = master.execute(1, cst.READ_HOLDING_REGISTERS, 40102, 2)  # 这里可以修改需要读取的功能码
+        master.set_verbose(True)
+        red = master.execute(6, cst.READ_HOLDING_REGISTERS, 40100, 2) #这里可以修改需要读取的功能码
         #print(red)
         alarm = "正常"
-        return list(red), list(red2), alarm
-
+        return list(red), alarm
     except Exception as exc:
         #print(str(exc))
         alarm = (str(exc))
-
-    return red, alarm      ##如果异常就返回[],故障信息
+        return red, alarm      ##如果异常就返回[],故障信息
 
 
 if __name__ == "__main__":
-    red,red2, alarm = ip()
+    red, alarm = ip()
     print(alarm)
     print(red)
-    print(red2)
     print("*"*120)
