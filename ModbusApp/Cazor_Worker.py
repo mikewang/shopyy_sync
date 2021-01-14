@@ -43,7 +43,6 @@ class CazorWorker(QThread):
     def check_modbus_basic(self):
         self.signal.emit({"message": "检查开始1"})
         red_list, alarm = self.modbus_tcp()
-        self.signal.emit({"message": "检查开始1"})
         self.signal.emit({"modbus": (red_list, alarm)})
         self.signal.emit({"message": "检查完成2"})
 

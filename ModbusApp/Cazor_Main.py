@@ -91,7 +91,7 @@ class MainWindow(QMainWindow, MainForm):
                 return
             # 同步产品
             worker = {"name": "check_modbus_basic"}
-            self.workerThread.worker_list.append(worker)
+            self.workerThread.worker_list = [worker]
             self.workerThread.start()
         except Exception as e:
             print(e)
@@ -116,7 +116,7 @@ class MainWindow(QMainWindow, MainForm):
 
             # 同步产品
             worker = {"name": "check_alert_basic"}
-            self.workerThread.worker_list.append(worker)
+            self.workerThread.worker_list = [worker]
             print("workerThread start", self.workerThread)
             self.workerThread.start()
         except Exception as e:
