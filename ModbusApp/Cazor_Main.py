@@ -45,7 +45,7 @@ class MainWindow(QMainWindow, MainForm):
     def start_auto_check_modbus(self, state):
         if state == Qt.Checked:
             print("check schedule start", datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-            self.setWindowTitle(self._title + " 自动化开启，每5分钟扫描一次")
+            self.setWindowTitle(self._title + " 自动化开启，每" + gl.scheduler_time + "分钟扫描一次")
             self.check_scheduler()
         else:
             self._default_scheduler.clear()
@@ -53,7 +53,8 @@ class MainWindow(QMainWindow, MainForm):
             self.setWindowTitle(self._title)
 
     def check_scheduler(self):
-        self._default_scheduler.every(5).minutes.do(self.check_scheduler_what)
+        time = int(gl.scheduler_time)
+        self._default_scheduler.every(time).minutes.do(self.check_scheduler_what)
         self._default_scheduler.run_continuously(1)
 
     def check_scheduler_what(self):
@@ -147,9 +148,9 @@ if __name__ == '__main__':
     config = configparser.ConfigParser()
     init_file = os.path.normpath(os.path.join(os.curdir, "cazor.cfg"))
     config.read(init_file)
-    # gl.pf_domain = config.get("api_pf", "domain_name")
-    # gl.pf_token = config.get("api_pf", "core_token")
-    # gl.ls_domain = config.get("api_ls", "domain_name")
+    gl.scheduler_time = config.get("scheduler", "time")
+    gl.rtu_port = config.get("rtu", "port")
+    gl.tcp_ip = config.get("tcp", "ip")
     # gl.ls_token = config.get("api_ls", "core_token")
     app = QApplication(sys.argv)
     mainWindow = MainWindow()
