@@ -17,12 +17,12 @@ from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5.QtGui import QPixmap
 #导入designer工具生成的login模块
-from sync_shopyy.Sync_Main_Form import Ui_Form as MainForm
-from sync_shopyy.Dialog_Form import Ui_Dialog as DialogForm
-from sync_shopyy.Spec_Form import Ui_Form as SpecForm
-from sync_shopyy.Sync_Worker import SyncWorker as Worker
-from sync_shopyy import Scheduler, global_v as gl
-from sync_shopyy.Sync_Dao import SyncDao as Dao
+from hist.sync_shopyy.Sync_Main_Form import Ui_Form as MainForm
+from hist.sync_shopyy.Dialog_Form import Ui_Dialog as DialogForm
+from hist.sync_shopyy.Spec_Form import Ui_Form as SpecForm
+from hist.sync_shopyy.Sync_Worker import SyncWorker as Worker
+from hist.sync_shopyy import Scheduler, global_v as gl
+from hist.sync_shopyy.Sync_Dao import SyncDao as Dao
 
 
 class MainWindow(QMainWindow, MainForm):
