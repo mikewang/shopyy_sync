@@ -33,6 +33,8 @@ class ProductInfo(object):
         # 其它.供应商名称	其它.允采购量	其它.应采购价	其它.商品品牌
         self.supplier = ''
         self.permittedNum = 0
+        self.appPermittedNum = 0
+        # appPermittedNum 在没有完成订货时，和permittedNum的数值 是不一致的。app中操作需要用到它判断是否继续采购。
         self.shouldPrice = 0.0
         self.brand = ''
         self.priceEnquiredID = 0
@@ -55,7 +57,6 @@ class ProductInfo(object):
         self.settlementTime = ''
         self.settlementOpCode = ''
         self.note = ''
-
 
     def desc(self):
         product_dict = self.__dict__

@@ -127,25 +127,34 @@ class StockDao(object):
             cnxn = pyodbc.connect(self._conn_str)
             cursor = cnxn.cursor()
             # 数据源
-            v_sql_g = "(select [StockProductID], sum([OrderNum]*[OrderStat]) as ordernum from [Stock_Product_Order_App] group by [StockProductID]) as g"
-            v_sql_h = "(select max(id) as id, max(createtime) as enquirydate, StockProductID from [Stock_Product_EnquiryPrice_App] group by StockProductID) as h"
-            v_sql_columns = "e.[采购人], a.StockProductID,a.ProductID,CONVERT(varchar, d.SignDate, 120 ) as SignDate," \
-                            "a.GoodsCode,a.SpecNo,f.GoodsCDesc, a.GoodsUnit, b._ImageID,c.ImageGuid,c.ImageFmt," \
-                            "c.ModuleID,CONVERT(varchar, c.FileDate, 120 ) as FileDate,c.ThumbImage,b.[其它.供应商名称]," \
-                            "b.[其它.允采购量],b.[其它.应采购价],b.[其它.商品品牌], " \
-                            "coalesce(g.ordernum, 0) as ordernum, coalesce(h.id,0) as priceEnquiredID," \
-                            "CONVERT(varchar, h.enquirydate, 120 ) as enquirydate  "
-            v_sql_fromtab = "FROM (select * from  [Stock_Product_Info] where status = 0 and [StockID] in (SELECT [StockID] from [Stock_InfoBase] where [ExecStatus] = 1)) as a " \
+            v_sql_columns = "select e.[采购人], a.StockProductID, a.ProductID," \
+                            "CONVERT(varchar, d.SignDate, 120 ) as SignDate, a.GoodsCode,a.SpecNo,f.GoodsCDesc, " \
+                            "a.GoodsUnit, b._ImageID,c.ImageGuid,c.ImageFmt, c.ModuleID, " \
+                            "CONVERT(varchar, c.FileDate, 120 ) as FileDate,c.ThumbImage," \
+                            "b.[其它.供应商名称], b.[其它.允采购量], b.[其它.应采购价], b.[其它.商品品牌], " \
+                            "coalesce(b.[其它.app采购量], 0) as ordernum, " \
+                            "coalesce(h.id,0) as priceEnquiredID," \
+                            "CONVERT(varchar, h.enquirydate, 120 ) as enquirydate, " \
+                            "coalesce(b.[其它.app允采购量], b.[其它.允采购量]) as appPermittedNum "
+            v_sql_h = "(select max(id) as id, max(createtime) as enquirydate, StockProductID " \
+                      "from [Stock_Product_EnquiryPrice_App] group by StockProductID) as h"
+            v_sql_fromtab = "FROM (select * from  [Stock_Product_Info] where status = 0 " \
+                            "and [StockID] in (SELECT [StockID] from [Stock_InfoBase] where [ExecStatus] = 1)) as a " \
                             "join FTPart_Stock_Product_Property_1 as b on a.StockProductID=b.MainID " \
                             "join Product_Image as c on b._ImageID=c.ProductImageID " \
                             "join stock_info d on d.ID=a.StockID " \
                             "join [FTPart_Stock_Property_1] e on e.[MainID] = d.ID " \
                             "left join [Stock_Product_Info_Desc] f on a.StockProductID=f.StockProductID " \
-                            "left join " + v_sql_g + " on a.StockProductID=g.StockProductID  " \
                             "left join " + v_sql_h + " on a.StockProductID=h.StockProductID "
-            v_sql = v_sql_columns + v_sql_fromtab + "  where b.[其它.允采购量] > coalesce(g.ordernum, 0) "
-            v_sql_cc = "select count(*) as cc " + v_sql_fromtab + "  where b.[其它.允采购量] > coalesce(g.ordernum, 0) "
+            v_sql_where = "  where b.[其它.允采购量] > 0 and  coalesce(b.[其它.app允采购量], b.[其它.允采购量]) >0 "
+            v_sql = v_sql_columns + v_sql_fromtab + v_sql_where
+            v_sql_cc = "select count(*) as cc " + v_sql_fromtab + v_sql_where
 
+            # 过滤条件，商品描述
+            filter_GoodsCDesc = filter_stock["goodsDesc"]
+            if filter_GoodsCDesc is not None:
+                v_sql = v_sql + " and f.GoodsCDesc like '%" + filter_GoodsCDesc + "%'"
+                v_sql_cc = v_sql_cc + " and f.GoodsCDesc like '%" + filter_GoodsCDesc + "%'"
             filter_brand = filter_stock["brand"]
             if filter_brand is not None:
                 filter_sql = ''
@@ -189,11 +198,14 @@ class StockDao(object):
             # 增加排序功能
 
             if filter_enquriy is not None and filter_enquriy == '已询价':
-                v_sql = "select row_number() over(order by h.enquirydate desc,a.stockproductid desc) as rownumber, " + v_sql + ""
+                v_sql = "select row_number() over(order by v.enquirydate desc,v.stockproductid desc) as rownumber, " \
+                        "v.*  from (" + v_sql + ") as v"
             else:
                 # 未询价
-                v_sql = "select row_number() over(order by h.enquirydate desc,a.stockproductid desc) as rownumber, " + v_sql + ""
-            v_sql = "select  * " + " from (" + v_sql + " ) as v1 where v1.rownumber > " + str(topN - page_prod_count) + " and v1.rownumber <= " + str(topN) + " order by v1.rownumber"
+                v_sql = "select row_number() over(order by v.SignDate desc,v.stockproductid desc) as rownumber, " \
+                        "v.*  from (" + v_sql + ") as v"
+
+            v_sql = "select * from (" + v_sql + ") as v1 where v1.rownumber > " + str(topN - page_prod_count) + " and v1.rownumber <= " + str(topN) + " order by v1.rownumber"
             print("select_stock_product_list page sql is \n", v_sql)
             cursor.execute(v_sql)
             for row in cursor:
@@ -219,9 +231,11 @@ class StockDao(object):
                 product.permittedNum = row[16]
                 product.shouldPrice = row[17]
                 product.brand = row[18]
+                # app采购量
                 product.orderNum = row[19]
                 product.priceEnquiredID = row[20]
                 product.enquiryDate = row[21]
+                product.appPermittedNum = row[22]
                 product_list.append(product)
 
             cursor.close()
@@ -312,6 +326,7 @@ class StockDao(object):
         product.settlementTime = row[32]
         product.settlementOpCode = row[33]
         product.enquiryDate = row[34]
+        product.appPermittedNum = row[35]
         return product
 
     def select_order_product_list(self, page_no, filter_stock, ptype):
@@ -327,7 +342,7 @@ class StockDao(object):
             cnxn = pyodbc.connect(self._conn_str)
             cursor = cnxn.cursor()
             # 数据源
-            v_sql_columns = "e.[采购人], a.StockProductID,a.ProductID,CONVERT(varchar, d.SignDate, 120 ) as SignDate," \
+            v_sql_columns = "select e.[采购人], a.StockProductID,a.ProductID,CONVERT(varchar, d.SignDate, 120 ) as SignDate," \
                             "a.GoodsCode,a.SpecNo,f.GoodsCDesc, a.GoodsUnit, b._ImageID,c.ImageGuid,c.ImageFmt," \
                             "c.ModuleID,CONVERT(varchar, c.FileDate, 120 ) as FileDate,c.ThumbImage," \
                             "g.supplier as supplier," \
@@ -340,7 +355,8 @@ class StockDao(object):
                             "g.sourceOrderID, CONVERT(varchar, g.ensureTime, 120 ) as ensureTime, g.ensureOpCode, " \
                             "CONVERT(varchar, g.receiveGoodsTime, 120 ) as receiveGoodsTime, g.receiveOpCode," \
                             "CONVERT(varchar, g.settlementTime, 120 ) as settlementTime, g.settlementOpCode, " \
-                            "CONVERT(varchar, h.enquirydate, 120 ) as enquirydate "
+                            "CONVERT(varchar, h.enquirydate, 120 ) as enquirydate, " \
+                            "coalesce(b.[其它.app允采购量], b.[其它.允采购量]) as appPermittedNum "
             v_sql_fromtab = "FROM [Stock_Product_Info] as a " \
                             "join  FTPart_Stock_Product_Property_1 as b on a.StockProductID=b.MainID " \
                             "join Product_Image as c on b._ImageID=c.ProductImageID " \
@@ -352,22 +368,22 @@ class StockDao(object):
             if ptype == cv.order_goods:
                 v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] WHERE settlement = 0) as g"
                 v_time_column = "g.CreateTime"
-                v_sql_filter = v_sql_filter + " and  OrderStat = 1"
+                v_sql_filter = v_sql_filter + " and  g.OrderStat = 1"
             elif ptype == cv.complete_order:
                 v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] WHERE settlement = 1 ) as g"
                 v_time_column = "g.ensureTime"
-                v_sql_filter = v_sql_filter + " and  OrderStat = 1"
+                v_sql_filter = v_sql_filter + " and  g.OrderStat = 1"
             elif ptype == cv.return_goods:
                 v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] WHERE settlement = 1 ) as g"
                 v_time_column = "g.CreateTime"
-                v_sql_filter = v_sql_filter + " and  OrderStat = -1"
+                v_sql_filter = v_sql_filter + " and  g.OrderStat = -1"
             elif ptype == cv.settlement_goods:
                 v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] WHERE settlement = 2 ) as g"
                 v_time_column = "g.settlementTime"
-                v_sql_filter = v_sql_filter + " and  OrderStat = 1"
+                v_sql_filter = v_sql_filter + " and  g.OrderStat = 1"
             elif ptype == cv.history_goods:
                 v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] AS T1 WHERE settlement >= 0) as g"
-                v_sql_filter = v_sql_filter + " and  OrderStat = 1"
+                v_sql_filter = v_sql_filter + " and  g.OrderStat = 1"
             else:
                 v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] AS T1 " \
                               "WHERE NOT EXISTS( SELECT 1 FROM [Stock_Product_Order_App] AS T2 " \
@@ -379,7 +395,10 @@ class StockDao(object):
             v_sql_fromtab = v_sql_fromtab + " join " + v_sql_tab_g + " on a.StockProductID=g.StockProductID"
             v_sql_fromtab = v_sql_fromtab + " left join " + v_sql_tab_h + " on a.StockProductID=h.StockProductID"
 
-
+            # 过滤条件，商品描述
+            filter_GoodsCDesc = filter_stock["goodsDesc"]
+            if filter_GoodsCDesc is not None:
+                v_sql_filter = v_sql_filter + " and f.GoodsCDesc like '%" + filter_GoodsCDesc + "%'"
             filter_brand = filter_stock["brand"]
             if filter_brand is not None:
                 filter_sql = ''
@@ -412,15 +431,17 @@ class StockDao(object):
             if filter_specno is not None:
                 v_sql_filter = v_sql_filter + " and a.SpecNo = '" + filter_specno + "'"
 
+            # 先总数
             v_sql_cc = "select count(*) " + v_sql_fromtab + v_sql_filter
             print(ptype, "sql count is ", v_sql_cc)
             cursor.execute(v_sql_cc)
             row = cursor.fetchone()
             product_count = row[0]
             topN = page_no*page_prod_count
-            # 增加排序功能
-            v_sql = "select row_number() over(order by " + v_time_column + " desc,a.stockproductid desc, g.orderID desc) as rownumber, " + v_sql_columns + v_sql_fromtab + v_sql_filter + ""
-            v_sql = "select  * " + " from (" + v_sql + " ) as v1 where v1.rownumber > " + str(topN - page_prod_count) + " and v1.rownumber <= " + str(topN) + " order by v1.rownumber"
+            # 再分页，需要增加排序功能
+            v_sql = v_sql_columns + v_sql_fromtab + v_sql_filter
+            v_sql = "select row_number() over(order by v." + v_time_column.split(".")[1] + " desc,v.stockproductid desc, v.product_order_id desc) as rownumber, v.* from (" + v_sql + ") as v "
+            v_sql = "select * from (" + v_sql + ") as v1 where v1.rownumber > " + str(topN - page_prod_count) + " and v1.rownumber <= " + str(topN) + " order by v1.rownumber"
             print(ptype, "sql page is ", v_sql)
             cursor.execute(v_sql)
             for row in cursor:
@@ -435,7 +456,8 @@ class StockDao(object):
                         v_sql_filter = " where (g.orderstat=-1 or g.orderstat=0) and a.stockproductid=" + str(product.StockProductID)
                     else:
                         v_sql_filter = " where g.orderstat=-1 and a.stockproductid=" + str(product.StockProductID)
-                    v_sql = "select 0 as rownumber, " + v_sql_columns + v_sql_fromtab + v_sql_filter + ""
+                    v_sql = v_sql_columns + v_sql_fromtab + v_sql_filter
+                    v_sql = "select 0 as rownumber, v.* from (" + v_sql + ") as v "
                     print(ptype, "sql attach is ", v_sql)
                     cursor.execute(v_sql)
                     for row in cursor:
@@ -484,20 +506,19 @@ class StockDao(object):
                 result_product.StockProductID = stockProductID
 
                 # 校验购买的数量和允购买量的关系，有可能允许购买量已经不够
-                sql = "select [其它.允采购量] from FTPart_Stock_Product_Property_1 where MainID=?"
+                sql = "select coalesce([其它.app允采购量], [其它.允采购量]) from FTPart_Stock_Product_Property_1 where MainID=?"
                 cursor.execute(sql, stockProductID)
                 permitNum = cursor.fetchone()[0]
                 if permitNum is None:
                     print("*error*"*10, "url is wrong.")
                     permitNum = -1
-                sql = "select sum(OrderNum*OrderStat) from Stock_Product_Order_App where StockProductID=?"
-                cursor.execute(sql, stockProductID)
-                hadPurchasedNum = cursor.fetchone()[0]
-                print("hadPurchasedNum is ", hadPurchasedNum)
-                if hadPurchasedNum is None:
-                    hadPurchasedNum = 0
-                permitNum = permitNum - hadPurchasedNum
                 if permitNum >= purchaseNum:
+                    sql = "update [FTPart_Stock_Product_Property_1] " \
+                          "set [其它.app允采购量] = coalesce([其它.app允采购量], [其它.允采购量]) - ?," \
+                          "[其它.app采购量] = coalesce([其它.app采购量], 0) + ?," \
+                          "[其它.供应商名称] = ? " \
+                          "where [MainID] = ?"
+                    cursor.execute(sql, purchaseNum,purchaseNum, supplier, stockProductID)
                     sql = "insert into Stock_Product_Order_App(stockProductID,opCode, OrderNum, OrderPrice,orderStat," \
                           "supplier, settlement) " \
                           " values(?,?,?,?,?,?,?)"
@@ -572,6 +593,12 @@ class StockDao(object):
                         purchasePrice = row[2]
                         supplier = row[3]
                         settlement = row[4]
+                        # 修改 app允采购量
+                        sql = "update [FTPart_Stock_Product_Property_1] " \
+                              "set [其它.app允采购量] = [其它.app允采购量] + ?, " \
+                              "[其它.app采购量] = [其它.app采购量] - ?" \
+                              " where [MainID] = ?"
+                        cursor.execute(sql, orderNum, orderNum, stockProductID)
                         # insert history row
                         sql = "insert INTO Stock_Product_Order_App_hist(StockProductID, OpCode, OrderNum,OrderPrice," \
                               " supplier, OperateType, orderId, note) VALUES(?,?,?,?,?,?,?,?)"
@@ -593,10 +620,6 @@ class StockDao(object):
                     # 订货确认。
                     settlement = 1
                     sql = "update Stock_Product_Order_App " \
-                          "set ensureOpCode = ?, OrderNum = ? , OrderPrice=?, supplier=? , settlement=?," \
-                          " ensureTime=getdate() " \
-                          "where orderID = ? and stockProductID = ? and settlement <> ? "
-                    sql = "update Stock_Product_Order_App " \
                           "set ensureOpCode = ?,settlement=?," \
                           " ensureTime=getdate() " \
                           "where orderID = ? and stockProductID = ? and settlement <> ? "
@@ -609,15 +632,16 @@ class StockDao(object):
                     cursor.execute(sql, stockProductID, ensureOpCode, purchaseNum, purchasePrice, supplier,
                                    cv.complete_order, orderID, '')
                     sql = "update [FTPart_Stock_Product_Property_1] " \
-                          "set [其它.app采购量] = coalesce([其它.app采购量], 0) + ?,[其它.供应商名称]=coalesce([其它.供应商名称],?),[其它.业务员]=? " \
+                          "set [其它.允采购量] = [其它.允采购量] - ?, " \
+                            "[其它.供应商名称] = ? " \
                           "where [MainID]=?"
-                    cursor.execute(sql, purchaseNum, supplier, ensureOpCode, stockProductID)
+                    cursor.execute(sql, purchaseNum, supplier, stockProductID)
                     print(operate_type, "update sql2 ---\n ", sql)
                     # [Stock_Product_InfoBase].unitprice 更新单价
                     # [Stock_Product_Info].goodsnum 更新采购量，为0是要设置为允采购量，因为系统不能设置为0。
                     sql = "select sum(ordernum*orderStat) as goodsnum,sum(ordernum*orderprice*orderStat) as allprice " \
                           "from Stock_Product_Order_App " \
-                          "where stockProductID = ? and (orderStat = -1 or orderStat = 1)"
+                          "where stockProductID = ? and (orderStat = -1 or orderStat = 1) and settlement >= 1"
                     cursor.execute(sql, stockProductID)
                     row = cursor.fetchone()
                     goodsnum = row[0]
@@ -627,12 +651,6 @@ class StockDao(object):
                     else:
                         unitprice = allprice/goodsnum
                     print("写入erp数据库", stockProductID, unitprice, goodsnum)
-                    sql = "select [其它.允采购量] from FTPart_Stock_Product_Property_1 where [MainID]=?"
-                    cursor.execute(sql, stockProductID)
-                    row = cursor.fetchone()
-                    permittedNum = row[0]
-                    if goodsnum == 0:
-                        goodsnum = permittedNum
                     sql = "update Stock_Product_InfoBase set unitprice=? where stockProductID = ?"
                     cursor.execute(sql, unitprice, stockProductID)
                     sql = "update Stock_Product_Info set goodsnum=? where stockProductID = ?"
@@ -644,6 +662,7 @@ class StockDao(object):
                     opCode = prod["orderOpCode"]
                     print(operate_type, "product", prod)
                     orderStat = -1
+                    # 本次退货数量
                     purchaseNum = prod["purchaseNum"]
                     purchasePrice = prod["purchasePrice"]
                     settlement = prod["settlement"]
@@ -679,9 +698,12 @@ class StockDao(object):
                             print(operate_type, "insert hist sql --- \n ", sql)
                             cursor.execute(sql, stockProductID, opCode, purchaseNum, purchasePrice,
                                            supplier, cv.return_goods, orderID, '')
-                            sql = "update [FTPart_Stock_Product_Property_1] set [其它.app采购量] = [其它.app采购量] - ? " \
+                            sql = "update [FTPart_Stock_Product_Property_1] " \
+                                  "set [其它.允采购量] = [其它.允采购量] + ?, " \
+                                  "[其它.app允采购量] = [其它.app允采购量] + ?, " \
+                                  "[其它.app采购量] = [其它.app采购量] - ? " \
                                   "where [MainID]=?"
-                            cursor.execute(sql, purchaseNum, stockProductID)
+                            cursor.execute(sql, purchaseNum, purchaseNum, purchaseNum, stockProductID)
                             print(operate_type, "update sql2 ---\n ", sql)
                             # [Stock_Product_InfoBase].unitprice 更新单价
                             # [Stock_Product_Info].goodsnum 更新采购量，为0是要设置为允采购量，因为系统不能设置为0。
@@ -697,12 +719,6 @@ class StockDao(object):
                             else:
                                 unitprice = allprice / goodsnum
                             print("写入erp数据库", stockProductID, unitprice, goodsnum)
-                            sql = "select [其它.允采购量] from FTPart_Stock_Product_Property_1 where [MainID]=?"
-                            cursor.execute(sql, stockProductID)
-                            row = cursor.fetchone()
-                            permittedNum = row[0]
-                            if goodsnum == 0:
-                                goodsnum = permittedNum
                             sql = "update Stock_Product_InfoBase set unitprice=? where stockProductID = ?"
                             cursor.execute(sql, unitprice, stockProductID)
                             sql = "update Stock_Product_Info set goodsnum=? where stockProductID = ?"
@@ -731,9 +747,11 @@ class StockDao(object):
                         print(operate_type, "update sql --- \n ", sql)
                         cursor.execute(sql,  orderStat, orderID)
                         sql = "update [FTPart_Stock_Product_Property_1] " \
-                              "set [其它.app采购量] = [其它.app采购量] + ? " \
+                              "set [其它.允采购量] = [其它.允采购量] - ?, " \
+                              "[其它.app允采购量] = [其它.app允采购量] - ?, " \
+                              "[其它.app采购量] = [其它.app采购量] + ? " \
                               "where [MainID]=?"
-                        cursor.execute(sql, purchaseNum, stockProductID)
+                        cursor.execute(sql, purchaseNum, purchaseNum, purchaseNum, stockProductID)
                         print(operate_type, "update sql2 ---\n ", sql)
                         # [Stock_Product_InfoBase].unitprice 更新单价
                         # [Stock_Product_Info].goodsnum 更新采购量，为0是要设置为允采购量，因为系统不能设置为0。
@@ -749,12 +767,6 @@ class StockDao(object):
                         else:
                             unitprice = allprice / goodsnum
                         print("写入erp数据库", stockProductID, unitprice, goodsnum)
-                        sql = "select [其它.允采购量] from FTPart_Stock_Product_Property_1 where [MainID]=?"
-                        cursor.execute(sql, stockProductID)
-                        row = cursor.fetchone()
-                        permittedNum = row[0]
-                        if goodsnum == 0:
-                            goodsnum = permittedNum
                         sql = "update Stock_Product_InfoBase set unitprice=? where stockProductID = ?"
                         cursor.execute(sql, unitprice, stockProductID)
                         sql = "update Stock_Product_Info set goodsnum=? where stockProductID = ?"
