@@ -5,7 +5,8 @@ import traceback
 import sys
 import logging
 import modbus_tk.defines as cst
-import modbus_tk.modbus_tcp as modbus_tcp
+import serial
+from modbus_tk import modbus_rtu, modbus_tcp
 from ModbusApp import Scheduler, Constant as gl
 
 
@@ -22,7 +23,7 @@ class CazorWorker(QThread):
         print("auto del", self)
         self.wait()
 
-    def modbus_tcp(ip="11.101.102.180"):
+    def modbus_tcp(ip="127.0.0.1"):
         print("加载modbus_tk 完成")
         red = []
         alarm = ""
@@ -43,12 +44,49 @@ class CazorWorker(QThread):
     def check_modbus_basic(self):
         self.signal.emit({"message": "检查开始1"})
         red_list, alarm = self.modbus_tcp()
-        self.signal.emit({"message": "检查开始1"})
         self.signal.emit({"modbus": (red_list, alarm)})
         self.signal.emit({"message": "检查完成2"})
 
     def check_alert_device(self):
         self.signal.emit({"message": "测试声光报警设备"})
+        red, alarm = self.modbus_rtu()
+        self.signal.emit({"modbus": (red, alarm)})
+
+    def modbus_rtu(self, PORT="COM1"):
+        # print("加载modbus_tk 完成")
+        red = []
+        alarm = ""
+        PORT = gl.rtu_port
+        try:
+
+            # 设定串口为从站
+            master = modbus_rtu.RtuMaster(serial.Serial(port=PORT,
+                                                        baudrate=9600, bytesize=8, parity='N', stopbits=1, xonxoff=0))
+            master.set_timeout(5.0)
+            master.set_verbose(True)
+            #控制开指令：01 05 00 00 FF 00 8C 3A
+            #控制关指令：01 05 00 00 00 00 CD CA
+            # 读 设备查询指令：01 01 00 00 00 01 FD CA
+            # 设备回应数据帧：01 01 01 00 51 88 正常
+            # 设备回应数据帧：01 01 01 01 90 48 报警
+            red = master.execute(1, cst.READ_COILS, 0, 1)
+            print("red1 is ", list(red))
+            alert_status = list(red)[0]
+            if alert_status == 0:
+                master.execute(1, cst.WRITE_SINGLE_COIL, 0, output_value=65280)  # 这里可以修改需要读取的功能码
+            else:
+                master.execute(1, cst.WRITE_SINGLE_COIL, 0, output_value=0)  # 这里可以修改需要读取的功能码
+            red = master.execute(1, cst.READ_COILS, 0, 1)
+            alert_status = list(red)[0]
+            if alert_status == 0:
+                alarm = "报警正常关闭"
+            else:
+                alarm = "报警正常打开"
+            return list(red), alarm
+        except Exception as exc:
+            # print(str(exc))
+            alarm = (str(exc))
+            return red, alarm  ##如果异常就返回[],故障信息
 
     @pyqtSlot()
     def run(self):

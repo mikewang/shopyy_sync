@@ -29,6 +29,7 @@ class ProductOrderResource(Resource):
             parser.add_argument('t')
             parser.add_argument('ptype')
             parser.add_argument('settlement')
+            parser.add_argument('goodsDesc')
             parser.add_argument('brand')
             parser.add_argument('enquiry')
             parser.add_argument('begin')
@@ -45,6 +46,14 @@ class ProductOrderResource(Resource):
             # 收货， 退货 两个状态的查询
             print("request args is ", args)
             filter_stock = {}
+            goodsDesc_base64 = args["goodsDesc"]
+            if goodsDesc_base64 is not None:
+                goodsDesc_base64 = base64Replace(goodsDesc_base64)
+                goodsDesc = base64.b64decode(goodsDesc_base64).decode('utf-8')
+                filter_stock['goodsDesc'] = goodsDesc
+                print("goodsDesc key is ", args["goodsDesc"], goodsDesc)
+            else:
+                filter_stock['goodsDesc'] = None
             brand_base64 = args["brand"]
             if brand_base64 is not None:
                 brand_base64 = base64Replace(brand_base64)

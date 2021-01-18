@@ -7,7 +7,7 @@ import modbus_tk.defines as cst
 from modbus_tk import modbus_rtu,modbus_tcp
 
 
-def mod(PORT="com10"):
+def mod(PORT="COM4"):
     #print("加载modbus_tk 完成")
     red = []
     alarm = ""
@@ -19,10 +19,17 @@ def mod(PORT="com10"):
         master.set_verbose(True)
 
         #读保持寄存器 03H 1站号 地址2700 长度0-42
-        red = master.execute(1, cst.READ_HOLDING_REGISTERS, 2700, 43) #这里可以修改需要读取的功能码
+        red = master.execute(1, cst.READ_COILS, 0, 1)
+        print("red1 is ", list(red))
+        master.execute(1, cst.WRITE_SINGLE_COIL, 0, output_value=65280) #这里可以修改需要读取的功能码
+        red = master.execute(1, cst.READ_COILS, 0, 1)
+        print("red2 is ", list(red))
+        master.execute(1, cst.WRITE_SINGLE_COIL, 0, output_value=0)  # 这里可以修改需要读取的功能码
+        red = master.execute(1, cst.READ_COILS, 0, 1)
+        print("red3 is ", list(red))
         #print(red)
         alarm="正常"
-        return list(red),alarm
+        return list(red), alarm
 
     except Exception as exc:
         #print(str(exc))
@@ -51,7 +58,7 @@ def ip(ip="11.101.102.180"):
 
 
 if __name__ == "__main__":
-    red, alarm = ip()
+    red, alarm = mod()
     print(alarm)
     print(red)
     print("*"*120)

@@ -2,9 +2,9 @@
 from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot
 import datetime
 import traceback
-from sync_shopyy.Sync_Request_Api import SyncRequestApi as RequstApi
-from sync_shopyy.Sync_Write_Erp import SyncWriteErp as WriteErp
-from sync_shopyy import global_v as gl
+from hist.sync_shopyy.Sync_Request_Api import SyncRequestApi as RequstApi
+from hist.sync_shopyy.Sync_Write_Erp import SyncWriteErp as WriteErp
+from hist.sync_shopyy import global_v as gl
 import sys
 import logging
 
