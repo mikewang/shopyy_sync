@@ -145,6 +145,8 @@ class StockService(UserInfo):
             elif operate == cv.cancel_order or operate == cv.complete_order or operate == cv.return_goods \
                     or operate == cv.undo_return or operate == cv.settlement_goods:
                 result = self._dao.update_stock_product_order(prod_dict_list, operate)
+            elif operate == cv.account_goods or operate == cv.undo_account:
+                result = self._dao.merge_stock_product_order_account(prod_dict_list, operate)
             else:
                 print("--" * 50)
                 print(operate, " maybe wrong.")
