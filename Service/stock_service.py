@@ -197,7 +197,7 @@ class StockService(UserInfo):
         product_count = 0
         user = self.get_checked_user(OpCode, timestamp, token)
         if user is not None:
-            product_list, product_count = self._dao.select_account_product(pageNo, filter_account, ptype)
+            account_product_list, product_count, product_list = self._dao.select_account_product(pageNo, filter_account, ptype)
         else:
             print(self.get_now_str(), "Error, get account product is failure.", OpCode, "PageNo=", pageNo)
-        return product_list, product_count
+        return account_product_list, product_count, product_list

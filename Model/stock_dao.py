@@ -797,7 +797,7 @@ class StockDao(object):
         # 状态 取消，或正常
         #
         try:
-            product_list = []
+            account_product_list = []
             page_prod_count = 10
             cnxn = pyodbc.connect(self._conn_str)
             cursor = cnxn.cursor()
@@ -850,14 +850,25 @@ class StockDao(object):
             v_sql = "select * from (" + v_sql + ") as v1 where v1.rownumber > " + str(topN - page_prod_count) + " and v1.rownumber <= " + str(topN) + " order by v1.rownumber"
             print(ptype, "sql page is ", v_sql)
             cursor.execute(v_sql)
+            orderID_set = set()
             for row in cursor:
                 product = self.parse_account_product_cursor(row)
                 product_count = row[len(row)-1]
-                product_list.append(product)
-
+                account_product_list.append(product)
+                orderID_set.add(product.orderID)
+            orderID_list_str = ""
+            for orderID in orderID_set:
+                orderID_list_str = orderID_list_str + "," + str(orderID)
+            print("orderID_list_str", orderID_list_str.lstrip(","))
+            v_sql = "select 0 as rownumber,  v.* ,count(*) over() as product_count from v_app_stock_order as v where v.product_order_id in (" + orderID_list_str.lstrip(",") +")"
+            cursor.execute(v_sql)
+            product_list = []
+            for row in cursor:
+                parent_product = self.parse_product_cursor(row)
+                product_list.append(parent_product)
             cursor.close()
             cnxn.close()
-            return product_list, product_count
+            return account_product_list, product_count, product_list
         except Exception as e:
             print('str(Exception):\t', str(Exception))
             print('str(e):\t\t', str(e))
@@ -870,7 +881,7 @@ class StockDao(object):
             print('traceback.print_exc(): ', traceback.print_exc())
             print('traceback.format_exc():\n%s' % traceback.format_exc())
             print('#' * 60)
-            return None, 0
+            return None, 0, None
 
     def merge_account_product(self, account_prod_dict_list, operate_type):
         try:
@@ -908,17 +919,17 @@ class StockDao(object):
                 elif operate_type == cv.undo_account:
                     accountStat = 0
                     sql = "update [Stock_Product_Order_Account_App] set [accountStat] = ?  WHERE [accountID] = ? and [accountStat] = 1"
-                    print(operate_type, "insert sql ---\n ", sql)
+                    print(operate_type, "update sql ---\n ", sql)
                     cursor.execute(sql, accountOpCode, accountNum, accountStat, accountID)
                     # insert history row
                     sql = "insert INTO Stock_Product_Order_App_hist(StockProductID, OpCode, OrderNum,OrderPrice," \
                           " supplier, OperateType, orderId, note) VALUES(?,?,?,?,?,?,?,?)"
                     print(operate_type, "insert hist sql --- \n ", sql)
                     cursor.execute(sql, stockProductID, accountOpCode, accountNum, purchasePrice, supplier,
-                                   cv.account_goods, orderID, '')
+                                   cv.account_goods, orderID, 'accountID='+str(accountID))
                     cursor.commit()
-                    result_product.note = "1:对账成功"
-                elif operate_type == cv.settlement_goods:
+                    result_product.note = "1:对账取消成功"
+                elif operate_type == cv.fullred_goods:
                     settlementOpCode = prod["settlementOpCode"]
                     # 结算
                     purchaseNum = prod["purchaseNum"]
@@ -938,7 +949,7 @@ class StockDao(object):
                     cursor.execute(sql, stockProductID, settlementOpCode, purchaseNum, purchasePrice, supplier,
                                    cv.settlement_goods, orderID, '')
                     cursor.commit()
-                    result_product.note = "1:结算成功"
+                    result_product.note = "1:充红成功"
                 result_product_list.append(result_product)
             cursor.close
             cnxn.close

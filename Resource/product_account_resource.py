@@ -113,16 +113,22 @@ class ProductAccountResource(Resource):
 
             print("filter_stock is ", filter_stock)
             user_service = StockService()
-            prod_list, prod_count = user_service.get_account_product(OpCode, timestamp, token, pageNo, filter_stock, ptype)
+            account_prod_list, prod_count, product_list = user_service.get_account_product(OpCode, timestamp, token, pageNo, filter_stock, ptype)
             result = {"code": 200, "msg": "", "count": prod_count}
-            if prod_list is not None:
+            if account_prod_list is not None:
                 json_list = []
-                for prod in prod_list:
+                for prod in account_prod_list:
                     # prod_json = json.dumps(prod.desc())
                     json_list.append(prod.desc())
                 result["data"] = json_list
+                json_list = []
+                for prod in product_list:
+                    # prod_json = json.dumps(prod.desc())
+                    json_list.append(prod.desc())
+                result["data2"] = json_list
             else:
                 result["data"] = []
+                result["data2"] = []
                 result = {"code": 201, "msg": "product is not existed."}
             return result, result["code"]
         except Exception as e:
