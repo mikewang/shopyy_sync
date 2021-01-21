@@ -120,142 +120,6 @@ class StockDao(object):
             print('#' * 60)
             return None
 
-    def select_stock_product_list_custom_table(self, page_no, filter_stock):
-        try:
-            product_list = []
-            page_prod_count = 10
-            cnxn = pyodbc.connect(self._conn_str)
-            cursor = cnxn.cursor()
-            # 数据源
-            v_sql_columns = "select e.[采购人], a.StockProductID, a.ProductID," \
-                            "CONVERT(varchar, d.SignDate, 120 ) as SignDate, a.GoodsCode,a.SpecNo,f.GoodsCDesc, " \
-                            "a.GoodsUnit, b._ImageID,c.ImageGuid,c.ImageFmt, c.ModuleID, " \
-                            "CONVERT(varchar, c.FileDate, 120 ) as FileDate,c.ThumbImage," \
-                            "b.[其它.供应商名称], b.[其它.允采购量], b.[其它.应采购价], b.[其它.商品品牌], " \
-                            "coalesce(b.[其它.app采购量], 0) as ordernum, " \
-                            "coalesce(h.id,0) as priceEnquiredID," \
-                            "CONVERT(varchar, h.enquirydate, 120 ) as enquirydate, " \
-                            "coalesce(b.[其它.app允采购量], b.[其它.允采购量]) as appPermittedNum "
-            v_sql_h = "(select max(id) as id, max(createtime) as enquirydate, StockProductID " \
-                      "from [Stock_Product_EnquiryPrice_App] group by StockProductID) as h"
-            v_sql_fromtab = "FROM (select * from  [Stock_Product_Info] where status = 0 " \
-                            "and [StockID] in (SELECT [StockID] from [Stock_InfoBase] where [ExecStatus] = 1)) as a " \
-                            "join FTPart_Stock_Product_Property_1 as b on a.StockProductID=b.MainID " \
-                            "join Product_Image as c on b._ImageID=c.ProductImageID " \
-                            "join stock_info d on d.ID=a.StockID " \
-                            "join [FTPart_Stock_Property_1] e on e.[MainID] = d.ID " \
-                            "left join [Stock_Product_Info_Desc] f on a.StockProductID=f.StockProductID " \
-                            "left join " + v_sql_h + " on a.StockProductID=h.StockProductID "
-            v_sql_where = "  where b.[其它.允采购量] > 0 and  coalesce(b.[其它.app允采购量], b.[其它.允采购量]) >0 "
-            v_sql = v_sql_columns + v_sql_fromtab + v_sql_where
-            v_sql_cc = "select count(*) as cc " + v_sql_fromtab + v_sql_where
-
-            # 过滤条件，商品描述
-            filter_GoodsCDesc = filter_stock["goodsDesc"]
-            if filter_GoodsCDesc is not None:
-                v_sql = v_sql + " and f.GoodsCDesc like '%" + filter_GoodsCDesc + "%'"
-                v_sql_cc = v_sql_cc + " and f.GoodsCDesc like '%" + filter_GoodsCDesc + "%'"
-            filter_brand = filter_stock["brand"]
-            if filter_brand is not None:
-                filter_sql = ''
-                for b in filter_brand:
-                    filter_sql = filter_sql + "'" + b + "',"
-                filter_sql = filter_sql.rstrip(',')
-                v_sql = v_sql + " and b.[其它.商品品牌] in (" + filter_sql + ")"
-                v_sql_cc = v_sql_cc + " and b.[其它.商品品牌] in (" + filter_sql + ")"
-            filter_enquriy = filter_stock["enquiry"]
-            if filter_enquriy is not None:
-                if filter_enquriy == '未询价':
-                    v_sql = v_sql + " and  coalesce(h.id,0) = 0 "
-                    v_sql_cc = v_sql_cc + " and  coalesce(h.id,0) = 0 "
-                elif filter_enquriy == '已询价':
-                    v_sql = v_sql + " and  coalesce(h.id,0) > 0 "
-                    v_sql_cc = v_sql_cc + " and  coalesce(h.id,0) > 0 "
-            filter_begin = filter_stock["begin"]
-            if filter_begin is not None:
-                if filter_enquriy is not None and filter_enquriy == '已询价':
-                    v_sql = v_sql + " and h.enquirydate >= '" + filter_begin + "'"
-                    v_sql_cc = v_sql_cc + " and h.enquirydate >= '" + filter_begin + "'"
-                else:
-                    # 未询价
-                    v_sql = v_sql + " and d.SignDate >= '" + filter_begin + "'"
-                    v_sql_cc = v_sql_cc + " and d.SignDate >= '" + filter_begin + "'"
-            filter_end = filter_stock["end"]
-            if filter_end is not None:
-                if filter_enquriy is not None and filter_enquriy == '已询价':
-                    v_sql = v_sql + " and h.enquirydate <= '" + filter_end + " 23:59:59'"
-                    v_sql_cc = v_sql_cc + " and h.enquirydate <= '" + filter_end + " 23:59:59'"
-                else:
-                    # 未询价
-                    v_sql = v_sql + " and d.SignDate <= '" + filter_end + " 23:59:59'"
-                    v_sql_cc = v_sql_cc + " and d.SignDate <= '" + filter_end + " 23:59:59'"
-                    # 总数统计
-                    print("select_stock_product_list count sql is \n", v_sql_cc)
-            cursor.execute(v_sql_cc)
-            product_count_row = cursor.fetchone()
-            product_count = product_count_row[0]
-            topN = page_no * page_prod_count
-            # 增加排序功能
-
-            if filter_enquriy is not None and filter_enquriy == '已询价':
-                v_sql = "select row_number() over(order by v.enquirydate desc,v.stockproductid desc) as rownumber, " \
-                        "v.*  from (" + v_sql + ") as v"
-            else:
-                # 未询价
-                v_sql = "select row_number() over(order by v.SignDate desc,v.stockproductid desc) as rownumber, " \
-                        "v.*  from (" + v_sql + ") as v"
-
-            v_sql = "select * from (" + v_sql + ") as v1 where v1.rownumber > " + str(topN - page_prod_count) + " and v1.rownumber <= " + str(topN) + " order by v1.rownumber"
-            print("select_stock_product_list page sql is \n", v_sql)
-            cursor.execute(v_sql)
-            for row in cursor:
-                product = ProductInfo()
-                product.OpCode = row[1]
-                product.StockProductID = row[2]
-                product.ProductID = row[3]
-                product.SignDate = row[4]
-                product.GoodsCode = row[5]
-                product.SpecNo = row[6]
-                product.GoodsCDesc = row[7]
-                product.GoodsUnit = row[8]
-                ImageID = row[9]
-                product.ImageGuid = row[10]
-                product.ImageFmt = row[11]
-                product.ModuleID = row[12]
-                product.FileDate = row[13]
-                thumbImage = row[14]
-                base64_bytes = base64.b64encode(thumbImage)
-                base64_image = base64_bytes.decode("utf8")
-                product.imageBase64 = base64_image
-                product.supplier = row[15]
-                product.permittedNum = row[16]
-                product.shouldPrice = row[17]
-                product.brand = row[18]
-                # app采购量
-                product.orderNum = row[19]
-                product.priceEnquiredID = row[20]
-                product.enquiryDate = row[21]
-                product.appPermittedNum = row[22]
-                product_list.append(product)
-
-            cursor.close()
-            cnxn.close()
-            print(product_list, product_count)
-            return product_list, product_count
-        except Exception as e:
-            print('str(Exception):\t', str(Exception))
-            print('str(e):\t\t', str(e))
-            print('repr(e):\t', repr(e))
-            # Get information about the exception that is currently being handled
-            exc_type, exc_value, exc_traceback = sys.exc_info()
-            print('e.message:\t', exc_value)
-            print("Note, object e and exc of Class %s is %s the same." %
-                  (type(exc_value), ('not', '')[exc_value is e]))
-            print('traceback.print_exc(): ', traceback.print_exc())
-            print('traceback.format_exc():\n%s' % traceback.format_exc())
-            print('#' * 60)
-            return None, 0
-
     def select_stock_product_list(self, page_no, filter_stock):
         try:
             product_list = []
@@ -434,162 +298,6 @@ class StockDao(object):
         product.accountNum = row[36]
         return product
 
-    def select_order_product_list_custom_tab(self, page_no, filter_stock, ptype):
-        # 检索 所有的 订货商品
-        # 查询的类型: 订货模块，类型有 order(已经订货,附加检索 取消订购的记录)
-        # 查询的类型: 退货模块，类型有 complete(完成订货，附加检索 已退货记录) return(已退货)
-        # 查询的类型: 结算模块，类型有 complete(完成订货，附加检索 已退货记录) settlement(已结算，附加检索 已退货记录)
-        # 查询的类型: 结算模块，类型有 history(所有状态，包括历史表订货，附加检索 已取消订货记录， 已退货记录和退货取消记录) settlement(已结算，附加检索 已退货记录)
-
-        try:
-            product_list = []
-            page_prod_count = 10
-            cnxn = pyodbc.connect(self._conn_str)
-            cursor = cnxn.cursor()
-            # 数据源
-            v_sql_columns = "select e.[采购人], a.StockProductID,a.ProductID,CONVERT(varchar, d.SignDate, 120 ) as SignDate," \
-                            "a.GoodsCode,a.SpecNo,f.GoodsCDesc, a.GoodsUnit, b._ImageID,c.ImageGuid,c.ImageFmt," \
-                            "c.ModuleID,CONVERT(varchar, c.FileDate, 120 ) as FileDate,c.ThumbImage," \
-                            "g.supplier as supplier," \
-                            "b.[其它.允采购量],b.[其它.应采购价],b.[其它.商品品牌]," \
-                            "coalesce(g.[OrderNum],0) as ordernum," \
-                            "g.orderprice, g.orderStat, g.settlement,g.opcode as order_opcode," \
-                            "g.orderID as product_order_id, " \
-                            "coalesce(h.id,0) as priceEnquiredID, " \
-                            "CONVERT(varchar, g.CreateTime, 120 ) as CreateTime," \
-                            "g.sourceOrderID, CONVERT(varchar, g.ensureTime, 120 ) as ensureTime, g.ensureOpCode, " \
-                            "CONVERT(varchar, g.receiveGoodsTime, 120 ) as receiveGoodsTime, g.receiveOpCode," \
-                            "CONVERT(varchar, g.settlementTime, 120 ) as settlementTime, g.settlementOpCode, " \
-                            "CONVERT(varchar, h.enquirydate, 120 ) as enquirydate, " \
-                            "coalesce(b.[其它.app允采购量], b.[其它.允采购量]) as appPermittedNum "
-            v_sql_fromtab = "FROM [Stock_Product_Info] as a " \
-                            "join  FTPart_Stock_Product_Property_1 as b on a.StockProductID=b.MainID " \
-                            "join Product_Image as c on b._ImageID=c.ProductImageID " \
-                            "join stock_info d on d.ID=a.StockID " \
-                            "join [FTPart_Stock_Property_1] e on e.[MainID] = d.ID " \
-                            "left join [Stock_Product_Info_Desc] f on a.StockProductID=f.StockProductID "
-            v_time_column = "g.CreateTime"
-            v_sql_filter = " where 1=1"
-            if ptype == cv.order_goods:
-                v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] WHERE settlement = 0) as g"
-                v_time_column = "g.CreateTime"
-                v_sql_filter = v_sql_filter + " and  g.OrderStat = 1"
-            elif ptype == cv.complete_order:
-                v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] WHERE settlement = 1 ) as g"
-                v_time_column = "g.ensureTime"
-                v_sql_filter = v_sql_filter + " and  g.OrderStat = 1"
-            elif ptype == cv.return_goods:
-                v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] WHERE settlement = 1 ) as g"
-                v_time_column = "g.CreateTime"
-                v_sql_filter = v_sql_filter + " and  g.OrderStat = -1"
-            elif ptype == cv.settlement_goods:
-                v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] WHERE settlement = 2 ) as g"
-                v_time_column = "g.settlementTime"
-                v_sql_filter = v_sql_filter + " and  g.OrderStat = 1"
-            elif ptype == cv.history_goods:
-                v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] AS T1 WHERE settlement >= 0) as g"
-                v_sql_filter = v_sql_filter + " and  g.OrderStat = 1"
-            else:
-                v_sql_tab_g = "(SELECT * FROM [Stock_Product_Order_App] AS T1 " \
-                              "WHERE NOT EXISTS( SELECT 1 FROM [Stock_Product_Order_App] AS T2 " \
-                              "WHERE T1.orderID=T2.sourceOrderId and OrderStat = -1) and t1.sourceOrderId is null " \
-                              "and T1.settlement < 3) as g"
-            v_sql_tab_h = "(select max(id) as id, max(createtime) as enquirydate, StockProductID " \
-                          " from [Stock_Product_EnquiryPrice_App] group by StockProductID) as h"
-
-            v_sql_fromtab = v_sql_fromtab + " join " + v_sql_tab_g + " on a.StockProductID=g.StockProductID"
-            v_sql_fromtab = v_sql_fromtab + " left join " + v_sql_tab_h + " on a.StockProductID=h.StockProductID"
-
-            # 过滤条件，商品描述
-            filter_GoodsCDesc = filter_stock["goodsDesc"]
-            if filter_GoodsCDesc is not None:
-                v_sql_filter = v_sql_filter + " and f.GoodsCDesc like '%" + filter_GoodsCDesc + "%'"
-            filter_brand = filter_stock["brand"]
-            if filter_brand is not None:
-                filter_sql = ''
-                for b in filter_brand:
-                    filter_sql = filter_sql + "'" + b + "',"
-                filter_sql = filter_sql.rstrip(',')
-                v_sql_filter = v_sql_filter + " and b.[其它.商品品牌] in (" + filter_sql + ")"
-            filter_enquriy = filter_stock["enquiry"]
-            if filter_enquriy is not None:
-                if filter_enquriy == '未询价':
-                    v_sql_filter = v_sql_filter + " and  coalesce(h.id,0) = 0 "
-                elif filter_enquriy == '已询价':
-                    v_sql_filter = v_sql_filter + " and  coalesce(h.id,0) > 0 "
-            # begin date
-            filter_begin = filter_stock["begin"]
-            if filter_begin is not None:
-                v_sql_filter = v_sql_filter + " and " + v_time_column + " >= '" + filter_begin + "'"
-            # end data
-            filter_end = filter_stock["end"]
-            if filter_end is not None:
-                v_sql_filter = v_sql_filter + " and " + v_time_column + "<= '" + filter_end + " 23:59:59'"
-            filter_supplier = filter_stock["supplier"]
-            if filter_supplier is not None:
-                filter_sql = ''
-                for b in filter_supplier:
-                    filter_sql = filter_sql + "'" + b + "',"
-                filter_sql = filter_sql.rstrip(',')
-                v_sql_filter = v_sql_filter + " and g.supplier in (" + filter_sql + ")"
-            filter_specno = filter_stock["specno"]
-            if filter_specno is not None:
-                v_sql_filter = v_sql_filter + " and a.SpecNo = '" + filter_specno + "'"
-
-            # 先总数
-            v_sql_cc = "select count(*) " + v_sql_fromtab + v_sql_filter
-            print(ptype, "sql count is ", v_sql_cc)
-            cursor.execute(v_sql_cc)
-            row = cursor.fetchone()
-            product_count = row[0]
-            topN = page_no*page_prod_count
-            # 再分页，需要增加排序功能
-            v_sql = v_sql_columns + v_sql_fromtab + v_sql_filter
-            v_sql = "select row_number() over(order by v." + v_time_column.split(".")[1] + " desc,v.stockproductid desc, v.product_order_id desc) as rownumber, v.* from (" + v_sql + ") as v "
-            v_sql = "select * from (" + v_sql + ") as v1 where v1.rownumber > " + str(topN - page_prod_count) + " and v1.rownumber <= " + str(topN) + " order by v1.rownumber"
-            print(ptype, "sql page is ", v_sql)
-            cursor.execute(v_sql)
-            for row in cursor:
-                product = self.parse_product_cursor(row)
-                product_list.append(product)
-
-            # 二次查询有没有退货的记录
-            if ptype == cv.complete_order or ptype == cv.settlement_goods or ptype == cv.history_goods:
-                return_product_list = []
-                for product in product_list:
-                    if ptype == cv.history_goods:
-                        v_sql_filter = " where (g.orderstat=-1 or g.orderstat=0) and a.stockproductid=" + str(product.StockProductID)
-                    else:
-                        v_sql_filter = " where g.orderstat=-1 and a.stockproductid=" + str(product.StockProductID)
-                    v_sql = v_sql_columns + v_sql_fromtab + v_sql_filter
-                    v_sql = "select 0 as rownumber, v.* from (" + v_sql + ") as v "
-                    print(ptype, "sql attach is ", v_sql)
-                    cursor.execute(v_sql)
-                    for row in cursor:
-                        return_product = self.parse_product_cursor(row)
-                        return_product.product = product
-                        return_product_list.append(return_product)
-                for return_product in return_product_list:
-                    index = product_list.index(return_product.product)
-                    return_product.product = None
-                    product_list.insert(index+1, return_product)
-            cursor.close()
-            cnxn.close()
-            return product_list, product_count
-        except Exception as e:
-            print('str(Exception):\t', str(Exception))
-            print('str(e):\t\t', str(e))
-            print('repr(e):\t', repr(e))
-            # Get information about the exception that is currently being handled
-            exc_type, exc_value, exc_traceback = sys.exc_info()
-            print('e.message:\t', exc_value)
-            print("Note, object e and exc of Class %s is %s the same." %
-                  (type(exc_value), ('not', '')[exc_value is e]))
-            print('traceback.print_exc(): ', traceback.print_exc())
-            print('traceback.format_exc():\n%s' % traceback.format_exc())
-            print('#' * 60)
-            return None, 0
-
     def select_order_product_list(self, page_no, filter_stock, ptype):
         # 检索 所有的 订货商品
         # 查询的类型: 订货模块，类型有 order(已经订货,附加检索 取消订购的记录)
@@ -659,7 +367,7 @@ class StockDao(object):
                 v_sql = v_sql + " and supplier in (" + filter_sql + ")"
             filter_specno = filter_stock["specno"]
             if filter_specno is not None:
-                v_sql = v_sql + " and a.SpecNo = '" + filter_specno + "'"
+                v_sql = v_sql + " and SpecNo = '" + filter_specno + "'"
 
             # 先总数
             product_count = 0
@@ -1054,7 +762,117 @@ class StockDao(object):
             cnxn.rollback()
             return result_product_list
 
-    def merge_stock_product_order_account(self, account_prod_dict_list, operate_type):
+    def parse_account_product_cursor(self, row):
+        # [accountID]
+        # , [batchNo]
+        # , [orderID]
+        # , [StockProductID]
+        # , [OpCode]
+        # , [OrderNum]
+        # , [OrderPrice]
+        # , [Settlement]
+        # , [supplier]
+        # , [CreateTime]
+        # , [accountNum]
+        # , [accountStat]
+        product = AccountProductInfo()
+        product.accountID = row[1]
+        product.batchNo = row[2]
+        product.orderID = row[3]
+        product.StockProductID = row[4]
+        product.accountOpCode = row[5]
+        product.orderNum = row[6]
+        product.orderPrice = row[7]
+        product.settlement = row[8]
+        product.supplier = row[9]
+        product.createTime = row[10]
+        product.accountNum = row[11]
+        product.accountStat = row[12]
+        return product
+
+    def select_account_product(self, page_no, filter_account, ptype):
+        # 检索 所有的 对账记录
+        # 订单号 orderID
+        # 批号 batchNo
+        # 状态 取消，或正常
+        #
+        try:
+            product_list = []
+            page_prod_count = 10
+            cnxn = pyodbc.connect(self._conn_str)
+            cursor = cnxn.cursor()
+            # 数据源
+            v_sql = "SELECT [accountID], [batchNo], [orderID], [StockProductID], [OpCode], [OrderNum], [OrderPrice], [Settlement], [supplier],CONVERT(varchar, CreateTime, 120) AS CreateTime, [accountNum], [accountStat] FROM [Stock_Product_Order_Account_App] where 0=0 "
+            v_time_column = "CreateTime"
+
+            filter_orderID = filter_account["orderID"]
+            if filter_orderID is not None:
+                v_sql = v_sql + " and orderID =" + filter_orderID + ""
+            filter_batchNo = filter_account["batchNo"]
+            if filter_batchNo is not None:
+                v_sql = v_sql + " and batchNo = '" + filter_batchNo + "'"
+
+            # 过滤条件，商品描述
+            filter_GoodsCDesc = filter_account["goodsDesc"]
+            if filter_GoodsCDesc is not None:
+                v_sql = v_sql + " and orderID in (select product_order_id from v_app_stock_order  where GoodsCDesc like '%" + filter_GoodsCDesc + "%')"
+            filter_brand = filter_account["brand"]
+            if filter_brand is not None:
+                filter_sql = ''
+                for b in filter_brand:
+                    filter_sql = filter_sql + "'" + b + "',"
+                filter_sql = filter_sql.rstrip(',')
+                v_sql = v_sql + " and orderID in (select product_order_id from v_app_stock_order  where [其它.商品品牌] in (" + filter_sql + "))"
+            # begin date
+            filter_begin = filter_account["begin"]
+            if filter_begin is not None:
+                v_sql = v_sql + "  and orderID in (select product_order_id from v_app_stock_order  where " + v_time_column + " >= '" + filter_begin + "')"
+            # end data
+            filter_end = filter_account["end"]
+            if filter_end is not None:
+                v_sql = v_sql + "  and orderID in (select product_order_id from v_app_stock_order  where " + v_time_column + "<= '" + filter_end + " 23:59:59')"
+            filter_supplier = filter_account["supplier"]
+            if filter_supplier is not None:
+                filter_sql = ''
+                for b in filter_supplier:
+                    filter_sql = filter_sql + "'" + b + "',"
+                filter_sql = filter_sql.rstrip(',')
+                v_sql = v_sql + "  and orderID in (select product_order_id from v_app_stock_order  where supplier in (" + filter_sql + "))"
+            filter_specno = filter_account["specno"]
+            if filter_specno is not None:
+                v_sql = v_sql + "  and orderID in (select product_order_id from v_app_stock_order  where SpecNo = '" + filter_specno + "')"
+
+            # 先总数
+            product_count = 0
+            topN = page_no*page_prod_count
+            # 再分页，需要增加排序功能
+            v_sql = "select row_number() over(order by v." + v_time_column + " desc,v.accountid desc) as rownumber,  v.* ,count(*) over() as product_count from (" + v_sql + ") as v"
+            v_sql = "select * from (" + v_sql + ") as v1 where v1.rownumber > " + str(topN - page_prod_count) + " and v1.rownumber <= " + str(topN) + " order by v1.rownumber"
+            print(ptype, "sql page is ", v_sql)
+            cursor.execute(v_sql)
+            for row in cursor:
+                product = self.parse_account_product_cursor(row)
+                product_count = row[len(row)-1]
+                product_list.append(product)
+
+            cursor.close()
+            cnxn.close()
+            return product_list, product_count
+        except Exception as e:
+            print('str(Exception):\t', str(Exception))
+            print('str(e):\t\t', str(e))
+            print('repr(e):\t', repr(e))
+            # Get information about the exception that is currently being handled
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            print('e.message:\t', exc_value)
+            print("Note, object e and exc of Class %s is %s the same." %
+                  (type(exc_value), ('not', '')[exc_value is e]))
+            print('traceback.print_exc(): ', traceback.print_exc())
+            print('traceback.format_exc():\n%s' % traceback.format_exc())
+            print('#' * 60)
+            return None, 0
+
+    def merge_account_product(self, account_prod_dict_list, operate_type):
         try:
             result_product_list = []
             cnxn = pyodbc.connect(self._conn_str)

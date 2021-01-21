@@ -146,7 +146,7 @@ class StockService(UserInfo):
                     or operate == cv.undo_return or operate == cv.settlement_goods:
                 result = self._dao.update_stock_product_order(prod_dict_list, operate)
             elif operate == cv.account_goods or operate == cv.undo_account:
-                result = self._dao.merge_stock_product_order_account(prod_dict_list, operate)
+                result = self._dao.merge_account_product(prod_dict_list, operate)
             else:
                 print("--" * 50)
                 print(operate, " maybe wrong.")
@@ -191,3 +191,13 @@ class StockService(UserInfo):
             print(self.get_now_str(), "Error, complete product order is failure.", prod_dict_list)
             return None
 
+    def get_account_product(self, OpCode, timestamp, token, pageNo, filter_account, ptype):
+        print(self.get_now_str(), "PageNo=", pageNo, filter_account, "get account product by " + OpCode, "-"*30)
+        product_list = None
+        product_count = 0
+        user = self.get_checked_user(OpCode, timestamp, token)
+        if user is not None:
+            product_list, product_count = self._dao.select_account_product(pageNo, filter_account, ptype)
+        else:
+            print(self.get_now_str(), "Error, get account product is failure.", OpCode, "PageNo=", pageNo)
+        return product_list, product_count
