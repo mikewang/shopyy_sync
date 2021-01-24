@@ -1,0 +1,6 @@
+sql2008		mysql
+
+roomno		room		房间号，此为对应关系
+name		clientname	姓名，
+sex				姓别，IF SEX=男  clientname=name+先生，IF SEX=女  clientname=name+女士
+leave_flag			在住状态，leave_flag=0：在住；leave_flag=1：退房；此表中有很多条信息，查所有在住状态的信息即可，

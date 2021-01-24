@@ -57,6 +57,8 @@ class ProductInfo(object):
         self.settlementTime = ''
         self.settlementOpCode = ''
         self.note = ''
+        #对账商品数量
+        self.accountNum = 0
 
     def desc(self):
         product_dict = self.__dict__
@@ -66,6 +68,47 @@ class ProductInfo(object):
         print("product is ", self.StockProductID, self.ProductID, "price enquried is ", self.priceEnquiredID, self.GoodsCDesc, self.permittedNum,self.orderNum,self.shouldPrice,self.orderPrice)
         return product_dict
 
+# SELECT [accountID]
+#       ,[orderID]
+#       ,[StockProductID]
+#       ,[OpCode]
+#       ,[OrderNum]
+#       ,[OrderPrice]
+#       ,[Settlement]
+#       ,[supplier]
+#       ,[CreateTime]
+#       ,[accountNum]
+#       ,[accountStat]
+
+class AccountProductInfo(object):
+
+    def __init__(self):
+        super(AccountProductInfo, self).__init__()
+        self.__setup_product()
+
+    def __del__(self):
+        pass
+
+    def __setup_product(self):
+        self.accountID = 0
+        self.batchNo = ''
+        self.orderID = 0
+        self.StockProductID = 0
+        self.accountOpCode = ''
+        self.orderNum = 0
+        self.orderPrice = 0.0
+        self.settlement = -1
+        self.supplier = ''
+        self.createTime = ''
+        self.accountNum = 0
+        self.accountStat = 1
+        self.note = ''
+
+    def desc(self):
+        product_dict = self.__dict__
+        product_dict["orderPrice"] = str(self.orderPrice)
+        # product_dict["CreateDate"] = self.CreateDate.strftime('%Y-%m-%d %H:%M:%S')
+        return product_dict
 
 class ProductEnquiryPrice(object):
 

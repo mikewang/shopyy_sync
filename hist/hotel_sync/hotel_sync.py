@@ -66,10 +66,10 @@ def home_days_sqlserver():
     room_client_list = []
     conn = conn_sqlserver()
     cur = conn.cursor()
-    cur.execute("select [roomno],[the_man] from [home_days]")
+    cur.execute("select a.roomno,a.the_man.,(select top 1 case sex when '男' then '先生' when '女' then '女士' else '' end as mr from receive where roomno=a.roomno and name = a.the_man) from home_days a")
     for row in cur:
         room = row[0]
-        name = row[1]
+        name = row[1] + " " + row[2]
         room_client = {"room": room, "name": name}
         room_client_list.append(room_client)
     cur.close()
@@ -158,7 +158,7 @@ if __name__ == '__main__':
     config = configparser.ConfigParser()
     config_file = os.path.normpath(os.path.join(os.curdir, "config.ini"))
     config.read(config_file)
-    interval = int(config.get("sync_shopyy", "interval"))
+    interval = int(config.get("sync", "interval"))
     default_scheduler = Scheduler.Scheduler()
     default_scheduler.every(interval).seconds.do(sync_romm_client)
     default_scheduler.run_continuously(1)
