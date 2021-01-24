@@ -440,7 +440,8 @@ class StockDao(object):
                 result_product.StockProductID = stockProductID
 
                 # 校验购买的数量和允购买量的关系，有可能允许购买量已经不够
-                sql = "select coalesce([其它.app允采购量], [其它.允采购量]) from FTPart_Stock_Product_Property_1 where MainID=?"
+                sql = "select coalesce([其它.app允采购量], [其它.允采购量]) from FTPart_Stock_Product_Property_1 " \
+                      "where MainID=?"
                 cursor.execute(sql, stockProductID)
                 permitNum = cursor.fetchone()[0]
                 if permitNum is None:
@@ -573,11 +574,10 @@ class StockDao(object):
                     cursor.execute(sql, stockProductID, ensureOpCode, purchaseNum, purchasePrice, supplier,
                                    cv.complete_order, orderID, '')
                     sql = "update [FTPart_Stock_Product_Property_1] " \
-                          "set [其它.允采购量] = [其它.允采购量] - ?," \
-                          "[其它.app允采购量] = [其它.app允采购量] + ?,[其它.app采购量] = [其它.app采购量] - ?, " \
+                          "set [其它.app允采购量] = [其它.app允采购量] + ?,[其它.app采购量] = [其它.app采购量] - ?, " \
                             "[其它.供应商名称] = ? " \
                           "where [MainID]=?"
-                    cursor.execute(sql, purchaseNum, orderNum-purchaseNum, orderNum-purchaseNum, supplier, stockProductID)
+                    cursor.execute(sql, orderNum-purchaseNum, orderNum-purchaseNum, supplier, stockProductID)
                     print(operate_type, "update sql2 ---\n ", sql)
                     # [Stock_Product_InfoBase].unitprice 更新单价
                     # [Stock_Product_Info].goodsnum 更新采购量，为0是要设置为允采购量，因为系统不能设置为0。
@@ -627,7 +627,7 @@ class StockDao(object):
                         row = cursor.fetchone()
                         if row is not None:
                             returnOrderNum = row[1]
-                        if doneOrderNum <  returnOrderNum + purchaseNum:
+                        if doneOrderNum < returnOrderNum + purchaseNum:
                             result_product.note = "0:退货失败，采购量 " + str(doneOrderNum) + ", 已退货 " + str(returnOrderNum) + ", 本次退货 " + str(purchaseNum)
                         else:
                             sql = "insert into Stock_Product_Order_App(stockProductID,opCode, OrderNum, OrderPrice," \
@@ -642,11 +642,10 @@ class StockDao(object):
                             cursor.execute(sql, stockProductID, opCode, purchaseNum, purchasePrice,
                                            supplier, cv.return_goods, orderID, '')
                             sql = "update [FTPart_Stock_Product_Property_1] " \
-                                  "set [其它.允采购量] = [其它.允采购量] + ?, " \
-                                  "[其它.app允采购量] = [其它.app允采购量] + ?, " \
+                                  "set [其它.app允采购量] = [其它.app允采购量] + ?, " \
                                   "[其它.app采购量] = [其它.app采购量] - ? " \
                                   "where [MainID]=?"
-                            cursor.execute(sql, purchaseNum, purchaseNum, purchaseNum, stockProductID)
+                            cursor.execute(sql, purchaseNum, purchaseNum, stockProductID)
                             print(operate_type, "update sql2 ---\n ", sql)
                             # [Stock_Product_InfoBase].unitprice 更新单价
                             # [Stock_Product_Info].goodsnum 更新采购量，为0是要设置为允采购量，因为系统不能设置为0。
@@ -690,11 +689,10 @@ class StockDao(object):
                         print(operate_type, "update sql --- \n ", sql)
                         cursor.execute(sql,  orderStat, orderID)
                         sql = "update [FTPart_Stock_Product_Property_1] " \
-                              "set [其它.允采购量] = [其它.允采购量] - ?, " \
-                              "[其它.app允采购量] = [其它.app允采购量] - ?, " \
+                              "set [其它.app允采购量] = [其它.app允采购量] - ?, " \
                               "[其它.app采购量] = [其它.app采购量] + ? " \
                               "where [MainID]=?"
-                        cursor.execute(sql, purchaseNum, purchaseNum, purchaseNum, stockProductID)
+                        cursor.execute(sql, purchaseNum, purchaseNum, stockProductID)
                         print(operate_type, "update sql2 ---\n ", sql)
                         # [Stock_Product_InfoBase].unitprice 更新单价
                         # [Stock_Product_Info].goodsnum 更新采购量，为0是要设置为允采购量，因为系统不能设置为0。
