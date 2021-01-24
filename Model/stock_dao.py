@@ -609,6 +609,7 @@ class StockDao(object):
                     purchasePrice = prod["purchasePrice"]
                     settlement = prod["settlement"]
                     # 退货。
+                    result_product.orderNum = purchaseNum
 
                     sql = "select stockProductID, supplier, settlement,orderNum from Stock_Product_Order_App " \
                           "where orderID=? and orderStat = 1"
@@ -900,8 +901,10 @@ class StockDao(object):
 
                 # 返回结果集
                 result_product = AccountProductInfo()
+                result_product.accountID = accountID
                 result_product.orderID = orderID
                 result_product.StockProductID = stockProductID
+                result_product.accountNum = accountNum
                 result_product.note = "0:" + operate_type + " failure."
 
                 if operate_type == cv.account_goods:
@@ -915,18 +918,17 @@ class StockDao(object):
                     print(operate_type, "insert hist sql --- \n ", sql)
                     cursor.execute(sql, stockProductID, accountOpCode, accountNum, cv.account_goods, orderID, '')
                     cursor.commit()
-                    result_product.note = "1:对账成功"
+                    result_product.note = "1:对账成功, 已对账数" + str(accountNum)
                 elif operate_type == cv.undo_account:
                     accountStat = 0
                     sql = "update [Stock_Product_Order_Account_App] set [accountStat] = ?  WHERE [accountID] = ? and [accountStat] = 1"
                     print(operate_type, "update sql ---\n ", sql)
-                    cursor.execute(sql, accountOpCode, accountNum, accountStat, accountID)
+                    cursor.execute(sql, accountStat, accountID)
                     # insert history row
                     sql = "insert INTO Stock_Product_Order_App_hist(StockProductID, OpCode, OrderNum,OrderPrice," \
                           " supplier, OperateType, orderId, note) VALUES(?,?,?,?,?,?,?,?)"
                     print(operate_type, "insert hist sql --- \n ", sql)
-                    cursor.execute(sql, stockProductID, accountOpCode, accountNum, purchasePrice, supplier,
-                                   cv.account_goods, orderID, 'accountID='+str(accountID))
+                    cursor.execute(sql, stockProductID, accountOpCode, 0, 0.0, '',cv.undo_account, orderID, 'accountID='+str(accountID))
                     cursor.commit()
                     result_product.note = "1:对账取消成功"
                 elif operate_type == cv.fullred_goods:
@@ -944,10 +946,9 @@ class StockDao(object):
                     cursor.execute(sql, settlementOpCode, settlement, orderID, stockProductID, settlement)
                     # insert history row
                     sql = "insert INTO Stock_Product_Order_App_hist(StockProductID, OpCode, OrderNum,OrderPrice," \
-                          " supplier, OperateType, orderId, note) VALUES(?,?,?,?,?,?,?,?)"
+                          " supplier, OperateType, orderId, note) VALUES(?,?,?,null,null,?,?,?)"
                     print(operate_type, "insert hist sql --- \n ", sql)
-                    cursor.execute(sql, stockProductID, settlementOpCode, purchaseNum, purchasePrice, supplier,
-                                   cv.settlement_goods, orderID, '')
+                    cursor.execute(sql, stockProductID, settlementOpCode, supplier, cv.settlement_goods, orderID, '')
                     cursor.commit()
                     result_product.note = "1:充红成功"
                 result_product_list.append(result_product)

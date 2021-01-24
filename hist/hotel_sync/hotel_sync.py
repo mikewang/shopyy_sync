@@ -81,11 +81,12 @@ def client_mysql():
     room_client_list = []
     conn = conn_mysql()
     cur = conn.cursor()
-    cur.execute("select room,clientname from client")
+    cur.execute("select room,clientname,sex from client")
     for row in cur:
         room = row[0]
         name = row[1]
-        room_client = {"room": room, "name": name}
+        sex = row[2]
+        room_client = {"room": room, "name": name, "sex": sex}
         room_client_list.append(room_client)
     cur.close()
     conn.close()
@@ -158,7 +159,7 @@ if __name__ == '__main__':
     config = configparser.ConfigParser()
     config_file = os.path.normpath(os.path.join(os.curdir, "config.ini"))
     config.read(config_file)
-    interval = int(config.get("sync_shopyy", "interval"))
+    interval = int(config.get("sync", "interval"))
     default_scheduler = Scheduler.Scheduler()
     default_scheduler.every(interval).seconds.do(sync_romm_client)
     default_scheduler.run_continuously(1)
