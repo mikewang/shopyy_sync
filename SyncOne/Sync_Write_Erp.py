@@ -149,7 +149,7 @@ class SyncWriteErp(QObject):
                     if productID == product_info["ProductID"]:
                         erp_prod_list_offline.append(product_info)
             cc = len(erp_set)
-            if cc > gl.offline_limit:
+            if cc > int(gl.offline_limit):
                 message = "网站" + domain_name + "下架的产品" + str(cc) + "，数量异常，操作中止"
                 self.signal.emit({"message": message})
             else:

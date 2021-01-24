@@ -4,7 +4,7 @@ block_cipher = None
 
 
 a = Analysis(['hotel_sync.py','Scheduler.py'],
-             pathex=['C:\\Users\\wfg.langfang\\PycharmProjects\\shopyy_sync\\hotel_sync'],
+             pathex=['C:\\Users\\Administrator\\PycharmProjects\\shopyy_sync\\hist\\hotel_sync'],
              binaries=[],
              datas=[],
              hiddenimports=[],
