@@ -66,10 +66,10 @@ def home_days_sqlserver():
     room_client_list = []
     conn = conn_sqlserver()
     cur = conn.cursor()
-    cur.execute("select [roomno],[the_man] from [home_days]")
+    cur.execute("select a.roomno,a.the_man.,(select top 1 case sex when '男' then '先生' when '女' then '女士' else '' end as mr from receive where roomno=a.roomno and name = a.the_man) from home_days a")
     for row in cur:
         room = row[0]
-        name = row[1]
+        name = row[1] + " " + row[2]
         room_client = {"room": room, "name": name}
         room_client_list.append(room_client)
     cur.close()
@@ -81,12 +81,11 @@ def client_mysql():
     room_client_list = []
     conn = conn_mysql()
     cur = conn.cursor()
-    cur.execute("select room,clientname,sex from client")
+    cur.execute("select room,clientname from client")
     for row in cur:
         room = row[0]
         name = row[1]
-        sex = row[2]
-        room_client = {"room": room, "name": name, "sex": sex}
+        room_client = {"room": room, "name": name}
         room_client_list.append(room_client)
     cur.close()
     conn.close()
