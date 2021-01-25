@@ -66,7 +66,11 @@ def home_days_sqlserver():
     room_client_list = []
     conn = conn_sqlserver()
     cur = conn.cursor()
-    cur.execute("select a.roomno,a.the_man, (select top 1 case sex when '男' then '先生' when '女' then '女士' else '' end as mr from receive where roomno=a.roomno and name = a.the_man) from home_days a")
+    v_sql = "select roomno, the_man, coalesce(sex,'') as sex " \
+            "from (select a.roomno,a.the_man," \
+            "(select top 1 case sex when '男' then '先生' when '女' then '女士' else '' end as mr " \
+            "from receive where roomno=a.roomno and name = a.the_man) as sex from home_days a) as v"
+    cur.execute(v_sql)
     for row in cur:
         room = row[0]
         name = row[1] + " " + row[2]
