@@ -7,7 +7,7 @@ import configparser
 import pymysql
 import pyodbc
 import logging
-import Scheduler
+import Scheduler as Scheduler
 
 
 def test_mysql_connect():
