@@ -7,7 +7,7 @@ import pyodbc
 import datetime
 import base64
 from Model.user import UserInfo
-from Model.product import ProductInfo, AccountProductInfo, ProductEnquiryPrice
+from Model.product import ProductInfo, AccountProductInfo, AccountBatchNo, ProductEnquiryPrice
 from Model import constant_v as cv
 
 
@@ -789,7 +789,7 @@ class StockDao(object):
         product.accountStat = row[12]
         return product
 
-    def select_account_product(self, page_no, filter_account, ptype):
+    def select_account_product(self, page_no, query_params, ptype):
         # 检索 所有的 对账记录
         # 订单号 orderID
         # 批号 batchNo
@@ -804,18 +804,18 @@ class StockDao(object):
             v_sql = "SELECT [accountID], [batchNo], [orderID], [StockProductID], [OpCode], [OrderNum], [OrderPrice], [Settlement], [supplier],CONVERT(varchar, CreateTime, 120) AS CreateTime, [accountNum], [accountStat] FROM [Stock_Product_Order_Account_App] where 0=0 "
             v_time_column = "CreateTime"
 
-            filter_orderID = filter_account["orderID"]
+            filter_orderID = query_params["orderID"]
             if filter_orderID is not None:
                 v_sql = v_sql + " and orderID =" + filter_orderID + ""
-            filter_batchNo = filter_account["batchNo"]
+            filter_batchNo = query_params["batchNo"]
             if filter_batchNo is not None:
                 v_sql = v_sql + " and batchNo = '" + filter_batchNo + "'"
 
             # 过滤条件，商品描述
-            filter_GoodsCDesc = filter_account["goodsDesc"]
+            filter_GoodsCDesc = query_params["goodsDesc"]
             if filter_GoodsCDesc is not None:
                 v_sql = v_sql + " and orderID in (select product_order_id from v_app_stock_order  where GoodsCDesc like '%" + filter_GoodsCDesc + "%')"
-            filter_brand = filter_account["brand"]
+            filter_brand = query_params["brand"]
             if filter_brand is not None:
                 filter_sql = ''
                 for b in filter_brand:
@@ -823,21 +823,21 @@ class StockDao(object):
                 filter_sql = filter_sql.rstrip(',')
                 v_sql = v_sql + " and orderID in (select product_order_id from v_app_stock_order  where [其它.商品品牌] in (" + filter_sql + "))"
             # begin date
-            filter_begin = filter_account["begin"]
+            filter_begin = query_params["begin"]
             if filter_begin is not None:
                 v_sql = v_sql + "  and orderID in (select product_order_id from v_app_stock_order  where " + v_time_column + " >= '" + filter_begin + "')"
             # end data
-            filter_end = filter_account["end"]
+            filter_end = query_params["end"]
             if filter_end is not None:
                 v_sql = v_sql + "  and orderID in (select product_order_id from v_app_stock_order  where " + v_time_column + "<= '" + filter_end + " 23:59:59')"
-            filter_supplier = filter_account["supplier"]
+            filter_supplier = query_params["supplier"]
             if filter_supplier is not None:
                 filter_sql = ''
                 for b in filter_supplier:
                     filter_sql = filter_sql + "'" + b + "',"
                 filter_sql = filter_sql.rstrip(',')
                 v_sql = v_sql + "  and orderID in (select product_order_id from v_app_stock_order  where supplier in (" + filter_sql + "))"
-            filter_specno = filter_account["specno"]
+            filter_specno = query_params["specno"]
             if filter_specno is not None:
                 v_sql = v_sql + "  and orderID in (select product_order_id from v_app_stock_order  where SpecNo = '" + filter_specno + "')"
 
@@ -881,6 +881,53 @@ class StockDao(object):
             print('traceback.format_exc():\n%s' % traceback.format_exc())
             print('#' * 60)
             return None, 0, None
+
+    def select_account_batchno(self, page_no, query_params, ptype):
+        # 检索 所有的 对账批号
+        # 批号 batchNo
+        #
+        try:
+            account_batchNo_list = []
+            page_prod_count = 10
+            cnxn = pyodbc.connect(self._conn_str)
+            cursor = cnxn.cursor()
+            # 数据源
+            v_sql = "SELECT  distinct [batchNo], CONVERT(varchar, CreateTime, 120) AS CreateTime  FROM [Stock_Product_Order_Account_App] where 0=0 "
+
+            filter_batchNo = query_params["batchNo"]
+            if filter_batchNo is not None:
+                v_sql = v_sql + " and batchNo = '" + filter_batchNo + "'"
+
+            # 先总数
+            product_count = 0
+            topN = page_no*page_prod_count
+            # 再分页，需要增加排序功能
+            v_sql = "select row_number() over(order by v.CreateTime desc) as rownumber,  v.* ,count(*) over() as product_count from (" + v_sql + ") as v"
+            v_sql = "select * from (" + v_sql + ") as v1 where v1.rownumber > " + str(topN - page_prod_count) + " and v1.rownumber <= " + str(topN) + " order by v1.rownumber"
+            print(ptype, "sql page is ", v_sql)
+            cursor.execute(v_sql)
+            for row in cursor:
+                product = AccountBatchNo()
+                product.batchNo = row[1]
+                product.createTime = row[2]
+                product_count = row[len(row)-1]
+                account_batchNo_list.append(product)
+            cursor.close()
+            cnxn.close()
+            return account_batchNo_list, product_count
+        except Exception as e:
+            print('str(Exception):\t', str(Exception))
+            print('str(e):\t\t', str(e))
+            print('repr(e):\t', repr(e))
+            # Get information about the exception that is currently being handled
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            print('e.message:\t', exc_value)
+            print("Note, object e and exc of Class %s is %s the same." %
+                  (type(exc_value), ('not', '')[exc_value is e]))
+            print('traceback.print_exc(): ', traceback.print_exc())
+            print('traceback.format_exc():\n%s' % traceback.format_exc())
+            print('#' * 60)
+            return None, 0
 
     def merge_account_product(self, account_prod_dict_list, operate_type):
         try:

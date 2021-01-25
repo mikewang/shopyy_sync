@@ -7,7 +7,7 @@ from Resource.image_resource import ImageResource
 from Resource.dict_resource import DictResource
 from Resource.product_enquiry_resource import ProductEnquiryResource as EnquiryResource
 from Resource.product_order_resource import ProductOrderResource as OrderResource
-from Resource.product_account_resource import ProductAccountResource as AccountResource
+from Resource.product_account_resource import ProductAccountResource as AccountResource, AccountBatchNoResource as BacthNoResource
 
 app = Flask(__name__)
 api = Api(app)
@@ -25,6 +25,7 @@ api.add_resource(DictResource, '/Dict', '/Dict/<string:item_type>')
 api.add_resource(EnquiryResource, '/Enquiry')
 api.add_resource(OrderResource, '/order', '/order/<int:pageNo>')
 api.add_resource(AccountResource, '/account', '/account/<int:pageNo>')
+api.add_resource(BacthNoResource, '/batchno', '/batchno/<int:pageNo>')
 
 
 @api.representation('text/html')  # 当要返回的数据类型是这里定义的content-type的时候，会执行这里的函数

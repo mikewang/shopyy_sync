@@ -191,13 +191,24 @@ class StockService(UserInfo):
             print(self.get_now_str(), "Error, complete product order is failure.", prod_dict_list)
             return None
 
-    def get_account_product(self, OpCode, timestamp, token, pageNo, filter_account, ptype):
-        print(self.get_now_str(), "PageNo=", pageNo, filter_account, "get account product by " + OpCode, "-"*30)
+    def get_account_product(self, OpCode, timestamp, token, pageNo, query_params, ptype):
+        print(self.get_now_str(), "PageNo=", pageNo, query_params, "get account product by " + OpCode, "-"*30)
         product_list = None
         product_count = 0
         user = self.get_checked_user(OpCode, timestamp, token)
         if user is not None:
-            account_product_list, product_count, product_list = self._dao.select_account_product(pageNo, filter_account, ptype)
+            account_product_list, product_count, product_list = self._dao.select_account_product(pageNo, query_params, ptype)
         else:
             print(self.get_now_str(), "Error, get account product is failure.", OpCode, "PageNo=", pageNo)
         return account_product_list, product_count, product_list
+
+    def get_account_batchno(self, OpCode, timestamp, token, pageNo, query_params, ptype):
+        print(self.get_now_str(), "PageNo=", pageNo, query_params, "get account product batchno by " + OpCode, "-"*30)
+        product_list = None
+        product_count = 0
+        user = self.get_checked_user(OpCode, timestamp, token)
+        if user is not None:
+            batchno_list, batchno_count = self._dao.select_account_batchno(pageNo, query_params, ptype)
+        else:
+            print(self.get_now_str(), "Error, get account product batchno is failure.", OpCode, "PageNo=", pageNo)
+        return batchno_list, batchno_count

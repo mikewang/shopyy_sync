@@ -80,6 +80,7 @@ class ProductInfo(object):
 #       ,[accountNum]
 #       ,[accountStat]
 
+
 class AccountProductInfo(object):
 
     def __init__(self):
@@ -109,6 +110,26 @@ class AccountProductInfo(object):
         product_dict["orderPrice"] = str(self.orderPrice)
         # product_dict["CreateDate"] = self.CreateDate.strftime('%Y-%m-%d %H:%M:%S')
         return product_dict
+
+
+class AccountBatchNo(object):
+
+    def __init__(self):
+        super(AccountBatchNo, self).__init__()
+        self.__setup_product()
+
+    def __del__(self):
+        pass
+
+    def __setup_product(self):
+        self.batchNo = ''
+        self.createTime = ''
+
+    def desc(self):
+        product_dict = self.__dict__
+        # product_dict["CreateDate"] = self.CreateDate.strftime('%Y-%m-%d %H:%M:%S')
+        return product_dict
+
 
 class ProductEnquiryPrice(object):
 
