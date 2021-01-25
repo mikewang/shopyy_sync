@@ -106,7 +106,7 @@ def update_client_mysql(room_client):
     conn = conn_mysql()
     cur = conn.cursor()
     values = [room_client["name"], room_client["room"]]
-    if room_client["flag"] == 0:
+    if room_client["name"] == '':
         cur.execute("update client set clientname = %s ,status = 1 where room = %s", values)
     else:
         cur.execute("update client set clientname = %s ,status = 0 where room = %s", values)
