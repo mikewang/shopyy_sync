@@ -74,8 +74,11 @@ def home_days_sqlserver():
     cur.execute(v_sql)
     for row in cur:
         room = row[0]
-        name = row[1] + " " + row[2]
-        room_client = {"room": room, "name": name}
+        name = row[1]
+        sex = row[2]
+        name_sex = name + " " + sex
+        print("name:", name, "sex is ", sex)
+        room_client = {"room": room, "name": name_sex}
         room_client_list.append(room_client)
     cur.close()
     conn.close()
