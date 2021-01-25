@@ -74,7 +74,9 @@ def home_days_sqlserver():
         sex = row[2]
         leave_flag = row[3]
         name_sex = name + " " + sex
-        room_client = {"room": room, "name": name_sex, "flag": leave_flag}
+        if leave_flag == 1:
+            name_sex = ''
+        room_client = {"room": room, "name": name_sex}
         room_client_list.append(room_client)
     cur.close()
     conn.close()
