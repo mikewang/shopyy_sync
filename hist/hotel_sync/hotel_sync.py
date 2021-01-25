@@ -66,15 +66,15 @@ def home_days_sqlserver():
     room_client_list = []
     conn = conn_sqlserver()
     cur = conn.cursor()
-    v_sql = "select roomno, name, case sex when '男' then '先生' when '女' then '女士' else ' ' end as mr from receive"
+    v_sql = "select roomno, name, case sex when '男' then '先生' when '女' then '女士' else ' ' end as mr,0 as leave_flag from receive where leave_flag = 0 union all select distinct roomno ,'','',1 as leave_flag from [receive]  where roomno not in (SELECT  [roomno] FROM [receive]  where leave_flag = 0) "
     cur.execute(v_sql)
     for row in cur:
         room = row[0]
         name = row[1]
         sex = row[2]
+        leave_flag = row[3]
         name_sex = name + " " + sex
-        print("name:", name, "sex is ", sex)
-        room_client = {"room": room, "name": name_sex}
+        room_client = {"room": room, "name": name_sex, "flag": leave_flag}
         room_client_list.append(room_client)
     cur.close()
     conn.close()
@@ -88,6 +88,8 @@ def client_mysql():
     cur.execute("select room,clientname from client")
     for row in cur:
         room = row[0]
+        if room is None:
+            room = ''
         name = row[1]
         if name is None:
             name = ''
@@ -102,7 +104,7 @@ def update_client_mysql(room_client):
     conn = conn_mysql()
     cur = conn.cursor()
     values = [room_client["name"], room_client["room"]]
-    if room_client["name"] == '':
+    if room_client["flag"] == 0:
         cur.execute("update client set clientname = %s ,status = 1 where room = %s", values)
     else:
         cur.execute("update client set clientname = %s ,status = 0 where room = %s", values)
