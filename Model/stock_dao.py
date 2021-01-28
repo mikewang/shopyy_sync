@@ -510,6 +510,7 @@ class StockDao(object):
                 # 返回结果集
                 result_product = ProductInfo()
                 result_product.StockProductID = stockProductID
+                result_product.orderID = orderID
                 result_product.note = "0:" + operate_type + " failure."
 
                 if operate_type == cv.cancel_order:
@@ -735,7 +736,7 @@ class StockDao(object):
                     sql = "update Stock_Product_Order_App " \
                           "set settlementOpCode = ?, settlement=?,settlementTime=getdate() " \
                           "where orderID = ? and stockProductID = ? and settlement <> ? "
-                    print(operate_type, "update sql ---\n ", sql)
+                    print(operate_type, "update sql ---\n ", sql,settlement,orderID, stockProductID )
                     cursor.execute(sql, settlementOpCode, settlement, orderID, stockProductID, settlement)
                     # insert history row
                     sql = "insert INTO Stock_Product_Order_App_hist(StockProductID, OpCode, OrderNum,OrderPrice," \
@@ -745,6 +746,7 @@ class StockDao(object):
                                    cv.settlement_goods, orderID, '')
                     cursor.commit()
                     result_product.note = "1:结算成功"
+                    result_product.settlement = 2
                 result_product_list.append(result_product)
             cursor.close
             cnxn.close
@@ -804,7 +806,7 @@ class StockDao(object):
             cnxn = pyodbc.connect(self._conn_str)
             cursor = cnxn.cursor()
             # 数据源
-            v_sql = "SELECT [accountID], [batchNo], [orderID], [StockProductID], [OpCode], [OrderNum], [OrderPrice], [Settlement], [supplier],CONVERT(varchar, CreateTime, 120) AS CreateTime, [accountNum], [accountStat] FROM [Stock_Product_Order_Account_App] where 0=0 "
+            v_sql = "SELECT [accountID], [batchNo], [orderID], [StockProductID], [OpCode], [OrderNum], [OrderPrice], [Settlement], [supplier],CONVERT(varchar, CreateTime, 120) AS CreateTime, [accountNum], [accountStat] FROM [Stock_Product_Order_Account_App] where accountStat = 1"
             v_time_column = "CreateTime"
 
             filter_orderID = query_params["orderID"]
@@ -890,12 +892,13 @@ class StockDao(object):
         # 批号 batchNo
         #
         try:
+            print("query_params is ", query_params)
             account_batchNo_list = []
             page_prod_count = 1000
             cnxn = pyodbc.connect(self._conn_str)
             cursor = cnxn.cursor()
             # 数据源
-            v_sql = "SELECT [batchNo], CONVERT(varchar, CreateTime, 120) AS CreateTime,count(*) FROM [Stock_Product_Order_Account_App] group by batchNo,CreateTime "
+            v_sql = "SELECT distinct [batchNo], CONVERT(varchar, CreateTime, 120) AS CreateTime, count(*) over(partition by [batchNo]) as batchProdCount  FROM [Stock_Product_Order_Account_App] where accountStat = 1 "
 
             filter_batchNo = query_params["batchNo"]
             if filter_batchNo is not None:
@@ -922,6 +925,7 @@ class StockDao(object):
                 product = AccountBatchNo()
                 product.batchNo = row[1]
                 product.createTime = row[2]
+                product.batchProdCount = row[3]
                 product_count = row[len(row)-1]
                 account_batchNo_list.append(product)
             cursor.close()

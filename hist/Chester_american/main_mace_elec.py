@@ -10,6 +10,7 @@ from multiprocessing import Pool
 
 agent_count = 1
 
+
 def get_agent_filelist():
     config = configparser.ConfigParser()
     config_file = os.path.normpath(os.path.join(os.curdir, "config.ini"))
@@ -95,7 +96,7 @@ def make_mace(file_first):
         # create .gradmatrix from .out next file
         q2 = get_q(file_next)
         q_out, convergence_flag = compute_MACE_step(q1, q2-q1, gamma, tolerance)
-        print("q_out is",q_out)
+        print("q_out is", q_out)
 
         iterationcount += 1
         iter_time_fin = time.time() - iter_time_start

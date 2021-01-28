@@ -126,6 +126,7 @@ class AccountBatchNo(object):
     def __setup_product(self):
         self.batchNo = ''
         self.createTime = ''
+        self.batchProdCount = 0
 
     def desc(self):
         product_dict = self.__dict__

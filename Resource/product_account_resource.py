@@ -214,6 +214,8 @@ class AccountBatchNoResource(Resource):
             parser.add_argument('t')
             parser.add_argument('ptype')
             parser.add_argument('batchNo')
+            parser.add_argument('begin')
+            parser.add_argument('end')
 
             # 分析请求
             args = parser.parse_args()
@@ -232,7 +234,22 @@ class AccountBatchNoResource(Resource):
                 print("enquiry key is ", args["batchNo"], batchNo)
             else:
                 query_params['batchNo'] = None
-
+            begin_base64 = args["begin"]
+            if begin_base64 is not None:
+                begin_base64 = base64Replace(begin_base64)
+                begin_date = base64.b64decode(begin_base64).decode('utf-8')
+                query_params['begin'] = begin_date
+                print("begin_date key is ", args["begin"], begin_date)
+            else:
+                query_params['begin'] = None
+            end_base64 = args["end"]
+            if end_base64 is not None:
+                end_base64 = base64Replace(end_base64)
+                end_date = base64.b64decode(end_base64).decode('utf-8')
+                query_params['end'] = end_date
+                print("end_date key is ", args["end"], end_date)
+            else:
+                query_params['end'] = None
             print("query_params is ", query_params)
             user_service = StockService()
             account_batchno_list, prod_count = user_service.get_account_batchno(OpCode, timestamp, token, pageNo, query_params, ptype)
