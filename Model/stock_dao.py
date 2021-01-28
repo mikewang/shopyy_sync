@@ -671,7 +671,7 @@ class StockDao(object):
                             cursor.execute(sql, goodsnum, stockProductID)
                             cursor.commit()
 
-                            result_product.note = "1:退货成功，采购量 " + str(doneOrderNum) + ", 退货量 "+str(purchaseNum) + ", 共退货 " + str(returnOrderNum+purchaseNum) + ":" + str(doneOrderNum-returnOrderNum-purchaseNum)
+                            result_product.note = "1:退货成功，采购量 " + str(doneOrderNum) + ", 退货量 "+str(purchaseNum) + ", 共退货 "+ str(returnOrderNum+purchaseNum) + ":" + str(returnOrderNum+purchaseNum) + ":" + str(doneOrderNum-returnOrderNum-purchaseNum)
                     else:
                         result_product.note = "0:退货失败，没有记录."
                     print(result_product.note)
