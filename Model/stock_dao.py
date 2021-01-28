@@ -891,15 +891,24 @@ class StockDao(object):
         #
         try:
             account_batchNo_list = []
-            page_prod_count = 10
+            page_prod_count = 1000
             cnxn = pyodbc.connect(self._conn_str)
             cursor = cnxn.cursor()
             # 数据源
-            v_sql = "SELECT  distinct [batchNo], CONVERT(varchar, CreateTime, 120) AS CreateTime  FROM [Stock_Product_Order_Account_App] where 0=0 "
+            v_sql = "SELECT [batchNo], CONVERT(varchar, CreateTime, 120) AS CreateTime,count(*) FROM [Stock_Product_Order_Account_App] group by batchNo,CreateTime "
 
             filter_batchNo = query_params["batchNo"]
             if filter_batchNo is not None:
                 v_sql = v_sql + " and batchNo = '" + filter_batchNo + "'"
+            v_time_column = "CreateTime"
+            # begin date
+            filter_begin = query_params["begin"]
+            if filter_begin is not None:
+                v_sql = v_sql + " and " + v_time_column + " >= '" + filter_begin + "'"
+            # end data
+            filter_end = query_params["end"]
+            if filter_end is not None:
+                v_sql = v_sql + " and " + v_time_column + "<= '" + filter_end + " 23:59:59'"
 
             # 先总数
             product_count = 0
