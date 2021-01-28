@@ -59,6 +59,8 @@ class ProductInfo(object):
         self.note = ''
         #对账商品数量
         self.accountNum = 0
+        #退货数量
+        self.returnNum = 0
 
     def desc(self):
         product_dict = self.__dict__

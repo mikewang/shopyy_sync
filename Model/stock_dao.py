@@ -296,6 +296,7 @@ class StockDao(object):
         product.enquiryDate = row[34]
         product.appPermittedNum = row[35]
         product.accountNum = row[36]
+        product.returnNum = row[37]
         return product
 
     def select_order_product_list(self, page_no, filter_stock, ptype):
@@ -317,7 +318,7 @@ class StockDao(object):
                 v_sql = v_sql + "and settlement = 0 and OrderStat = 1"
                 v_time_column = "CreateTime"
             elif ptype == cv.complete_order:
-                v_sql = v_sql + "and settlement = 1 and OrderStat = 1"
+                v_sql = v_sql + "and settlement = 1 and OrderStat = 1 and orderNum > accountNum + returnNum"
                 v_time_column = "ensureTime"
             elif ptype == cv.account_goods:
                 v_sql = v_sql + "and settlement = 1 and OrderStat = 1 and accountNum > 0"
@@ -386,11 +387,13 @@ class StockDao(object):
             if ptype == cv.complete_order or ptype == cv.settlement_goods or ptype == cv.history_goods:
                 return_product_list = []
                 for product in product_list:
+                    if product.returnNum == 0:
+                        continue
                     v_sql = ""
                     if ptype == cv.history_goods:
-                        v_sql = "select * from v_app_stock_order  where (orderstat=-1 or orderstat=0) and stockproductid=" + str(product.StockProductID)
+                        v_sql = "select * from v_app_stock_order  where (orderstat=-1 or orderstat=0) and sourceOrderID=" + str(product.orderID)
                     else:
-                        v_sql = "select * from v_app_stock_order  where orderstat=-1 and stockproductid=" + str(product.StockProductID)
+                        v_sql = "select * from v_app_stock_order  where orderstat=-1 and sourceOrderID=" + str(product.orderID)
                     v_sql = "select 0 as rownumber, v.* from (" + v_sql + ") as v "
                     print(ptype, "sql attach is ", v_sql)
                     cursor.execute(v_sql)
