@@ -26,6 +26,7 @@ class ProductAccountResource(Resource):
             # parser.add_argument('timestamp', location=['headers', 'args'])
             parser.add_argument('t')
             parser.add_argument('ptype')
+            parser.add_argument('settlement')
             parser.add_argument('orderID')
             parser.add_argument('batchNo')
             parser.add_argument('goodsDesc')
@@ -43,6 +44,12 @@ class ProductAccountResource(Resource):
             ptype = args["ptype"]
             print("request args is ", args)
             query_params = {}
+            settlement = args["settlement"]
+            if settlement is not None:
+                query_params['settlement'] = settlement
+                print("enquiry key is ", args["settlement"], settlement)
+            else:
+                query_params['settlement'] = None
             orderID = args["orderID"]
             if orderID is not None:
                 query_params['orderID'] = orderID
@@ -213,7 +220,9 @@ class AccountBatchNoResource(Resource):
             # parser.add_argument('timestamp', location=['headers', 'args'])
             parser.add_argument('t')
             parser.add_argument('ptype')
+            parser.add_argument('settlement')
             parser.add_argument('batchNo')
+            parser.add_argument('note')
             parser.add_argument('begin')
             parser.add_argument('end')
 
@@ -225,6 +234,12 @@ class AccountBatchNoResource(Resource):
             ptype = args["ptype"]
             print("request args is ", args)
             query_params = {}
+            settlement = args["settlement"]
+            if settlement is not None:
+                query_params['settlement'] = settlement
+                print("enquiry key is ", args["settlement"], settlement)
+            else:
+                query_params['settlement'] = None
             enquiry_base64 = args["batchNo"]
             if enquiry_base64 is not None:
                 enquiry_base64 = base64Replace(enquiry_base64)
@@ -234,6 +249,15 @@ class AccountBatchNoResource(Resource):
                 print("enquiry key is ", args["batchNo"], batchNo)
             else:
                 query_params['batchNo'] = None
+            enquiry_base64 = args["note"]
+            if enquiry_base64 is not None:
+                enquiry_base64 = base64Replace(enquiry_base64)
+                print("enquiry_base64 is ", enquiry_base64)
+                note = base64.b64decode(enquiry_base64).decode('utf-8')
+                query_params['note'] = note
+                print("enquiry key is ", args["note"], note)
+            else:
+                query_params['note'] = None
             begin_base64 = args["begin"]
             if begin_base64 is not None:
                 begin_base64 = base64Replace(begin_base64)

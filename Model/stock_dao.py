@@ -733,19 +733,54 @@ class StockDao(object):
                     supplier = prod["supplier"]
                     settlement = prod["settlement"]
                     settlement = 2
+                    # 增加更新对账记录
+                    accountID = prod["accountID"]
+                    batchNo = prod["batchNo"]
+
+                    sql = "select orderNum from Stock_Product_Order_App  where orderstate =  1 and orderid = ? "
+                    cursor.execute(sql, orderID)
+                    row = cursor.fetchone()
+                    orderNum = row[0]
+                    sql = "select orderNum from Stock_Product_Order_App  where orderstate =  -1 and sourceOrderId = ? "
+                    cursor.execute(sql, orderID)
+                    row = cursor.fetchone()
+                    returnNum = row[0]
+                    sql = "select accountNum from Stock_Product_Order_Account_App  where orderid = ? and accountID = ? "
+                    cursor.execute(sql, orderID, accountID)
+                    row = cursor.fetchone()
+                    accountNum = row[0]
+                    fullredNum = 0
+                    # orderNum = returnNum + accountNum 则正常，否则需要充红。
+                    fullredNum = orderNum - returnNum - accountNum
+                    note = '结算成功, 结算' + str(accountNum) + ' 退货' + str(returnNum) + " =  采购" + str(orderNum)
+                    if fullredNum > 0:
+                        note = note + ' -需要充红: ' + str(fullredNum)
+                    elif fullredNum < 0:
+                        note = '数据异常，结算' + str(accountNum) + ' 退货' + str(returnNum) + " !=  采购" + str(orderNum)
+
+                    sql = "UPDATE [Stock_Product_Order_Account_App] SET [Settlement] = 2 ,[note] = '' WHERE accountID = ? "
+                    print(operate_type, "update Stock_Product_Order_Account_App sql ---\n ", sql, settlement, accountID)
+                    cursor.execute(sql, settlementOpCode, settlement, orderID, stockProductID, settlement)
+
                     sql = "update Stock_Product_Order_App " \
                           "set settlementOpCode = ?, settlement=?,settlementTime=getdate() " \
                           "where orderID = ? and stockProductID = ? and settlement <> ? "
-                    print(operate_type, "update sql ---\n ", sql,settlement,orderID, stockProductID )
+                    print(operate_type, "update sql ---\n ", sql, settlement, orderID, stockProductID )
                     cursor.execute(sql, settlementOpCode, settlement, orderID, stockProductID, settlement)
+
+                    if fullredNum > 0:
+                        sql = "INSERT INTO [Stock_Product_Order_Account_fullred_App]([accountID],[batchNo],[orderID],[StockProductID],[OpCode],[CreateTime],[fullredNum],[fullredStat],[note]) VALUES(?,?,?,?,?,getdate(),?,0,'')"
+                        print("fullred sql --- \n", sql)
+                        cursor.execute(sql, accountID, batchNo, orderID, stockProductID, settlementOpCode, fullredNum)
                     # insert history row
                     sql = "insert INTO Stock_Product_Order_App_hist(StockProductID, OpCode, OrderNum,OrderPrice," \
                           " supplier, OperateType, orderId, note) VALUES(?,?,?,?,?,?,?,?)"
                     print(operate_type, "insert hist sql --- \n ", sql)
                     cursor.execute(sql, stockProductID, settlementOpCode, purchaseNum, purchasePrice, supplier,
-                                   cv.settlement_goods, orderID, '')
+                                   cv.settlement_goods, orderID, note)
+
                     cursor.commit()
-                    result_product.note = "1:结算成功"
+                    result_product.note = "1:" + note + ":" + str(accountNum) + ":" + str(returnNum) + ":" + str(orderNum) + ":" + str(fullredNum)
                     result_product.settlement = 2
                 result_product_list.append(result_product)
             cursor.close
@@ -898,20 +933,27 @@ class StockDao(object):
             cnxn = pyodbc.connect(self._conn_str)
             cursor = cnxn.cursor()
             # 数据源
-            v_sql = "SELECT distinct [batchNo], CONVERT(varchar, CreateTime, 120) AS CreateTime, count(*) over(partition by [batchNo]) as batchProdCount  FROM [Stock_Product_Order_Account_App] where accountStat = 1 "
+            v_sql = "SELECT distinct [batchNo], CONVERT(varchar, CreateTime, 120) AS CreateTime, count(*) over(partition by [batchNo]) as batchProdCount, note  FROM [Stock_Product_Order_Account_App] where accountStat = 1"
+
+            if ptype == cv.batchno_list:
+                v_sql = v_sql + " and settlement != 2"
+            elif ptype == cv.settlement_goods:
+                v_sql = v_sql + " and settlement = 2 and batchNo not in (select batchNo from [Stock_Product_Order_Account_App] where  accountStat = 1 and settlement = 1)"
 
             filter_batchNo = query_params["batchNo"]
             if filter_batchNo is not None:
                 v_sql = v_sql + " and batchNo = '" + filter_batchNo + "'"
-            v_time_column = "CreateTime"
+            filter_note = query_params["note"]
+            if filter_note is not None:
+                v_sql = v_sql + " and note like '%" + filter_note + "%'"
             # begin date
             filter_begin = query_params["begin"]
             if filter_begin is not None:
-                v_sql = v_sql + " and " + v_time_column + " >= '" + filter_begin + "'"
+                v_sql = v_sql + " and CreateTime >= '" + filter_begin + "'"
             # end data
             filter_end = query_params["end"]
             if filter_end is not None:
-                v_sql = v_sql + " and " + v_time_column + "<= '" + filter_end + " 23:59:59'"
+                v_sql = v_sql + " and CreateTime <= '" + filter_end + " 23:59:59'"
 
             # 先总数
             product_count = 0
@@ -926,6 +968,7 @@ class StockDao(object):
                 product.batchNo = row[1]
                 product.createTime = row[2]
                 product.batchProdCount = row[3]
+                product.note = row[4]
                 product_count = row[len(row)-1]
                 account_batchNo_list.append(product)
             cursor.close()
@@ -960,6 +1003,7 @@ class StockDao(object):
                 accountNum = prod["purchaseNum"]
                 accountOpCode = prod["accountOpCode"]
 
+
                 # 返回结果集
                 result_product = AccountProductInfo()
                 result_product.accountID = accountID
@@ -970,9 +1014,10 @@ class StockDao(object):
 
                 if operate_type == cv.account_goods:
                     accountStat = 1
-                    sql = "INSERT INTO [Stock_Product_Order_Account_App](batchNo,[orderID], [StockProductID], [OpCode], [OrderNum], [OrderPrice], [Settlement], [supplier], [CreateTime], [accountNum], [accountStat]) SELECT ?, [orderID], [StockProductID], ?, [OrderNum], [OrderPrice]	, [Settlement], [supplier], getdate(), ?, ? FROM [Stock_Product_Order_App] WHERE [orderID] = ?"
+                    note = prod["note"]
+                    sql = "INSERT INTO [Stock_Product_Order_Account_App](batchNo,[orderID], [StockProductID], [OpCode], [OrderNum], [OrderPrice], [Settlement], [supplier], [CreateTime], [accountNum], [accountStat], [note]) SELECT ?, [orderID], [StockProductID], ?, [OrderNum], [OrderPrice]	, [Settlement], [supplier], getdate(), ?, ?, ? as nn FROM [Stock_Product_Order_App] WHERE [orderID] = ?"
                     print(operate_type, "insert sql ---\n ", sql)
-                    cursor.execute(sql, batchNo, accountOpCode, accountNum, accountStat, orderID)
+                    cursor.execute(sql, batchNo, accountOpCode, accountNum, accountStat, note, orderID)
                     # insert history row
                     sql = "insert INTO Stock_Product_Order_App_hist(StockProductID, OpCode, OrderNum,OrderPrice," \
                           " supplier, OperateType, orderId, note) VALUES(?,?,?,null,null,?,?,?)"
