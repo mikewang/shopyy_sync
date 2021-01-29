@@ -8,7 +8,7 @@ import subprocess
 import numpy as np
 from multiprocessing import Pool
 
-agent_count = 1
+global_file_list = []
 
 
 def get_agent_filelist():
@@ -36,7 +36,7 @@ def open_agent_file(file):
         return ""
 
 
-def get_q(file_name):
+def get_q(file_name, agent_index):
     file_name_out = file_name + ".out"
     file_name_q = file_name + ".gradmatrix"
     print("get_q", file_name_out, file_name_q)
@@ -52,7 +52,8 @@ def get_q(file_name):
         for line in file:
             N_orbitals = N_orbitals + 1
     # get N_orbitals = 19
-    global agent_count
+    global global_file_list
+    agent_count = len(global_file_list)
     print('size of N_orbitals', N_orbitals, "agent_count is ", str(agent_count))
     q = np.zeros([N_orbitals*N_orbitals, agent_count], dtype=np.float64)
     with open(file_name_q) as file:
@@ -61,7 +62,7 @@ def get_q(file_name):
             entry = line.split()
             i = 0
             for col_value in entry:
-                q[i, j] = col_value
+                q[i + N_orbitals*j, agent_index] = col_value
                 i = i + 1
             j = j + 1
     print(q)
@@ -69,11 +70,12 @@ def get_q(file_name):
 
 
 def make_mace(file_first):
+    agent_index = global_file_list.index(file_first)
     start_time = time.time()
     # create .out file from .inp file
     open_agent_file(file_first)
     # create .gradmatrix from first .out file
-    q1 = get_q(file_first)
+    q1 = get_q(file_first, agent_index)
     done = 0
     iterationcount = 0
     tot_time_gms = 0
@@ -154,10 +156,10 @@ if __name__ == '__main__':
     run_time = datetime.datetime.now()
     run_time_str = run_time.strftime('%Y-%m-%d %H:%M:%S')
     print("Beginning MACE job on the following agents:", run_time_str)
-    file_list, gamma, tolerance = get_agent_filelist()
-    agent_count = len(file_list)
-    pool = Pool(len(file_list))
-    pool.map(make_mace, file_list)
+    global global_file_list
+    global_file_list, gamma, tolerance = get_agent_filelist()
+    pool = Pool(len(global_file_list))
+    pool.map(make_mace, global_file_list)
     pool.close()
     pool.join()
     run_time_str = run_time.strftime('%Y-%m-%d %H:%M:%S')
