@@ -1,14 +1,28 @@
 # -*- coding: utf-8 -*-
 
-import sys
 import datetime, time
+from multiprocessing import Pool
 import os
 import configparser
 import subprocess
 import numpy as np
-from multiprocessing import Pool
 
-global_file_list = []
+global_file_list = ['water1','water2','water3','water4']
+global_q = None
+global_q2 = None
+thread_count = 0
+
+run_times_limit = 10
+
+
+def make_mace_test(file_first):
+    agent_index = global_file_list.index(file_first)
+    start_time = datetime.datetime.now()
+    start_time_str = start_time.strftime('%Y-%m-%d %H:%M:%S.%f')
+    global thread_count
+    thread_count = thread_count + 1
+    print("agent work info , agent_index is", agent_index, "file is ", file_first, start_time_str)
+    time.sleep(3)
 
 
 def get_agent_filelist():
@@ -66,7 +80,7 @@ def get_q(file_name, agent_index):
                 i = i + 1
             j = j + 1
     print(q)
-    return q, agent_index
+    return q
 
 
 def make_mace(file_first):
@@ -77,49 +91,25 @@ def make_mace(file_first):
     open_agent_file(file_first)
     # create .gradmatrix from first .out file
     q1 = get_q(file_first, agent_index)
+    global global_q
+    if global_q is None:
+        global_q = q1
+    else:
+        global_q[agent_index] = q1[agent_index]
 
-    done = 0
-    iterationcount = 0
-    tot_time_gms = 0
-    tot_time_matlab = 0
-    tot_time = 0
+    # get q from second file
     current_file = file_first
-    while not done:
-        iter_time_start = time.time()
-        # get q from second file
-        extract_dat_to_inp_sh = os.path.normpath(os.path.join(os.curdir, "extract_dat_to_inp.sh"))
-        subprocess.run(["./extract_dat_to_inp.sh"])
-        file_num = int(current_file.split('.')[1]) + 1
-        file_next = current_file.split('.')[0] + "." + str(file_num) + ".inp"
-        if not os.path.isfile(file_next):
-            print("Error file is not existed .", file_next)
-            break
-            return
-        # create .out  next file from .inp next file
-        open_agent_file(file_next)
-        # create .gradmatrix from .out next file
-        q2 = get_q(file_next)
-        q_out, convergence_flag = compute_MACE_step(q1, q2-q1, gamma, tolerance)
-        print("q_out is", q_out)
-
-        iterationcount += 1
-        iter_time_fin = time.time() - iter_time_start
-        tot_time = tot_time + iter_time_fin
-        # if iterationcount == 1:
-        #    convergence_flag = True
-        if convergence_flag:
-            if iterationcount == 200:
-                print("Max iterations reached.")
-            avg_time_gms = (tot_time_gms) / iterationcount
-            print("Converged in %s iterations." % iterationcount)
-            print("Time elapsed: %s seconds" % (time.time() - start_time))
-            print("Average time elapsed running GAMESS: %s seconds" % avg_time_gms)
-            print("Total time elapsed: %s seconds" % tot_time)
-            done = 1
-        else:
-            current_file = file_next
-            q1 = q2
-            print("current file is", current_file)
+    extract_dat_to_inp_sh = os.path.normpath(os.path.join(os.curdir, "extract_dat_to_inp.sh"))
+    subprocess.run(["./extract_dat_to_inp.sh"])
+    file_num = int(current_file.split('.')[1]) + 1
+    file_next = current_file.split('.')[0] + "." + str(file_num) + ".inp"
+    if not os.path.isfile(file_next):
+        print("Error file is not existed .", file_next)
+    global global_file_list
+    global_file_list[agent_index] = file_next
+    start_time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
+    print("agent work info , agent_index is", agent_index, "file is ", file_first, start_time_str)
+    time.sleep(3)
 
 
 def compute_MACE_step(q,gradient,gamma,tolerance):
@@ -155,15 +145,44 @@ def compute_MACE_step(q,gradient,gamma,tolerance):
 
 
 if __name__ == '__main__':
-    run_time = datetime.datetime.now()
-    run_time_str = run_time.strftime('%Y-%m-%d %H:%M:%S')
+    run_time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     print("Beginning MACE job on the following agents:", run_time_str)
+    # 初始化数据，读取数据文件列表
     global global_file_list
     global_file_list, gamma, tolerance = get_agent_filelist()
-    pool = Pool(len(global_file_list))
-    pool.map(make_mace, global_file_list)
-    pool.close()
-    pool.join()
-    run_time_str = run_time.strftime('%Y-%m-%d %H:%M:%S')
+
+    iterationcount = 1
+    tot_time_gms = 0
+    tot_time = 0
+    done = 0
+    while not done:
+        iter_time_start = time.time()
+        run_time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        print("iterate:", iterationcount, run_time_str)
+        with Pool(processes=len(global_file_list)) as pool:
+            pool.map(make_mace, global_file_list)
+        global global_q, global_q2
+        if global_q is not None and global_q2 is not None:
+            run_time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            print("iterate run ", iterationcount, run_time_str)
+            q_out, convergence_flag = compute_MACE_step(global_q, global_q2 - global_q, gamma, tolerance)
+            iterationcount += 1
+            iter_time_fin = time.time() - iter_time_start
+            tot_time = tot_time + iter_time_fin
+            # if iterationcount == 1:
+            #    convergence_flag = True
+            if convergence_flag:
+                if iterationcount == 200:
+                    print("Max iterations reached.")
+                avg_time_gms = (tot_time_gms) / iterationcount
+                print("Converged in %s iterations." % iterationcount)
+                print("Time elapsed: %s seconds" % (time.time() - iter_time_start))
+                print("Average time elapsed running GAMESS: %s seconds" % avg_time_gms)
+                print("Total time elapsed: %s seconds" % tot_time)
+                done = 1
+            else:
+                global_q = global_q2
+
+    run_time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     print("End MACE job on the following agents:", run_time_str)
     # the end
