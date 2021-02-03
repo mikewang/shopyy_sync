@@ -2,27 +2,13 @@
 
 import datetime, time
 from multiprocessing import Pool
+from multiprocessing import Process,Manager
 import os
 import configparser
 import subprocess
 import numpy as np
 
-global_file_list = ['water1','water2','water3','water4']
-global_q = None
-global_q2 = None
-thread_count = 0
-
 run_times_limit = 10
-
-
-def make_mace_test(file_first):
-    agent_index = global_file_list.index(file_first)
-    start_time = datetime.datetime.now()
-    start_time_str = start_time.strftime('%Y-%m-%d %H:%M:%S.%f')
-    global thread_count
-    thread_count = thread_count + 1
-    print("agent work info , agent_index is", agent_index, "file is ", file_first, start_time_str)
-    time.sleep(3)
 
 
 def get_agent_filelist():
@@ -50,7 +36,7 @@ def open_agent_file(file):
         return ""
 
 
-def get_q(file_name, agent_index):
+def get_q(file_name, agent_index, q_dict):
     file_name_out = file_name + ".out"
     file_name_q = file_name + ".gradmatrix"
     print("get_q", file_name_out, file_name_q)
@@ -66,53 +52,43 @@ def get_q(file_name, agent_index):
         for line in file:
             N_orbitals = N_orbitals + 1
     # get N_orbitals = 19
-    global global_file_list
-    agent_count = len(global_file_list)
-    print('size of N_orbitals', N_orbitals, "agent_count is ", str(agent_count))
-    q = np.zeros([N_orbitals*N_orbitals, agent_count], dtype=np.float64)
+    print('size of N_orbitals', N_orbitals - 1)
+    q = []
     with open(file_name_q) as file:
-        j = 0
         for line in file:
             entry = line.split()
-            i = 0
             for col_value in entry:
-                q[i + N_orbitals*j, agent_index] = col_value
-                i = i + 1
-            j = j + 1
+                q.append(col_value)
     print(q)
-    return q
+    q_dict[agent_index] = q
+    return q_dict
 
 
-def make_mace(file_first):
-    agent_index = global_file_list.index(file_first)
-    start_time = time.time()
-    print("agent work info , agent_index is", agent_index, "file is ", file_first, start_time)
+def make_mace(file_list, i, q_dict):
+    file_name = file_list[i]
+    run_time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    print("agent work info , agent_index is", i, "file is ", file_name, run_time_str)
     # create .out file from .inp file
-    open_agent_file(file_first)
+    open_agent_file(file_name)
     # create .gradmatrix from first .out file
-    q1 = get_q(file_first, agent_index)
-    global global_q
-    if global_q is None:
-        global_q = q1
-    else:
-        global_q[agent_index] = q1[agent_index]
+    q1 = get_q(file_name, i, q_dict)
 
     # get q from second file
-    current_file = file_first
+    current_file = file_name
     extract_dat_to_inp_sh = os.path.normpath(os.path.join(os.curdir, "extract_dat_to_inp.sh"))
     subprocess.run(["./extract_dat_to_inp.sh"])
     file_num = int(current_file.split('.')[1]) + 1
     file_next = current_file.split('.')[0] + "." + str(file_num) + ".inp"
     if not os.path.isfile(file_next):
         print("Error file is not existed .", file_next)
-    global global_file_list
-    global_file_list[agent_index] = file_next
-    start_time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
-    print("agent work info , agent_index is", agent_index, "file is ", file_first, start_time_str)
+    file_list[i] = file_next
+    print("set after", i, file_list[i])
+    run_time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
+    print("agent work info , agent_index is", i, "file is ", current_file, run_time_str)
     time.sleep(3)
 
 
-def compute_MACE_step(q,gradient,gamma,tolerance):
+def compute_MACE_step(q, gradient, gamma, tolerance):
     print("q is", q)
     print("gradient is", gradient)
     print('gamma is ', gamma)
@@ -148,31 +124,58 @@ if __name__ == '__main__':
     run_time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     print("Beginning MACE job on the following agents:", run_time_str)
     # 初始化数据，读取数据文件列表
-    global global_file_list
-    global_file_list, gamma, tolerance = get_agent_filelist()
-
     iterationcount = 1
     tot_time_gms = 0
     tot_time = 0
     done = 0
+    q1 = None
+    q2 = None
+    manager = Manager()
+    q_dict = manager.dict()
+    file_list = manager.list()  # 生成一个列表
+    temp_file_list, gamma, tolerance = get_agent_filelist()
+    for file in temp_file_list:
+        file_list.append(file)  # 填充文件
     while not done:
+        print("file list " + str(iterationcount) + " is ", file_list)
         iter_time_start = time.time()
         run_time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        print("iterate:", iterationcount, run_time_str)
-        with Pool(processes=len(global_file_list)) as pool:
-            pool.map(make_mace, global_file_list)
-        global global_q, global_q2
-        if global_q is not None and global_q2 is not None:
-            run_time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            print("iterate run ", iterationcount, run_time_str)
-            q_out, convergence_flag = compute_MACE_step(global_q, global_q2 - global_q, gamma, tolerance)
+        print("iterate " + str(iterationcount) + ":", run_time_str)
+        p_list = []
+        for i in range(len(file_list)):
+            p = Process(target=make_mace, args=(file_list, i, q_dict))
+            p.start()
+            p_list.append(p)
+        for res in p_list:
+            res.join()
+        run_time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        print("iterate run " + str(iterationcount) + ":", run_time_str)
+        m = len(q_dict.keys())
+        item = q_dict.items()[0]
+        key = q_dict.keys()[0]
+        item = q_dict[key]
+        n = len(item)
+        print("q size is m,n", m, n)
+        if q1 is None:
+            q1 = np.zeros([m, n], dtype=np.float64)
+            for k in q_dict.keys():
+                item = q_dict[k]
+                for i in range(len(item)):
+                    q1[k][i] = item[i]
+        else:
+            q2 = np.zeros([m, n], dtype=np.float64)
+            for k in q_dict.keys():
+                item = q_dict[k]
+                for i in range(len(item)):
+                    q2[k][i] = item[i]
+            q_out, convergence_flag = compute_MACE_step(q1, q2 - q1, gamma, tolerance)
             iterationcount += 1
             iter_time_fin = time.time() - iter_time_start
             tot_time = tot_time + iter_time_fin
             # if iterationcount == 1:
             #    convergence_flag = True
             if convergence_flag:
-                if iterationcount == 200:
+                if iterationcount == 20:
                     print("Max iterations reached.")
                 avg_time_gms = (tot_time_gms) / iterationcount
                 print("Converged in %s iterations." % iterationcount)
@@ -181,8 +184,8 @@ if __name__ == '__main__':
                 print("Total time elapsed: %s seconds" % tot_time)
                 done = 1
             else:
-                global_q = global_q2
-
+                q1 = q2.copy()
+                q2 = None
     run_time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     print("End MACE job on the following agents:", run_time_str)
     # the end
