@@ -27,7 +27,8 @@ def open_agent_file(file):
     print("file in open_agent_file is", file)
     if file.split('.')[2] == 'inp':
         fegms_sh = os.path.normpath(os.path.join(os.curdir, "fegms.sh"))
-        gms_out_filename = subprocess.run(["./fegms.sh", file], stdout=subprocess.PIPE)
+        #gms_out_filename = subprocess.run(["./fegms.sh", file], stdout=subprocess.PIPE)
+        gms_out_filename = os.system('./fegms.sh ' + file)
         # generate name.x.dat file for generation of name.x+1.inp
         gms_out_filename = file + ".out"
         return gms_out_filename
