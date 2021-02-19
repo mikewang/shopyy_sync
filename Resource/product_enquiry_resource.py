@@ -16,14 +16,7 @@ def base64Replace(base64_str):
 
 class ProductEnquiryResource(Resource):
 
-    def get(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('token')
-        args = parser.parse_args()
-        print("request paramter:", args)
-        result = args
-        return args
-
+    # 询价插入操作。
     def post(self):
         try:
             # 增加请求解析参数
@@ -83,5 +76,15 @@ class ProductEnquiryResource(Resource):
         finally:
             time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             print("enquiry price product.py", OpCode, time_str)
+
+
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('token')
+        args = parser.parse_args()
+        print("request paramter:", args)
+        result = args
+        return args
+
 
 

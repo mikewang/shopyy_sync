@@ -234,6 +234,23 @@ class AccountBatchNoResource(Resource):
             ptype = args["ptype"]
             print("request args is ", args)
             query_params = {}
+            contractNo_base64 = args["contractNo"]
+            if contractNo_base64 is not None:
+                contractNo_base64 = base64Replace(contractNo_base64)
+                contractNo = base64.b64decode(contractNo_base64).decode('utf-8')
+                query_params['contractNo'] = contractNo
+                print("contractNo key is ", args["contractNo"], contractNo)
+            else:
+                query_params['contractNo'] = None
+
+            SpecNo_base64 = args["SpecNo"]
+            if SpecNo_base64 is not None:
+                SpecNo_base64 = base64Replace(SpecNo_base64)
+                SpecNo = base64.b64decode(SpecNo_base64).decode('utf-8')
+                query_params['SpecNo'] = SpecNo
+                print("SpecNo key is ", args["SpecNo"], SpecNo)
+            else:
+                query_params['SpecNo'] = None
             settlement = args["settlement"]
             if settlement is not None:
                 query_params['settlement'] = settlement

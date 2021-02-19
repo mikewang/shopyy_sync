@@ -61,6 +61,10 @@ class ProductInfo(object):
         self.accountNum = 0
         #退货数量
         self.returnNum = 0
+        # 销售合同号
+        self.contractNo = ''
+        # 采购价格确认
+        self.orderPriceAccpt = 0
 
     def desc(self):
         product_dict = self.__dict__
@@ -106,6 +110,8 @@ class AccountProductInfo(object):
         self.accountNum = 0
         self.accountStat = 1
         self.note = ''
+        # 销售合同号
+        self.contractNo = ''
 
     def desc(self):
         product_dict = self.__dict__

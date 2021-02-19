@@ -13,7 +13,7 @@ from Model.product import DecimalEncoder
 def base64Replace(base64_str):
     return base64_str.replace('*', '+').replace('-', '/').replace('.', '=')
 
-
+# 采购商品的查询
 class ProductStockResource(Resource):
 
     def get(self, pageNo):
@@ -28,6 +28,8 @@ class ProductStockResource(Resource):
             # parser.add_argument('timestamp', location=['headers', 'args'])
             parser.add_argument('t')
             parser.add_argument('ptype')
+            parser.add_argument('contractNo')
+            parser.add_argument('SpecNo')
             parser.add_argument('goodsDesc')
             parser.add_argument('brand')
             parser.add_argument('enquiry')
@@ -42,6 +44,23 @@ class ProductStockResource(Resource):
             # 去掉订货，订货，订货完成 三个状态的查询
             print("request args is ", args)
             filter_stock = {}
+            contractNo_base64 = args["contractNo"]
+            if contractNo_base64 is not None:
+                contractNo_base64 = base64Replace(contractNo_base64)
+                contractNo = base64.b64decode(contractNo_base64).decode('utf-8')
+                filter_stock['contractNo'] = contractNo
+                print("contractNo key is ", args["contractNo"], contractNo)
+            else:
+                filter_stock['contractNo'] = None
+
+            SpecNo_base64 = args["SpecNo"]
+            if SpecNo_base64 is not None:
+                SpecNo_base64 = base64Replace(SpecNo_base64)
+                SpecNo = base64.b64decode(SpecNo_base64).decode('utf-8')
+                filter_stock['SpecNo'] = SpecNo
+                print("SpecNo key is ", args["SpecNo"], SpecNo)
+            else:
+                filter_stock['SpecNo'] = None
             goodsDesc_base64 = args["goodsDesc"]
             if goodsDesc_base64 is not None:
                 goodsDesc_base64 = base64Replace(goodsDesc_base64)
@@ -85,8 +104,9 @@ class ProductStockResource(Resource):
             else:
                 filter_stock['end'] = None
             print("filter_stock is ", filter_stock)
-            user_service = StockService()
-            prod_list, prod_count = user_service.get_stock_product(OpCode, timestamp, token, pageNo, filter_stock, ptype)
+            product_service = StockService()
+            # 获取采购商品 列表。
+            prod_list, prod_count = product_service.get_stock_product(OpCode, timestamp, token, pageNo, filter_stock, ptype)
             result = {"code": 200, "msg": "", "count": prod_count}
             if prod_list is not None:
                 json_list = []

@@ -89,7 +89,7 @@ class StockService(UserInfo):
         return item_list
 
     def get_stock_product(self, OpCode, timestamp, token, pageNo, filter_stock, ptype):
-
+        # 获取商品 询价或采购
         print(self.get_now_str(), ptype, "PageNo=", pageNo, filter_stock, "get stock product by " + OpCode, "-"*30)
         product_list = None
         product_count = 0

@@ -35,7 +35,8 @@ class ProductOrderResource(Resource):
             parser.add_argument('begin')
             parser.add_argument('end')
             parser.add_argument('supplier')
-            parser.add_argument('specno')
+            parser.add_argument('contractNo')
+            parser.add_argument('SpecNo')
             # 分析请求
             args = parser.parse_args()
             OpCode = args["OpCode"]
@@ -46,6 +47,23 @@ class ProductOrderResource(Resource):
             # 收货， 退货 两个状态的查询
             print("request args is ", args)
             filter_stock = {}
+            contractNo_base64 = args["contractNo"]
+            if contractNo_base64 is not None:
+                contractNo_base64 = base64Replace(contractNo_base64)
+                contractNo = base64.b64decode(contractNo_base64).decode('utf-8')
+                filter_stock['contractNo'] = contractNo
+                print("contractNo key is ", args["contractNo"], contractNo)
+            else:
+                filter_stock['contractNo'] = None
+
+            SpecNo_base64 = args["SpecNo"]
+            if SpecNo_base64 is not None:
+                SpecNo_base64 = base64Replace(SpecNo_base64)
+                SpecNo = base64.b64decode(SpecNo_base64).decode('utf-8')
+                filter_stock['SpecNo'] = SpecNo
+                print("SpecNo key is ", args["SpecNo"], SpecNo)
+            else:
+                filter_stock['SpecNo'] = None
             goodsDesc_base64 = args["goodsDesc"]
             if goodsDesc_base64 is not None:
                 goodsDesc_base64 = base64Replace(goodsDesc_base64)
@@ -98,14 +116,7 @@ class ProductOrderResource(Resource):
                 filter_stock['supplier'] = None
             # set settlement
             filter_stock['settlement'] = settlement
-            specno_base64 = args["specno"]
-            if specno_base64 is not None:
-                specno_base64 = base64Replace(specno_base64)
-                specno = base64.b64decode(specno_base64).decode('utf-8')
-                filter_stock['specno'] = specno
-                print("specno key is ", args["specno"], specno)
-            else:
-                filter_stock['specno'] = None
+
 
             print("filter_stock is ", filter_stock)
             user_service = StockService()

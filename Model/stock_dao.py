@@ -129,6 +129,14 @@ class StockDao(object):
             # 数据源
             v_sql = "  select * from v_app_stock  where 0=0  "
 
+            # 过滤条件，销售合同号
+            filter_contractNo = filter_stock["contractNo"]
+            if filter_contractNo is not None:
+                v_sql = v_sql + " and contractNo like '%" + filter_contractNo + "%'"
+            # 过滤条件，商品规格
+            filter_SpecNo = filter_stock["SpecNo"]
+            if filter_SpecNo is not None:
+                v_sql = v_sql + " and SpecNo like '%" + filter_SpecNo + "%'"
             # 过滤条件，商品描述
             filter_GoodsCDesc = filter_stock["goodsDesc"]
             if filter_GoodsCDesc is not None:
@@ -203,9 +211,10 @@ class StockDao(object):
                 product.priceEnquiredID = row[20]
                 product.enquiryDate = row[21]
                 product.appPermittedNum = row[22]
-                product_count = row[23]
+                # 销售合同号
+                product.contractNo = row[23]
+                product_count = row[24]
                 product_list.append(product)
-
             cursor.close()
             cnxn.close()
             print(product_list, product_count)
@@ -297,6 +306,8 @@ class StockDao(object):
         product.appPermittedNum = row[35]
         product.accountNum = row[36]
         product.returnNum = row[37]
+        product.accountNo = row[38]
+        product.orderPriceAccpt = row[39]
         return product
 
     def select_order_product_list(self, page_no, filter_stock, ptype):
@@ -334,6 +345,14 @@ class StockDao(object):
             else:
                 v_sql = v_sql + " and settlement = 0 and OrderStat = 1"
 
+            # 过滤条件，销售合同号
+            filter_contractNo = filter_stock["contractNo"]
+            if filter_contractNo is not None:
+                v_sql = v_sql + " and contractNo like '%" + filter_contractNo + "%'"
+            # 过滤条件，商品规格
+            filter_SpecNo = filter_stock["SpecNo"]
+            if filter_SpecNo is not None:
+                v_sql = v_sql + " and SpecNo like '%" + filter_SpecNo + "%'"
             # 过滤条件，商品描述
             filter_GoodsCDesc = filter_stock["goodsDesc"]
             if filter_GoodsCDesc is not None:
@@ -366,9 +385,6 @@ class StockDao(object):
                     filter_sql = filter_sql + "'" + b + "',"
                 filter_sql = filter_sql.rstrip(',')
                 v_sql = v_sql + " and supplier in (" + filter_sql + ")"
-            filter_specno = filter_stock["specno"]
-            if filter_specno is not None:
-                v_sql = v_sql + " and SpecNo = '" + filter_specno + "'"
 
             # 先总数
             product_count = 0
@@ -436,6 +452,7 @@ class StockDao(object):
                 orderStat = prod["orderStat"]
                 supplier = prod["supplier"]
                 settlement = prod["settlement"]
+                orderPriceAccpt = prod["orderPriceAccpt"]
                 # 訂貨
                 settlement = 0
 
@@ -458,24 +475,21 @@ class StockDao(object):
                           "where [MainID] = ?"
                     cursor.execute(sql, purchaseNum,purchaseNum, supplier, stockProductID)
                     sql = "insert into Stock_Product_Order_App(stockProductID,opCode, OrderNum, OrderPrice,orderStat," \
-                          "supplier, settlement) " \
-                          " values(?,?,?,?,?,?,?)"
+                          "supplier, settlement, orderPriceAccpt) " \
+                          " values(?,?,?,?,?,?,?,?)"
                     print("add order", "insert Stock_Product_Order_App sql is ", sql)
-                    cursor.execute(sql, stockProductID, opCode, purchaseNum, purchasePrice, orderStat, supplier, settlement)
+                    cursor.execute(sql, stockProductID, opCode, purchaseNum, purchasePrice, orderStat, supplier, settlement, orderPriceAccpt)
                     sql = "select @@IDENTITY"
                     cursor.execute(sql)
-                    lastOrderID = cursor.fetchone()[0]
+                    lastOrderID = cursor.fetchone()[0] # 生成的主键字段值。
                     sql = "insert INTO Stock_Product_Order_App_hist(StockProductID, OpCode, OrderNum," \
-                          "OrderPrice, supplier, OperateType, orderId, note) " \
-                          "VALUES(?,?,?,?,?,?,?,?)"
-                    cursor.execute(sql, stockProductID, opCode, purchaseNum, purchasePrice, supplier, 'order', lastOrderID, '')
-                    # myTableId = cursor.fetchone()[0]
-                    # print("Stock_Product_Order_App id is ", myTableId)
-                    #  last row id 不生效。
+                          "OrderPrice, supplier, OperateType, orderId, note, orderPriceAccpt) " \
+                          "VALUES(?,?,?,?,?,?,?,?,?)"
+                    cursor.execute(sql, stockProductID, opCode, purchaseNum, purchasePrice, supplier, 'order', lastOrderID, '', orderPriceAccpt)
                     cursor.commit()
                     result_product.note = "1:采购成功"
                 else:
-                    result_product.note = "0:采购失败，允购量 " + str(permitNum) + ", 采购量 " + str(purchaseNum)
+                    result_product.note = "0:采购失败, 允购量 " + str(permitNum) + ", 采购量 " + str(purchaseNum)
                 result_product_list.append(result_product)
 
             cursor.close
@@ -522,7 +536,7 @@ class StockDao(object):
                     # 取消订货。
                     sql = "update Stock_Product_Order_App set orderStat= ? where orderID=?"
                     cursor.execute(sql, orderStat, orderID)
-                    sql = "select stockProductID, OrderNum, OrderPrice,supplier, settlement " \
+                    sql = "select stockProductID, OrderNum, OrderPrice,supplier, settlement, orderPriceAccpt " \
                           "from Stock_Product_Order_App where orderID=?"
                     cursor.execute(sql, orderID)
                     row = cursor.fetchone()
@@ -532,6 +546,7 @@ class StockDao(object):
                         purchasePrice = row[2]
                         supplier = row[3]
                         settlement = row[4]
+                        orderPriceAccpt = row[5]
                         # 修改 app允采购量
                         sql = "update [FTPart_Stock_Product_Property_1] " \
                               "set [其它.app允采购量] = [其它.app允采购量] + ?, " \
@@ -540,10 +555,10 @@ class StockDao(object):
                         cursor.execute(sql, orderNum, orderNum, stockProductID)
                         # insert history row
                         sql = "insert INTO Stock_Product_Order_App_hist(StockProductID, OpCode, OrderNum,OrderPrice," \
-                              " supplier, OperateType, orderId, note) VALUES(?,?,?,?,?,?,?,?)"
+                              " supplier, OperateType, orderId, note, orderPriceAccpt) VALUES(?,?,?,?,?,?,?,?,?)"
                         print(operate_type, "insert hist sql --- \n ", sql)
                         cursor.execute(sql, stockProductID, opCode, orderNum, purchasePrice,
-                                       supplier, cv.cancel_order, orderID, '')
+                                       supplier, cv.cancel_order, orderID, '',orderPriceAccpt)
                         cursor.commit()
                         result_product.note = "1:取消订货成功"
 
@@ -556,6 +571,7 @@ class StockDao(object):
                     orderStat = prod["orderStat"]
                     supplier = prod["supplier"]
                     settlement = prod["settlement"]
+                    orderPriceAccpt = prod["orderPriceAccpt"]
                     # 订货确认。
                     settlement = 1
                     sql = "select orderNum from Stock_Product_Order_App where orderID = ? and stockProductID = ? and settlement <> ?"
@@ -566,17 +582,17 @@ class StockDao(object):
                         orderNum = row[0]
 
                     sql = "update Stock_Product_Order_App " \
-                          "set ensureOpCode = ?,settlement=?, orderNum = ?," \
+                          "set ensureOpCode = ?,settlement=?, orderNum = ?, OrderPrice = ?, orderPriceAccpt=? " \
                           " ensureTime=getdate() " \
                           "where orderID = ? and stockProductID = ? and settlement <> ? "
                     print(operate_type, "update sql ---\n ", sql)
-                    cursor.execute(sql, ensureOpCode, settlement, purchaseNum, orderID, stockProductID, settlement)
+                    cursor.execute(sql, ensureOpCode, settlement, purchaseNum, purchasePrice, orderID, orderPriceAccpt, stockProductID, settlement)
                     # insert history row
                     sql = "insert INTO Stock_Product_Order_App_hist(StockProductID, OpCode, OrderNum," \
-                          "OrderPrice, supplier, OperateType, orderId, note) " \
-                          "VALUES(?,?,?,?,?,?,?,?)"
+                          "OrderPrice, supplier, OperateType, orderId, note, orderPriceAccpt) " \
+                          "VALUES(?,?,?,?,?,?,?,?,?)"
                     cursor.execute(sql, stockProductID, ensureOpCode, purchaseNum, purchasePrice, supplier,
-                                   cv.complete_order, orderID, '')
+                                   cv.complete_order, orderID, '', orderPriceAccpt)
                     sql = "update [FTPart_Stock_Product_Property_1] " \
                           "set [其它.app允采购量] = [其它.app允采购量] + ?,[其它.app采购量] = [其它.app采购量] - ?, " \
                             "[其它.供应商名称] = ? " \
@@ -605,6 +621,7 @@ class StockDao(object):
                     result_product.note = "1:订购成功"
                 elif operate_type == cv.return_goods:
                     # 插入一条 退货 记录进来，原订货记录保存。
+                    # 退货，有可能是 钱已经预付款了，特例，后面再考虑。
                     opCode = prod["orderOpCode"]
                     print(operate_type, "product", prod)
                     orderStat = -1
@@ -732,6 +749,7 @@ class StockDao(object):
                     purchasePrice = prod["purchasePrice"]
                     supplier = prod["supplier"]
                     settlement = prod["settlement"]
+                    orderPriceAccpt = prod["orderPriceAccpt"]
                     settlement = 2
                     # 增加更新对账记录
                     accountID = prod["accountID"]
@@ -774,10 +792,10 @@ class StockDao(object):
                         cursor.execute(sql, accountID, batchNo, orderID, stockProductID, settlementOpCode, fullredNum)
                     # insert history row
                     sql = "insert INTO Stock_Product_Order_App_hist(StockProductID, OpCode, OrderNum,OrderPrice," \
-                          " supplier, OperateType, orderId, note) VALUES(?,?,?,?,?,?,?,?)"
+                          " supplier, OperateType, orderId, note, orderPriceAccpt) VALUES(?,?,?,?,?,?,?,?,?)"
                     print(operate_type, "insert hist sql --- \n ", sql)
                     cursor.execute(sql, stockProductID, settlementOpCode, purchaseNum, purchasePrice, supplier,
-                                   cv.settlement_goods, orderID, note)
+                                   cv.settlement_goods, orderID, note, orderPriceAccpt)
 
                     cursor.commit()
                     result_product.note = "1:" + note + ":" + str(accountNum) + ":" + str(returnNum) + ":" + str(orderNum) + ":" + str(fullredNum)
@@ -802,18 +820,6 @@ class StockDao(object):
             return result_product_list
 
     def parse_account_product_cursor(self, row):
-        # [accountID]
-        # , [batchNo]
-        # , [orderID]
-        # , [StockProductID]
-        # , [OpCode]
-        # , [OrderNum]
-        # , [OrderPrice]
-        # , [Settlement]
-        # , [supplier]
-        # , [CreateTime]
-        # , [accountNum]
-        # , [accountStat]
         product = AccountProductInfo()
         product.accountID = row[1]
         product.batchNo = row[2]
@@ -1001,6 +1007,7 @@ class StockDao(object):
                 orderID = prod["orderID"]
                 stockProductID = prod["stockProductID"]
                 accountNum = prod["purchaseNum"]
+                purchasePrice = prod["purchasePrice"]
                 accountOpCode = prod["accountOpCode"]
 
 
@@ -1009,18 +1016,40 @@ class StockDao(object):
                 result_product.accountID = accountID
                 result_product.orderID = orderID
                 result_product.StockProductID = stockProductID
+                result_product.orderPrice = purchasePrice
                 result_product.accountNum = accountNum
                 result_product.note = "0:" + operate_type + " failure."
 
                 if operate_type == cv.account_goods:
                     accountStat = 1
                     note = prod["note"]
-                    sql = "INSERT INTO [Stock_Product_Order_Account_App](batchNo,[orderID], [StockProductID], [OpCode], [OrderNum], [OrderPrice], [Settlement], [supplier], [CreateTime], [accountNum], [accountStat], [note]) SELECT ?, [orderID], [StockProductID], ?, [OrderNum], [OrderPrice]	, [Settlement], [supplier], getdate(), ?, ?, ? as nn FROM [Stock_Product_Order_App] WHERE [orderID] = ?"
+                    sql = "INSERT INTO [Stock_Product_Order_Account_App](batchNo,[orderID], [StockProductID], [OpCode], [OrderNum], [OrderPrice], [Settlement], [supplier], [CreateTime], [accountNum], [accountStat], [note])" \
+                          " SELECT ?, [orderID], [StockProductID], ?, [OrderNum], ? , [Settlement], [supplier], getdate(), ?, ?, ? as nn FROM [Stock_Product_Order_App] WHERE [orderID] = ?"
                     print(operate_type, "insert sql ---\n ", sql)
-                    cursor.execute(sql, batchNo, accountOpCode, accountNum, accountStat, note, orderID)
+                    cursor.execute(sql, batchNo, accountOpCode, purchasePrice, accountNum, accountStat, note, orderID)
+                    # 最后确认采购价格。
+                    sql = "update Stock_Product_Order_App set OrderPrice=?, orderPriceAccpt = 1 where orderID=?"
+                    print(operate_type, "update sql --- \n ", sql)
+                    cursor.execute(sql, purchasePrice, orderID)
+                    sql = "select sum(ordernum*orderStat) as goodsnum,sum(ordernum*orderprice*orderStat) as allprice " \
+                          "from Stock_Product_Order_App " \
+                          "where stockProductID = ? and (orderStat = -1 or orderStat = 1)"
+                    cursor.execute(sql, stockProductID)
+                    row = cursor.fetchone()
+                    goodsnum = row[0]
+                    allprice = row[1]
+                    if goodsnum == 0:
+                        unitprice = 0
+                    else:
+                        unitprice = allprice / goodsnum
+                    print("写入erp数据库", stockProductID, unitprice, goodsnum)
+                    sql = "update Stock_Product_InfoBase set unitprice=? where stockProductID = ?"
+                    cursor.execute(sql, unitprice, stockProductID)
+                    sql = "update Stock_Product_Info set goodsnum=? where stockProductID = ?"
+                    cursor.execute(sql, goodsnum, stockProductID)
                     # insert history row
                     sql = "insert INTO Stock_Product_Order_App_hist(StockProductID, OpCode, OrderNum,OrderPrice," \
-                          " supplier, OperateType, orderId, note) VALUES(?,?,?,null,null,?,?,?)"
+                          " supplier, OperateType, orderId, note) VALUES(?,?,?,purchasePrice,null,?,?,?)"
                     print(operate_type, "insert hist sql --- \n ", sql)
                     cursor.execute(sql, stockProductID, accountOpCode, accountNum, cv.account_goods, orderID, '')
                     cursor.commit()
