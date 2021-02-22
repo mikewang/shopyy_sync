@@ -212,3 +212,13 @@ class StockService(UserInfo):
         else:
             print(self.get_now_str(), "Error, get account product batchno is failure.", OpCode, "PageNo=", pageNo)
         return batchno_list, batchno_count
+
+    def get_orderprice_product(self, OpCode, timestamp, token, pageNo, query_params, ptypes):
+        print(self.get_now_str(), "PageNo=", pageNo, query_params, "get orderprice product by " + OpCode, "-"*30)
+        product_count = 0
+        user = self.get_checked_user(OpCode, timestamp, token)
+        if user is not None:
+            orderprice_product_list, product_count = self._dao.select_product_orderprice_list(pageNo, query_params, ptypes)
+        else:
+            print(self.get_now_str(), "Error, select_product_orderprice_list is failure.", OpCode, "PageNo=", pageNo)
+        return orderprice_product_list, product_count

@@ -51,7 +51,7 @@ class ProductEnquiryResource(Resource):
             # json_string = json.dumps(data)
             # print(json_string)
             # prod = ProductInfo()
-            # prod.StockProductID = 100
+            # prod.stockProductID = 100
             # prod.shouldPrice = 10.1
             # json_list = json.dumps(prod.__dict__)
             # print(json_list)

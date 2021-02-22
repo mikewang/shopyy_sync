@@ -2,7 +2,7 @@
 import json
 import decimal
 # 定义 采购产品 类
-# 采购人	StockProductID	ProductID	SignDate	GoodsCode	SpecNo	GoodsSpec	GoodsUnit	_ImageID	ImageGuid	ImageFmt	ModuleID	FileDate	ThumbImage	其它.供应商名称	其它.允采购量	其它.应采购价	其它.商品品牌
+# 采购人	StockProductID	ProductID	SignDate	GoodsCode	specNo	GoodsSpec	GoodsUnit	_ImageID	ImageGuid	ImageFmt	ModuleID	FileDate	ThumbImage	其它.供应商名称	其它.允采购量	其它.应采购价	其它.商品品牌
 
 
 class ProductInfo(object):
@@ -17,11 +17,11 @@ class ProductInfo(object):
 
     def __setup_product(self):
         self.OpCode = ''
-        self.StockProductID = 0
+        self.stockProductID = 0
         self.ProductID = 0
         self.SignDate = ''
         self.GoodsCode = ''
-        self.SpecNo = ''
+        self.specNo = ''
         self.GoodsCDesc = ''
         self.GoodsUnit = ''
         self.ImageID = 0
@@ -65,26 +65,44 @@ class ProductInfo(object):
         self.contractNo = ''
         # 采购价格确认
         self.orderPriceAccpt = 0
+        # 采购价格推荐
+        self.orderpriceList = []
 
     def desc(self):
         product_dict = self.__dict__
         product_dict["shouldPrice"] = str(self.shouldPrice)
         product_dict["orderPrice"] = str(self.orderPrice)
         # product_dict["CreateDate"] = self.CreateDate.strftime('%Y-%m-%d %H:%M:%S')
-        print("product is ", self.StockProductID, self.ProductID, "price enquried is ", self.priceEnquiredID, self.GoodsCDesc, self.permittedNum,self.orderNum,self.shouldPrice,self.orderPrice)
+        print("product is ", self.stockProductID, self.ProductID, "price enquried is ", self.priceEnquiredID, self.GoodsCDesc, self.permittedNum,self.orderNum,self.shouldPrice,self.orderPrice)
         return product_dict
 
-# SELECT [accountID]
-#       ,[orderID]
-#       ,[StockProductID]
-#       ,[OpCode]
-#       ,[OrderNum]
-#       ,[OrderPrice]
-#       ,[Settlement]
-#       ,[supplier]
-#       ,[CreateTime]
-#       ,[accountNum]
-#       ,[accountStat]
+
+class OrderpriceInfo(object):
+
+    def __init__(self):
+        super(OrderpriceInfo, self).__init__()
+        self.__setup_product()
+
+    def __del__(self):
+        pass
+
+    def __setup_product(self):
+        self.orderID = 0
+        self.stockProductID = 0
+        self.supplier = ''
+        self.orderNum = 0
+        self.orderPrice = 0.0
+        self.createTime = ''
+        self.orderOpCode = ''
+        # 确认订货时间
+        self.ensureTime = ''
+        self.ensureOpCode = ''
+        self.ptype = ''
+
+    def desc(self):
+        product_dict = self.__dict__
+        product_dict["orderPrice"] = str(self.orderPrice)
+        return product_dict
 
 
 class AccountProductInfo(object):
@@ -100,7 +118,7 @@ class AccountProductInfo(object):
         self.accountID = 0
         self.batchNo = ''
         self.orderID = 0
-        self.StockProductID = 0
+        self.stockProductID = 0
         self.accountOpCode = ''
         self.orderNum = 0
         self.orderPrice = 0.0
@@ -153,7 +171,7 @@ class ProductEnquiryPrice(object):
     def __setup_product(self):
         self.ID = 0
         self.OpCode = ''
-        self.StockProductID = 0
+        self.stockProductID = 0
         self.ActivityType = ''
         self.What = ''
         self.CreateTime = ''

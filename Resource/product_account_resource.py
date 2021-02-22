@@ -35,7 +35,7 @@ class ProductAccountResource(Resource):
             parser.add_argument('begin')
             parser.add_argument('end')
             parser.add_argument('supplier')
-            parser.add_argument('specno')
+            parser.add_argument('specNo')
             # 分析请求
             args = parser.parse_args()
             OpCode = args["OpCode"]
@@ -107,14 +107,14 @@ class ProductAccountResource(Resource):
                 print("supplier key is ", args["supplier"], supplier)
             else:
                 query_params['supplier'] = None
-            specno_base64 = args["specno"]
-            if specno_base64 is not None:
-                specno_base64 = base64Replace(specno_base64)
-                specno = base64.b64decode(specno_base64).decode('utf-8')
-                query_params['specno'] = specno
-                print("specno key is ", args["specno"], specno)
+            specNo_base64 = args["specNo"]
+            if specNo_base64 is not None:
+                specNo_base64 = base64Replace(specNo_base64)
+                specNo = base64.b64decode(specNo_base64).decode('utf-8')
+                query_params['specNo'] = specNo
+                print("specNo key is ", args["specNo"], specNo)
             else:
-                query_params['specno'] = None
+                query_params['specNo'] = None
 
             print("query_params is ", query_params)
             user_service = StockService()
@@ -243,14 +243,14 @@ class AccountBatchNoResource(Resource):
             else:
                 query_params['contractNo'] = None
 
-            SpecNo_base64 = args["SpecNo"]
-            if SpecNo_base64 is not None:
-                SpecNo_base64 = base64Replace(SpecNo_base64)
-                SpecNo = base64.b64decode(SpecNo_base64).decode('utf-8')
-                query_params['SpecNo'] = SpecNo
-                print("SpecNo key is ", args["SpecNo"], SpecNo)
+            specNo_base64 = args["specNo"]
+            if specNo_base64 is not None:
+                specNo_base64 = base64Replace(specNo_base64)
+                specNo = base64.b64decode(specNo_base64).decode('utf-8')
+                query_params['specNo'] = specNo
+                print("specNo key is ", args["specNo"], specNo)
             else:
-                query_params['SpecNo'] = None
+                query_params['specNo'] = None
             settlement = args["settlement"]
             if settlement is not None:
                 query_params['settlement'] = settlement
