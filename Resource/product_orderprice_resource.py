@@ -106,6 +106,24 @@ class ProductOrderpriceResource(Resource):
             run_time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             print(run_time_str, "prod json is ", prod_list_json)
             result = {"code": 201, "msg": ""}
+            prod_dict_list = json.loads(prod_list_json)
+            if prod_dict_list is None:
+                result["data"] = []
+                result = {"code": 500, "msg": "prod json is error."}
+                return result, result["code"]
+            print("prod_dict_list is ", prod_dict_list)
+            user_service = StockService()
+            result_product = user_service.update_product_orderprice(OpCode, timestamp, token, prod_dict_list, operate)
+            if result_product is not None:
+                result = {"code": 200, "msg": ""}
+                json_list = []
+                for prod in result_product:
+                    # prod_json = json.dumps(prod.desc())
+                    json_list.append(prod.desc())
+                result["data"] = json_list
+            else:
+                result["data"] = []
+                result = {"code": 201, "msg": "product is not existed."}
             return result, result["code"]
         except Exception as e:
             print('str(Exception):\t', str(Exception))

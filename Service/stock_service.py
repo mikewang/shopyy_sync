@@ -191,6 +191,16 @@ class StockService(UserInfo):
             print(self.get_now_str(), "Error, complete product order is failure.", prod_dict_list)
             return None
 
+    def update_product_orderprice(self, OpCode, timestamp, token, prod_dict_list, operate):
+        print(self.get_now_str(),  operate, "product order by " + OpCode, "-"*30)
+        user = self.get_checked_user(OpCode, timestamp, token)
+        if user is not None:
+            result = self._dao.update_product_orderprice(prod_dict_list, operate)
+            return result
+        else:
+            print(self.get_now_str(), "Error, ", operate, " product order is failure.", prod_dict_list)
+            return None
+
     def get_account_product(self, OpCode, timestamp, token, pageNo, query_params, ptype):
         print(self.get_now_str(), "PageNo=", pageNo, query_params, "get account product by " + OpCode, "-"*30)
         product_list = None

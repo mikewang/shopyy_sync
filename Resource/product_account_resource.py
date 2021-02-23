@@ -225,6 +225,8 @@ class AccountBatchNoResource(Resource):
             parser.add_argument('note')
             parser.add_argument('begin')
             parser.add_argument('end')
+            parser.add_argument('contractNo')
+            parser.add_argument('specNo')
 
             # 分析请求
             args = parser.parse_args()
