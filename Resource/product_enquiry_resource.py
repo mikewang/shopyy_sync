@@ -10,7 +10,7 @@ from Model.product import DecimalEncoder
 import base64
 
 
-def base64Replace(base64_str):
+def urlsafe_base64(base64_str):
     return base64_str.replace('*', '+').replace('-', '/').replace('.', '=')
 
 
@@ -35,7 +35,7 @@ class ProductEnquiryResource(Resource):
             token = args["token"]
             timestamp = args["timestamp"]
             prod_list_json_base64 = args["prod_list"]
-            prod_list_json_base64 = base64Replace(prod_list_json_base64)
+            prod_list_json_base64 = urlsafe_base64(prod_list_json_base64)
             prod_list_json = base64.b64decode(prod_list_json_base64).decode('utf-8')
             user_service = StockService()
             print("prod list json data is ", prod_list_json)

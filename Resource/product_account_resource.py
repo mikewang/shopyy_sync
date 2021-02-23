@@ -8,7 +8,7 @@ from Service.stock_service import StockService
 import base64
 
 
-def base64Replace(base64_str):
+def urlsafe_base64(base64_str):
     return base64_str.replace('*', '+').replace('-', '/').replace('.', '=')
 
 
@@ -58,7 +58,7 @@ class ProductAccountResource(Resource):
                 query_params['orderID'] = None
             enquiry_base64 = args["batchNo"]
             if enquiry_base64 is not None:
-                enquiry_base64 = base64Replace(enquiry_base64)
+                enquiry_base64 = urlsafe_base64(enquiry_base64)
                 print("enquiry_base64 is ", enquiry_base64)
                 batchNo = base64.b64decode(enquiry_base64).decode('utf-8')
                 query_params['batchNo'] = batchNo
@@ -67,7 +67,7 @@ class ProductAccountResource(Resource):
                 query_params['batchNo'] = None
             goodsDesc_base64 = args["goodsDesc"]
             if goodsDesc_base64 is not None:
-                goodsDesc_base64 = base64Replace(goodsDesc_base64)
+                goodsDesc_base64 = urlsafe_base64(goodsDesc_base64)
                 goodsDesc = base64.b64decode(goodsDesc_base64).decode('utf-8')
                 query_params['goodsDesc'] = goodsDesc
                 print("goodsDesc key is ", args["goodsDesc"], goodsDesc)
@@ -75,7 +75,7 @@ class ProductAccountResource(Resource):
                 query_params['goodsDesc'] = None
             brand_base64 = args["brand"]
             if brand_base64 is not None:
-                brand_base64 = base64Replace(brand_base64)
+                brand_base64 = urlsafe_base64(brand_base64)
                 brands = base64.b64decode(brand_base64).decode('utf-8')
                 brand_list = brands.split(';')
                 query_params['brand'] = brand_list
@@ -85,7 +85,7 @@ class ProductAccountResource(Resource):
 
             begin_base64 = args["begin"]
             if begin_base64 is not None:
-                begin_base64 = base64Replace(begin_base64)
+                begin_base64 = urlsafe_base64(begin_base64)
                 begin_date = base64.b64decode(begin_base64).decode('utf-8')
                 query_params['begin'] = begin_date
                 print("begin_date key is ", args["begin"], begin_date)
@@ -93,7 +93,7 @@ class ProductAccountResource(Resource):
                 query_params['begin'] = None
             end_base64 = args["end"]
             if end_base64 is not None:
-                end_base64 = base64Replace(end_base64)
+                end_base64 = urlsafe_base64(end_base64)
                 end_date = base64.b64decode(end_base64).decode('utf-8')
                 query_params['end'] = end_date
                 print("end_date key is ", args["end"], end_date)
@@ -101,7 +101,7 @@ class ProductAccountResource(Resource):
                 query_params['end'] = None
             supplier_base64 = args["supplier"]
             if supplier_base64 is not None:
-                supplier_base64 = base64Replace(supplier_base64)
+                supplier_base64 = urlsafe_base64(supplier_base64)
                 supplier = base64.b64decode(supplier_base64).decode('utf-8')
                 query_params['supplier'] = supplier
                 print("supplier key is ", args["supplier"], supplier)
@@ -109,7 +109,7 @@ class ProductAccountResource(Resource):
                 query_params['supplier'] = None
             specNo_base64 = args["specNo"]
             if specNo_base64 is not None:
-                specNo_base64 = base64Replace(specNo_base64)
+                specNo_base64 = urlsafe_base64(specNo_base64)
                 specNo = base64.b64decode(specNo_base64).decode('utf-8')
                 query_params['specNo'] = specNo
                 print("specNo key is ", args["specNo"], specNo)
@@ -167,7 +167,7 @@ class ProductAccountResource(Resource):
             timestamp = args["timestamp"]
             operate = args["operate"]
             prod_list_json_base64 = args["prod_list"]
-            prod_list_json_base64 = base64Replace(prod_list_json_base64)
+            prod_list_json_base64 = urlsafe_base64(prod_list_json_base64)
             prod_list_json = base64.b64decode(prod_list_json_base64).decode('utf-8')
             run_time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             print(run_time_str, "prod json is ", prod_list_json)
@@ -236,7 +236,7 @@ class AccountBatchNoResource(Resource):
             query_params = {}
             contractNo_base64 = args["contractNo"]
             if contractNo_base64 is not None:
-                contractNo_base64 = base64Replace(contractNo_base64)
+                contractNo_base64 = urlsafe_base64(contractNo_base64)
                 contractNo = base64.b64decode(contractNo_base64).decode('utf-8')
                 query_params['contractNo'] = contractNo
                 print("contractNo key is ", args["contractNo"], contractNo)
@@ -245,7 +245,7 @@ class AccountBatchNoResource(Resource):
 
             specNo_base64 = args["specNo"]
             if specNo_base64 is not None:
-                specNo_base64 = base64Replace(specNo_base64)
+                specNo_base64 = urlsafe_base64(specNo_base64)
                 specNo = base64.b64decode(specNo_base64).decode('utf-8')
                 query_params['specNo'] = specNo
                 print("specNo key is ", args["specNo"], specNo)
@@ -259,7 +259,7 @@ class AccountBatchNoResource(Resource):
                 query_params['settlement'] = None
             enquiry_base64 = args["batchNo"]
             if enquiry_base64 is not None:
-                enquiry_base64 = base64Replace(enquiry_base64)
+                enquiry_base64 = urlsafe_base64(enquiry_base64)
                 print("enquiry_base64 is ", enquiry_base64)
                 batchNo = base64.b64decode(enquiry_base64).decode('utf-8')
                 query_params['batchNo'] = batchNo
@@ -268,7 +268,7 @@ class AccountBatchNoResource(Resource):
                 query_params['batchNo'] = None
             enquiry_base64 = args["note"]
             if enquiry_base64 is not None:
-                enquiry_base64 = base64Replace(enquiry_base64)
+                enquiry_base64 = urlsafe_base64(enquiry_base64)
                 print("enquiry_base64 is ", enquiry_base64)
                 note = base64.b64decode(enquiry_base64).decode('utf-8')
                 query_params['note'] = note
@@ -277,7 +277,7 @@ class AccountBatchNoResource(Resource):
                 query_params['note'] = None
             begin_base64 = args["begin"]
             if begin_base64 is not None:
-                begin_base64 = base64Replace(begin_base64)
+                begin_base64 = urlsafe_base64(begin_base64)
                 begin_date = base64.b64decode(begin_base64).decode('utf-8')
                 query_params['begin'] = begin_date
                 print("begin_date key is ", args["begin"], begin_date)
@@ -285,7 +285,7 @@ class AccountBatchNoResource(Resource):
                 query_params['begin'] = None
             end_base64 = args["end"]
             if end_base64 is not None:
-                end_base64 = base64Replace(end_base64)
+                end_base64 = urlsafe_base64(end_base64)
                 end_date = base64.b64decode(end_base64).decode('utf-8')
                 query_params['end'] = end_date
                 print("end_date key is ", args["end"], end_date)
@@ -336,7 +336,7 @@ class AccountBatchNoResource(Resource):
             timestamp = args["timestamp"]
             operate = args["operate"]
             prod_list_json_base64 = args["prod_list"]
-            prod_list_json_base64 = base64Replace(prod_list_json_base64)
+            prod_list_json_base64 = urlsafe_base64(prod_list_json_base64)
             prod_list_json = base64.b64decode(prod_list_json_base64).decode('utf-8')
             run_time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             print(run_time_str, "prod json is ", prod_list_json)
