@@ -12,6 +12,8 @@ def urlsafe_base64(base64_str):
     return base64_str.replace('*', '+').replace('-', '/').replace('.', '=')
 
 
+
+
 class ProductOrderpriceResource(Resource):
 
     def get(self, pageNo):
