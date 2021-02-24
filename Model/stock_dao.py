@@ -330,7 +330,7 @@ class StockDao(object):
         product.appPermittedNum = row[35]
         product.accountNum = row[36]
         product.returnNum = row[37]
-        product.accountNo = row[38]
+        product.contractNo = row[38]
         product.orderPriceAccpt = row[39]
         return product
 
@@ -823,7 +823,7 @@ class StockDao(object):
                     elif fullredNum < 0:
                         note = '数据异常，结算' + str(accountNum) + ' 退货' + str(returnNum) + " !=  采购" + str(orderNum)
 
-                    sql = "UPDATE [Stock_Product_Order_Account_App] SET [Settlement] = 2 ,[note] = '' WHERE accountID = ? "
+                    sql = "UPDATE [Stock_Product_Order_Account_App] SET [Settlement] = 2  WHERE accountID = ? "
                     print(operate_type, "update Stock_Product_Order_Account_App sql ---\n ", sql, settlement, accountID)
                     cursor.execute(sql, accountID)
 

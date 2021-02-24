@@ -116,8 +116,6 @@ class ProductOrderResource(Resource):
                 filter_stock['supplier'] = None
             # set settlement
             filter_stock['settlement'] = settlement
-
-
             print("filter_stock is ", filter_stock)
             user_service = StockService()
             prod_list, prod_count = user_service.get_order_product(OpCode, timestamp, token, pageNo, filter_stock, ptype)

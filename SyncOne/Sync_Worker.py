@@ -360,6 +360,18 @@ class SyncWorker(QThread):
         signal_emit = {"message": message}
         self.signal.emit(signal_emit)
 
+    def sync_request_whpj(self, domain_name):
+        request_api = RequstApi()
+        request_api.signal.connect(self.callback_request_api)
+
+        request_api.request_whpj_list(domain_name)
+
+        whpj_info_list = []
+        # write erp
+        cc = len(whpj_info_list)
+        message = "中国银行外汇牌价" + domain_name + " 产品 " + str(cc) + " 个"
+        self.signal.emit({"message": message})
+        # write_erp.write_product_info(domain_name, recent_prod_info_list)
 
     @pyqtSlot()
     def run(self):
@@ -384,6 +396,8 @@ class SyncWorker(QThread):
                     self.sync_product_info_selected(worker["domain_name"], worker["token"], self.selected_goodscode)
                 elif worker["name"] == "query_product_info":
                     self.query_product_info(self.selected_goodscode)
+                elif worker["name"] == "sync_request_whpj":
+                    self.sync_request_whpj(worker["domain_name"])
         except Exception as e:
             print('str(Exception):\t', str(Exception))
             print('str(e):\t\t', str(e))

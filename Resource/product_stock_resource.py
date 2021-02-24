@@ -42,7 +42,7 @@ class ProductStockResource(Resource):
             timestamp = args["timestamp"]
             ptype = args["ptype"]
             # 去掉订货，订货，订货完成 三个状态的查询
-            print("request args is ", args)
+            print("ProductStockResource request args is ", args)
             filter_stock = {}
             contractNo_base64 = args["contractNo"]
             if contractNo_base64 is not None:

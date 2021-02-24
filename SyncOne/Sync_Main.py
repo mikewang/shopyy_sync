@@ -43,7 +43,9 @@ class MainWindow(QMainWindow, MainForm):
         # btn_product_offline_sync
         self.btn_product_sync.clicked.connect(lambda: self.call_sync_dialg())
         self.btn_product_single_sync.clicked.connect(lambda: self.start_selected_sync())
-        self.btn_product_sync_stop.clicked.connect(lambda: self.stop_sync())
+        #self.btn_product_sync_stop.clicked.connect(lambda: self.stop_sync())
+
+        self.btn_product_sync_stop.clicked.connect(lambda: self.scheduler_sync_request_whpj())
 
         self.btn_product_query.clicked.connect(self.query_product_info)
         self.btn_spec_list.clicked.connect(self.query_spec_list)
@@ -126,6 +128,30 @@ class MainWindow(QMainWindow, MainForm):
             self.workerThread.start()
             logging.warning(sync_name + " 提交到后台线程")
             
+        except Exception as e:
+            print(e)
+
+    def scheduler_sync_request_whpj(self):
+        try:
+            sync_name = "自动化增量同步外汇牌价"
+            print(sync_name, "开始", datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+            logging.warning(sync_name + " 开始")
+            self.listWidget.addItem(sync_name + " 开始 " + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+            if self.workerThread.isRunning():
+                logging.warning(sync_name + "上一次未完成，此次取消")
+                message = sync_name + " 上一次未完成，此次同步取消 " + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                self.listWidget.addItem(message)
+                self.listWidget.scrollToBottom()
+                return
+            self.workerThread.sync_sleep_time = 0
+            # 同步产品
+            worker = {"name": "sync_request_whpj", "domain_name": "www.boc.cn"}
+            self.workerThread.worker_list = [worker]
+
+            print("workerThread start", self.workerThread)
+            self.workerThread.start()
+            logging.warning(sync_name + " 提交到后台线程")
+
         except Exception as e:
             print(e)
 

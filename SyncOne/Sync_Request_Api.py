@@ -6,6 +6,8 @@ import sys
 import requests
 import json
 import hashlib
+from bs4 import BeautifulSoup
+
 from SyncOne import global_v as gl
 
 
@@ -466,3 +468,115 @@ class SyncRequestApi(QObject):
             # print(product_info)
             # 继续遍历下一个产品数据，直到数组结束
         return product_info_list
+
+    def request_whpj_list(self, domain_name):
+        try:
+            json_dict = {}
+            url1 = "https://www.boc.cn/sourcedb/whpj/index.html"
+            time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            print(url1, time_str)
+
+            # 添加请求头
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36 QIHU 360SE'
+            }
+            response_1 = requests.get(url1, headers=headers)
+
+            response_1.encoding = 'utf-8'
+            # 第一种：
+            # with open('steve_jobs2.html','w',encoding='utf-8') as f1:
+            #     f1.write(response_1.text)
+            # 第二种：
+            f1 = open('whpj.html', 'w', encoding='utf-8')
+            f1.write(response_1.text)
+            bs = BeautifulSoup(response_1.text, "html.parser")
+            # 缩进格式
+            #print(bs.prettify())
+
+            # 获取title标签的所有内容
+            print(bs.title)
+            #print(bs.body.find_all('table'))
+            td = bs.find(text="货币名称2")
+            print("货币名称 is " , td)
+            for tt in bs.body.find_all('table'):
+                #print(tt.text)
+                trs = tt.find_all('tr')
+                for tr in trs:
+                    ths = tr.find_all('th')
+                    for th in ths:
+                        print(th.text)
+
+            response_text = ""
+            if response_1.status_code == 200:
+                response_text = response_1.text
+                #print(response_text)
+                self.signal.emit({"message": bs.title})
+            else:
+                print("response.status_code=" + str(response_1.status_code))
+            print(url1, "访问完成", time_str)
+            return response_text
+        except Exception as e:
+            print('str(Exception):\t', str(Exception))
+            print('str(e):\t\t', str(e))
+            print('repr(e):\t', repr(e))
+            # Get information about the exception that is currently being handled
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            print('e.message:\t', exc_value)
+            print("Note, object e and exc of Class %s is %s the same." %
+                  (type(exc_value), ('not', '')[exc_value is e]))
+            print('traceback.print_exc(): ', traceback.print_exc())
+            print('traceback.format_exc():\n%s' % traceback.format_exc())
+            print('#' * 60)
+            return None
+
+    def parse_whpj_list(self, domain_name, json_dict):
+        code = json_dict["code"]
+        data_array = json_dict["data"]
+        product_type_list = []
+        # Insert into Product_Type(ProductTypeID,ParentID,TypeName,SortID) values()
+        if domain_name == gl.single_website_domain:
+            product_type = {'ProductTypeID': 10000, 'ParentID': -1, 'TypeName': gl.single_website_name, 'SortID': 0}
+            product_type_list.append(product_type)
+            for item in data_array:
+                category_id = item["id"]
+                category_parent_id = item["parent_id"]
+                category_base_name = item["base_name"]
+                category_listorder = item["listorder"]
+                # print(category_id, category_base_name, category_listorder)
+                if category_parent_id == "0":
+                    category_parent_id = "10000"
+                product_type = {'ProductTypeID': int(category_id), 'ParentID': int(category_parent_id),
+                                'TypeName': category_base_name,
+                                'SortID': int(category_listorder)}
+                product_type_list.append(product_type)
+        elif domain_name == gl.pf_domain or domain_name == gl.ls_domain:
+            product_type = {'ProductTypeID': 10000, 'ParentID': -1, 'TypeName': "批发/零售", 'SortID': 0}
+            product_type_list.append(product_type)
+            for item in data_array:
+                category_id = item["id"]
+                category_parent_id = item["parent_id"]
+                category_base_name = item["base_name"]
+                category_listorder = item["listorder"]
+                # print(category_id, category_base_name, category_listorder)
+                if category_parent_id == "0":
+                    category_parent_id = "10000"
+                product_type = {'ProductTypeID': int(category_id), 'ParentID': int(category_parent_id),
+                                'TypeName': category_base_name,
+                                'SortID': int(category_listorder)}
+                product_type_list.append(product_type)
+        elif domain_name == gl.ls_domain:
+            product_type = {'ProductTypeID': 10001, 'ParentID': -1, 'TypeName': "零售", 'SortID': 0}
+            product_type_list.append(product_type)
+            for item in data_array:
+                category_id = item["id"]
+                category_parent_id = item["parent_id"]
+                category_base_name = item["base_name"]
+                category_listorder = item["listorder"]
+                # print(category_id, category_base_name, category_listorder)
+                if category_parent_id == "0":
+                    category_parent_id = "10001"
+                product_type = {'ProductTypeID': int(category_id), 'ParentID': int(category_parent_id),
+                                'TypeName': category_base_name,
+                                'SortID': int(category_listorder)}
+                product_type_list.append(product_type)
+        return product_type_list
