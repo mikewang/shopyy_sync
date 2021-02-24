@@ -814,3 +814,31 @@ class SyncDao(QObject):
             pass
         finally:
             return spec
+
+    def merge_whpj_list(self, whpj_list):
+        try:
+            # Insert into Product_Type(ProductTypeID,ParentID,TypeName,SortID) values()
+            cnxn = pyodbc.connect(self._conn_str)
+            cursor = cnxn.cursor()
+            for whpj in whpj_list:
+                # self.signal.emit({"message": str(prod_type)})
+                (a, b, c) = whpj
+                if a != '' and b != '' and c != '':
+                    sql = "update [FTPart_币种汇率_1] set [汇率] = " + b + ", [更新时间]=? where [币种]=? and  [汇率] != " + b
+                    print(sql, c, a, b)
+                    cursor.execute(sql, c, a)
+                cursor.commit()
+            cursor.close()
+            cnxn.close()
+        except Exception as e:
+            print('str(Exception):\t', str(Exception))
+            print('str(e):\t\t', str(e))
+            print('repr(e):\t', repr(e))
+            # Get information about the exception that is currently being handled
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            print('e.message:\t', exc_value)
+            print("Note, object e and exc of Class %s is %s the same." %
+                  (type(exc_value), ('not', '')[exc_value is e]))
+            print('traceback.print_exc(): ', traceback.print_exc())
+            print('traceback.format_exc():\n%s' % traceback.format_exc())
+            print('#' * 60)

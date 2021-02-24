@@ -195,4 +195,9 @@ class SyncWriteErp(QObject):
             product_info["product_spec_first"] = product_spec
         return product_info
 
+    def write_whpj(self, whpj_list):
+        dao = Dao()
+        dao.signal.connect(self.callback_dao)
+        dao.merge_whpj_list(whpj_list)
+
 

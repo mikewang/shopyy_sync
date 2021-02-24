@@ -65,6 +65,7 @@ class MainWindow(QMainWindow, MainForm):
 
     def sync_scheduler(self):
         self._default_scheduler.every(5).minutes.do(self.scheduler_sync_recent)
+        self._default_scheduler.every(60).minutes.do(self.scheduler_sync_request_whpj)
         self._default_scheduler.every().day.at("01:01").do(self.scheduler_sync_full)
         self._default_scheduler.run_continuously(1)
 
