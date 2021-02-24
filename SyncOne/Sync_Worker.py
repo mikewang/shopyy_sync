@@ -363,14 +363,14 @@ class SyncWorker(QThread):
     def sync_request_whpj(self, domain_name):
         request_api = RequstApi()
         request_api.signal.connect(self.callback_request_api)
-
-        request_api.request_whpj_list(domain_name)
-
-        whpj_info_list = []
+        whpj_info_list = request_api.request_whpj_list(domain_name)
         # write erp
         cc = len(whpj_info_list)
         message = "中国银行外汇牌价" + domain_name + " 产品 " + str(cc) + " 个"
         self.signal.emit({"message": message})
+        for whpj in whpj_info_list:
+            (a,b,c) = whpj
+            self.signal.emit({"message": a + " " + b + " " + c})
         # write_erp.write_product_info(domain_name, recent_prod_info_list)
 
     @pyqtSlot()

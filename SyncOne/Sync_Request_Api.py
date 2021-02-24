@@ -471,7 +471,7 @@ class SyncRequestApi(QObject):
 
     def request_whpj_list(self, domain_name):
         try:
-            json_dict = {}
+            whpj_list = []
             url1 = "https://www.boc.cn/sourcedb/whpj/index.html"
             time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             print(url1, time_str)
@@ -497,24 +497,53 @@ class SyncRequestApi(QObject):
             print(bs.title)
             #print(bs.body.find_all('table'))
             td = bs.find(text="货币名称2")
-            print("货币名称 is " , td)
+            print("货币名称 is ", td)
             for tt in bs.body.find_all('table'):
                 #print(tt.text)
+                usedata = 0
                 trs = tt.find_all('tr')
                 for tr in trs:
                     ths = tr.find_all('th')
                     for th in ths:
-                        print(th.text)
+                        if th.text == "货币名称":
+                            usedata = 1
+                            break
+                    if usedata == 1:
+                        tds = tr.find_all('td')
+                        i = 0
+                        name = ''
+                        value = ''
+                        time = ''
+                        for td in tds:
+                            if i == 0:
+                                name = td.text
+                            if i == 2:
+                                value = td.text
+                            if i == 6:
+                                time = td.text
+                            i = i + 1
+                        whpj = (name, value, time)
+                        whpj_list.append(whpj)
+                        print("whpj is ", whpj)
+            pages = bs.select(".turn_page")
+            page_num = 1
+            for page in pages:
+                num_text = page.text
+                num_text = num_text.strip()
+                num_text = num_text.strip("共")
+                num_text = num_text.strip("页")
+                num_text = num_text.strip()
+                print(num_text)
 
             response_text = ""
             if response_1.status_code == 200:
                 response_text = response_1.text
                 #print(response_text)
-                self.signal.emit({"message": bs.title})
+                #self.signal.emit({"message": bs.title})
             else:
                 print("response.status_code=" + str(response_1.status_code))
             print(url1, "访问完成", time_str)
-            return response_text
+            return whpj_list
         except Exception as e:
             print('str(Exception):\t', str(Exception))
             print('str(e):\t\t', str(e))

@@ -43,9 +43,9 @@ class MainWindow(QMainWindow, MainForm):
         # btn_product_offline_sync
         self.btn_product_sync.clicked.connect(lambda: self.call_sync_dialg())
         self.btn_product_single_sync.clicked.connect(lambda: self.start_selected_sync())
-        #self.btn_product_sync_stop.clicked.connect(lambda: self.stop_sync())
+        self.btn_product_sync_stop.clicked.connect(lambda: self.stop_sync())
 
-        self.btn_product_sync_stop.clicked.connect(lambda: self.scheduler_sync_request_whpj())
+        self.btn_whpj_sync.clicked.connect(lambda: self.scheduler_sync_request_whpj())
 
         self.btn_product_query.clicked.connect(self.query_product_info)
         self.btn_spec_list.clicked.connect(self.query_spec_list)
