@@ -915,17 +915,18 @@ class StockDao(object):
                               "where stockProductID = ? and (orderStat = -1 or orderStat = 1) and settlement >= 1"
                         cursor.execute(sql, stockProductID)
                         row = cursor.fetchone()
-                        goodsnum = row[0]
-                        allprice = row[1]
-                        if goodsnum == 0:
-                            unitprice = 0
-                        else:
-                            unitprice = allprice / goodsnum
-                        print("写入erp数据库", stockProductID, unitprice, goodsnum)
-                        sql = "update Stock_Product_InfoBase set unitprice=? where stockProductID = ?"
-                        cursor.execute(sql, unitprice, stockProductID)
-                        sql = "update Stock_Product_Info set goodsnum=? where stockProductID = ?"
-                        cursor.execute(sql, goodsnum, stockProductID)
+                        if row is not None:
+                            goodsnum = row[0]
+                            allprice = row[1]
+                            if goodsnum == 0:
+                                unitprice = 0
+                            else:
+                                unitprice = allprice / goodsnum
+                            print("写入erp数据库", stockProductID, unitprice, goodsnum)
+                            sql = "update Stock_Product_InfoBase set unitprice=? where stockProductID = ?"
+                            cursor.execute(sql, unitprice, stockProductID)
+                            sql = "update Stock_Product_Info set goodsnum=? where stockProductID = ?"
+                            cursor.execute(sql, goodsnum, stockProductID)
                         cursor.commit()
                         result_product.orderPrice = orderPrice
                         result_product.orderPriceAccpt = orderPriceAccpt
