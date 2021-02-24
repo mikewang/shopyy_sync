@@ -915,7 +915,7 @@ class StockDao(object):
                               "where stockProductID = ? and (orderStat = -1 or orderStat = 1) and settlement >= 1"
                         cursor.execute(sql, stockProductID)
                         row = cursor.fetchone()
-                        if row is not None:
+                        if row is not None and row[0] is not None and row[1] is not None:
                             goodsnum = row[0]
                             allprice = row[1]
                             if goodsnum == 0:
