@@ -884,7 +884,7 @@ class StockDao(object):
                 result_product = ProductInfo()
                 result_product.stockProductID = stockProductID
                 result_product.orderID = orderID
-                result_product.note = "0:" + operate_type + " 价格状态修改失败"
+                result_product.note = "0:" + operate_type + " 价格状态修改为" + str(orderPriceAccpt) + " 失败"
 
                 if operate_type == cv.order_price:
                     # 价格确认
@@ -907,7 +907,7 @@ class StockDao(object):
                               " supplier, OperateType, orderId, note, orderPriceAccpt) VALUES(?,?,?,?,?,?,?,?,?)"
                         print(operate_type, "insert hist sql --- \n ", sql)
                         cursor.execute(sql, stockProductID, opCode, orderNum, orderPrice,
-                                       supplier, cv.cancel_order, orderID, '',orderPriceAccpt)
+                                       supplier, cv.cancel_order, orderID, '', orderPriceAccpt)
                         # [Stock_Product_InfoBase].unitprice 更新单价
                         # [Stock_Product_Info].goodsnum 更新采购量，为0是要设置为允采购量，因为系统不能设置为0。
                         sql = "select sum(ordernum*orderStat) as goodsnum,sum(ordernum*orderprice*orderStat) as allprice " \
@@ -930,7 +930,7 @@ class StockDao(object):
                         cursor.commit()
                         result_product.orderPrice = orderPrice
                         result_product.orderPriceAccpt = orderPriceAccpt
-                        result_product.note = "1:价格状态修改成功"
+                        result_product.note = "1:价格状态修改为" + str(orderPriceAccpt) + " 成功"
                 result_product_list.append(result_product)
             cursor.close
             cnxn.close
