@@ -8,7 +8,7 @@ import json
 import hashlib
 from bs4 import BeautifulSoup
 
-import global_v as gl
+import SyncOne.global_v as gl
 
 
 class SyncRequestApi(QObject):

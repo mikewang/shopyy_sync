@@ -10,7 +10,7 @@ from PIL import Image
 import hashlib
 import pyodbc
 import datetime
-import global_v as gl
+import SyncOne.global_v as gl
 
 
 class SyncDao(QObject):

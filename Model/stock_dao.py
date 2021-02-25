@@ -872,7 +872,7 @@ class StockDao(object):
             cnxn = pyodbc.connect(self._conn_str)
             cursor = cnxn.cursor()
             for prod in prod_dict_list:
-                print("order product id=", prod["orderID"], prod["stockProductID"])
+                print("orderprice product id=", prod["orderID"], prod["stockProductID"], "orderPriceAccpt is ", prod["orderPriceAccpt"], prod["purchasePrice"] )
                 # 全局数据, 传入的参数值。
                 orderID = prod["orderID"]
                 stockProductID = prod["stockProductID"]
@@ -890,7 +890,7 @@ class StockDao(object):
                     # 价格确认
                     sql = "update Stock_Product_Order_App set orderPriceAccpt = ?, OrderPrice = ?  where orderID=?"
                     cursor.execute(sql, orderPriceAccpt, purchasePrice, orderID)
-                    print(sql)
+                    print(sql, orderPriceAccpt, purchasePrice, orderID)
                     sql = "select stockProductID, OrderNum, OrderPrice,supplier, settlement, orderPriceAccpt " \
                           "from Stock_Product_Order_App where orderID=?"
                     cursor.execute(sql, orderID)

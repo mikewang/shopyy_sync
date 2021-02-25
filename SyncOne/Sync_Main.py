@@ -17,12 +17,12 @@ from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5.QtGui import QPixmap
 #导入designer工具生成的login模块
-from Sync_Main_Form import Ui_Form as MainForm
-from Dialog_Form import Ui_Dialog as DialogForm
-from Spec_Form import Ui_Form as SpecForm
-from Sync_Worker import SyncWorker as Worker
-import Scheduler, global_v as gl
-from Sync_Dao import SyncDao as Dao
+from SyncOne.Sync_Main_Form import Ui_Form as MainForm
+from SyncOne.Dialog_Form import Ui_Dialog as DialogForm
+from SyncOne.Spec_Form import Ui_Form as SpecForm
+from SyncOne.Sync_Worker import SyncWorker as Worker
+import SyncOne.Scheduler, SyncOne.global_v as gl
+from SyncOne.Sync_Dao import SyncDao as Dao
 
 
 class MainWindow(QMainWindow, MainForm):
