@@ -4,9 +4,9 @@
 block_cipher = None
 py_files = [
     'SyncOne//Sync_Main.py',
-    'SyncOne//Sync_Main.py',
-    'SyncOne//Sync_Main.py',
-    'SyncOne//Sync_Main.py',
+    'SyncOne//Sync_Main_Form.py',
+    'SyncOne//Spec_Form.py',
+    'SyncOne//Dialog_Form.py',
     'SyncOne//global_v.py',
     'SyncOne//Sync_Request_Api.py',
     'SyncOne//Sync_Worker.py',
