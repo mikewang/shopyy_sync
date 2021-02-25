@@ -3,8 +3,8 @@ from PyQt5.QtCore import QObject, pyqtSignal
 import os
 import time
 import requests
-from SyncOne.Sync_Dao import SyncDao as Dao
-from SyncOne import global_v as gl
+from Sync_Dao import SyncDao as Dao
+import global_v as gl
 
 
 class SyncWriteErp(QObject):

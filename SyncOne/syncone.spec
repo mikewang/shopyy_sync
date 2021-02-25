@@ -1,22 +1,25 @@
 # -*- mode: python ; coding: utf-8 -*-
-# pyinstaller -D etlyy.spec  打包方法
+# pyinstaller -D syncone.spec SyncOne  打包方法 pyinstaller -D syncone.spec SyncOne
+# pyinstaller -p C:\Users\Administrator\AppData\Local\Programs\Python\Python37\Lib;C:\Users\Administrator\AppData\Local\Programs\Python\Python37\Lib\site-packages; -D syncone\syncone.spec SyncOne
+# pyinstaller -p C:\Users\Administrator\PycharmProjects\untitled\venv\Lib;C:\Users\Administrator\PycharmProjects\untitled\venv\Lib\site-packages; -D syncone\syncone.spec SyncOne
+
 
 block_cipher = None
 py_files = [
-    'SyncOne//Sync_Main.py',
-    'SyncOne//Sync_Main_Form.py',
-    'SyncOne//Spec_Form.py',
-    'SyncOne//Dialog_Form.py',
-    'SyncOne//global_v.py',
-    'SyncOne//Sync_Request_Api.py',
-    'SyncOne//Sync_Worker.py',
-    'SyncOne//Sync_Write_Erp.py',
-    'SyncOne//Sync_Dao.py',
-    'SyncOne//Scheduler.py'
+    'Sync_Main.py',
+    'Sync_Main_Form.py',
+    'Spec_Form.py',
+    'Dialog_Form.py',
+    'global_v.py',
+    'Sync_Request_Api.py',
+    'Sync_Worker.py',
+    'Sync_Write_Erp.py',
+    'Sync_Dao.py',
+    'Scheduler.py'
 ]
 
 a = Analysis(py_files,
-             pathex=['C:\\Users\\Administrator\\PycharmProjects\\shopyy_sync'],
+             pathex=['C:\\Users\\Administrator\\PycharmProjects\\shopyy_sync\\syncone'],
              binaries=[],
              datas=[],
              hiddenimports=[],

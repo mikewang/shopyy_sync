@@ -17,12 +17,12 @@ from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5.QtGui import QPixmap
 #导入designer工具生成的login模块
-from SyncOne.Sync_Main_Form import Ui_Form as MainForm
-from SyncOne.Dialog_Form import Ui_Dialog as DialogForm
-from SyncOne.Spec_Form import Ui_Form as SpecForm
-from SyncOne.Sync_Worker import SyncWorker as Worker
-from SyncOne import Scheduler, global_v as gl
-from SyncOne.Sync_Dao import SyncDao as Dao
+from Sync_Main_Form import Ui_Form as MainForm
+from Dialog_Form import Ui_Dialog as DialogForm
+from Spec_Form import Ui_Form as SpecForm
+from Sync_Worker import SyncWorker as Worker
+import Scheduler, global_v as gl
+from Sync_Dao import SyncDao as Dao
 
 
 class MainWindow(QMainWindow, MainForm):
@@ -526,8 +526,16 @@ if __name__ == '__main__':
     # pds.insert(3,4)
     # print(pds)
     config = configparser.ConfigParser()
-    init_file = os.path.normpath(os.path.join(os.curdir, "config", "ymcart.ini"))
-    config.read(init_file)
+    configure_file = 'ymcart.ini'
+    configure_filepath = os.path.join(os.curdir, 'config', configure_file)
+    config.read(configure_filepath, encoding='UTF-8')
+    file_existed = os.path.exists(configure_filepath)
+    if file_existed == False:
+        print("config file path is ", os.path.abspath(configure_filepath))
+    for each_section in config.sections():
+        for (each_key, each_val) in config.items(each_section):
+            print(each_key, each_val)
+            pass
     gl.single_website_domain = config.get("api_single_website", "domain_name")
     gl.single_website_token = config.get("api_single_website", "core_token")
     gl.single_website_name = config.get("api_single_website", "website_name")
