@@ -819,7 +819,7 @@ class StockDao(object):
                     fullredNum = orderNum - returnNum - accountNum
                     note = '结算成功, 结算' + str(accountNum) + ' 退货' + str(returnNum) + " =  采购" + str(orderNum)
                     if fullredNum > 0:
-                        note = note + ' -需要充红: ' + str(fullredNum)
+                        note = note + ' -充红: ' + str(fullredNum)
                     elif fullredNum < 0:
                         note = '数据异常，结算' + str(accountNum) + ' 退货' + str(returnNum) + " !=  采购" + str(orderNum)
 
@@ -846,7 +846,7 @@ class StockDao(object):
 
                     cursor.commit()
                     result_product.batchNo = batchNo
-                    result_product.note = "1:" + note + ":" + str(accountNum) + ":" + str(returnNum) + ":" + str(orderNum) + ":" + str(fullredNum)
+                    result_product.note = "1:" + note + " （结算,退货,采购,充红）:" + str(accountNum) + ":" + str(returnNum) + ":" + str(orderNum) + ":" + str(fullredNum)
                     result_product.settlement = 2
                 result_product_list.append(result_product)
             cursor.close
