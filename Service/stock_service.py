@@ -147,11 +147,13 @@ class StockService(UserInfo):
                 result = self._dao.update_stock_product_order(prod_dict_list, operate)
             elif operate == cv.account_goods or operate == cv.undo_account:
                 result = self._dao.merge_account_product(prod_dict_list, operate)
+            elif operate == cv.batch_settle:
+                result = self._dao.batch_update_order_product_settlement(prod_dict_list, OpCode)
             else:
                 print("--" * 50)
                 print(operate, " maybe wrong.")
                 print("--" * 50)
-
+                result = None
             return result
         else:
 

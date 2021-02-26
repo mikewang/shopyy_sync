@@ -67,6 +67,8 @@ class ProductInfo(object):
         self.orderPriceAccpt = 0
         # 采购价格推荐
         self.orderpriceList = []
+        # 对账批号 -- 对账返回时使用
+        self.batchNo = ''
 
     def desc(self):
         product_dict = self.__dict__

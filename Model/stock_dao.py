@@ -845,6 +845,7 @@ class StockDao(object):
                                    cv.settlement_goods, orderID, note, orderPriceAccpt)
 
                     cursor.commit()
+                    result_product.batchNo = batchNo
                     result_product.note = "1:" + note + ":" + str(accountNum) + ":" + str(returnNum) + ":" + str(orderNum) + ":" + str(fullredNum)
                     result_product.settlement = 2
                 result_product_list.append(result_product)
@@ -1066,7 +1067,7 @@ class StockDao(object):
         try:
             print("query_params is ", query_params)
             account_batchNo_list = []
-            page_prod_count = 1000
+            page_prod_count = 10000
             cnxn = pyodbc.connect(self._conn_str)
             cursor = cnxn.cursor()
             # 数据源
@@ -1151,7 +1152,7 @@ class StockDao(object):
                 result_product.note = "0:" + operate_type + " failure."
 
                 if operate_type == cv.account_goods:
-                    accountStat = 1
+                    accountStat = 1  # 对账状态 正常
                     note = prod["note"]
                     sql = "INSERT INTO [Stock_Product_Order_Account_App](batchNo,[orderID], [stockProductID], [OpCode], [OrderNum], [OrderPrice], [Settlement], [supplier], [CreateTime], [accountNum], [accountStat], [note])" \
                           " SELECT ?, [orderID], [stockProductID], ?, [OrderNum], ? , [Settlement], [supplier], getdate(), ?, ?, ? as nn FROM [Stock_Product_Order_App] WHERE [orderID] = ?"
@@ -1181,7 +1182,7 @@ class StockDao(object):
                     cursor.commit()
                     result_product.note = "1:对账成功, 已对账数:" + str(accountNum)
                 elif operate_type == cv.undo_account:
-                    accountStat = 0
+                    accountStat = 0  # 对账状态 取消
                     sql = "update [Stock_Product_Order_Account_App] set [accountStat] = ?  WHERE [accountID] = ? and [accountStat] = 1"
                     print(operate_type, "update sql ---\n ", sql)
                     cursor.execute(sql, accountStat, accountID)
@@ -1231,7 +1232,72 @@ class StockDao(object):
             cnxn.rollback()
             return result_product_list
 
+    def select_order_account_product_list_by_batchNo(self, batchNo):
+        # 检索 所有的 对账记录
+        # 订单号 orderID
+        # 批号 batchNo
+        # 状态 取消，或正常
+        #
+        try:
+            account_product_list = []
+            page_no = 1
+            page_prod_count = 10000
+            cnxn = pyodbc.connect(self._conn_str)
+            cursor = cnxn.cursor()
+            # 数据源
+            v_sql = "SELECT [accountID], [batchNo], [orderID], [stockProductID], [OpCode], [OrderNum], [OrderPrice], [Settlement], [supplier],CONVERT(varchar, CreateTime, 120) AS CreateTime, [accountNum], [accountStat] FROM [Stock_Product_Order_Account_App] where accountStat = 1"
+            v_time_column = "CreateTime"
+            v_sql = v_sql + " and batchNo = '" + batchNo + "'"
 
+            # 先总数
+            product_count = 0
+            topN = page_no*page_prod_count
+            # 再分页，需要增加排序功能
+            v_sql = "select row_number() over(order by v." + v_time_column + " desc,v.accountid desc) as rownumber,  v.* ,count(*) over() as product_count from (" + v_sql + ") as v"
+            v_sql = "select * from (" + v_sql + ") as v1 where v1.rownumber > " + str(topN - page_prod_count) + " and v1.rownumber <= " + str(topN) + " order by v1.rownumber"
+            print("sql page is ", v_sql, batchNo)
+            cursor.execute(v_sql)
+            for row in cursor:
+                product = self.parse_account_product_cursor(row)
+                account_product_list.append(product)
+            cursor.close()
+            cnxn.close()
+            return account_product_list
+        except Exception as e:
+            print('str(Exception):\t', str(Exception))
+            print('str(e):\t\t', str(e))
+            print('repr(e):\t', repr(e))
+            # Get information about the exception that is currently being handled
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            print('e.message:\t', exc_value)
+            print("Note, object e and exc of Class %s is %s the same." %
+                  (type(exc_value), ('not', '')[exc_value is e]))
+            print('traceback.print_exc(): ', traceback.print_exc())
+            print('traceback.format_exc():\n%s' % traceback.format_exc())
+            print('#' * 60)
+            return None
+
+    def batch_update_order_product_settlement(self, batchNo_dict_list, opCode):
+        for batch_prod in batchNo_dict_list:
+            print("settlement product batchNo =", batch_prod["batchNo"])
+            batchNo = batch_prod["batchNo"]
+            acct_prod_list = self.select_order_account_product_list_by_batchNo(batchNo)
+            account_product_list = []
+            for acct_prod in acct_prod_list:
+                prod = dict()
+                prod["orderID"] = acct_prod.orderID
+                prod["stockProductID"] = acct_prod.stockProductID
+                prod["settlementOpCode"] = opCode
+                prod["purchaseNum"] = acct_prod.accountNum
+                prod["purchasePrice"] = acct_prod.orderPrice
+                prod["supplier"] = acct_prod.supplier
+                prod["settlement"] = acct_prod.settlement
+                prod["accountID"] = acct_prod.accountID
+                prod["batchNo"] = batchNo
+                account_product_list.append(prod)
+            print("批量结算，", batchNo, "数量为", len(account_product_list))
+            result_list = self.update_stock_product_order(account_product_list, cv.settlement_goods)
+            return result_list
 
     def parse_orderprice_product_cursor(self, row):
         product = OrderpriceInfo()
