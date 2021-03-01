@@ -1071,7 +1071,8 @@ class StockDao(object):
             cnxn = pyodbc.connect(self._conn_str)
             cursor = cnxn.cursor()
             # 数据源
-            v_sql = "SELECT distinct [batchNo], CONVERT(varchar, CreateTime, 120) AS CreateTime, count(*) over(partition by [batchNo]) as batchProdCount, note  FROM [Stock_Product_Order_Account_App] where accountStat = 1"
+
+            v_sql = "SELECT distinct [batchNo], CONVERT(varchar, min(CreateTime) over(partition by [batchNo]), 120) AS CreateTime, count(*) over(partition by [batchNo]) as batchProdCount, note  FROM [Stock_Product_Order_Account_App] where accountStat = 1"
 
             if ptype == cv.batchno_list:
                 v_sql = v_sql + " and settlement != 2"
@@ -1126,7 +1127,36 @@ class StockDao(object):
             print('#' * 60)
             return None, 0
 
-    def merge_account_product(self, account_prod_dict_list, operate_type):
+    def select_account_note(self, query_params):
+        try:
+            result_product_list = []
+            cnxn = pyodbc.connect(self._conn_str)
+            cursor = cnxn.cursor()
+            sql = "select distinct note,batchNo from Stock_Product_Order_Account_App where accountStat =1 and note=?"
+            filter_note = query_params["note"]
+            cursor.execute(sql, filter_note)
+            for row in cursor:
+                prod = dict()
+                prod["note"] = row[0]
+                prod["batchNo"] = row[1]
+                result_product_list.append(prod)
+            return result_product_list
+        except Exception as e:
+            print('str(Exception):\t', str(Exception))
+            print('str(e):\t\t', str(e))
+            print('repr(e):\t', repr(e))
+            # Get information about the exception that is currently being handled
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            print('e.message:\t', exc_value)
+            print("Note, object e and exc of Class %s is %s the same." %
+                  (type(exc_value), ('not', '')[exc_value is e]))
+            print('traceback.print_exc(): ', traceback.print_exc())
+            print('traceback.format_exc():\n%s' % traceback.format_exc())
+            print('#' * 60)
+            return None
+
+
+    def create_account_product(self, account_prod_dict_list, operate_type):
         try:
             result_product_list = []
             cnxn = pyodbc.connect(self._conn_str)

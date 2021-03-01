@@ -146,7 +146,7 @@ class StockService(UserInfo):
                     or operate == cv.undo_return or operate == cv.settlement_goods:
                 result = self._dao.update_stock_product_order(prod_dict_list, operate)
             elif operate == cv.account_goods or operate == cv.undo_account:
-                result = self._dao.merge_account_product(prod_dict_list, operate)
+                result = self._dao.create_account_product(prod_dict_list, operate)
             elif operate == cv.batch_settle:
                 result = self._dao.batch_update_order_product_settlement(prod_dict_list, OpCode)
             else:
@@ -203,6 +203,17 @@ class StockService(UserInfo):
             print(self.get_now_str(), "Error, ", operate, " product order is failure.", prod_dict_list)
             return None
 
+    def get_account_note(self, OpCode, timestamp, token, pageNo, query_params, ptype):
+        print(self.get_now_str(), "PageNo=", pageNo, query_params, "get account product by " + OpCode, "-"*30)
+        user = self.get_checked_user(OpCode, timestamp, token)
+        if user is not None:
+            account_batchno_note_list, prod_count = self._dao.select_account_note(query_params)
+        else:
+            account_batchno_note_list = None
+            prod_count = 0
+            print(self.get_now_str(), "Error, get get_account_note is failure.", OpCode, "PageNo=", pageNo)
+        return account_batchno_note_list, prod_count
+
     def get_account_product(self, OpCode, timestamp, token, pageNo, query_params, ptype):
         print(self.get_now_str(), "PageNo=", pageNo, query_params, "get account product by " + OpCode, "-"*30)
         product_list = None
@@ -211,6 +222,7 @@ class StockService(UserInfo):
         if user is not None:
             account_product_list, product_count, product_list = self._dao.select_account_product(pageNo, query_params, ptype)
         else:
+            account_product_list = None
             print(self.get_now_str(), "Error, get account product is failure.", OpCode, "PageNo=", pageNo)
         return account_product_list, product_count, product_list
 

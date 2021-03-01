@@ -206,6 +206,104 @@ class ProductAccountResource(Resource):
             print(run_time_str, "add order product ", OpCode)
 
 
+class AccountNoteResource(Resource):
+
+    def get(self, pageNo):
+        try:
+            # 增加请求解析参数
+            parser = reqparse.RequestParser()
+            parser.add_argument('OpCode', location='headers')
+            parser.add_argument('token', location='headers')
+            parser.add_argument('timestamp', location='headers')
+            # parser.add_argument('OpCode', location=['headers', 'args'])
+            # parser.add_argument('token', location=['headers', 'args'])
+            # parser.add_argument('timestamp', location=['headers', 'args'])
+            parser.add_argument('t')
+            parser.add_argument('ptype')
+            parser.add_argument('note')
+
+            # 分析请求
+            args = parser.parse_args()
+            OpCode = args["OpCode"]
+            token = args["token"]
+            timestamp = args["timestamp"]
+            ptype = args["ptype"]
+            print("request args is ", args)
+            query_params = {}
+            enquiry_base64 = args["note"]
+            if enquiry_base64 is not None:
+                enquiry_base64 = urlsafe_base64(enquiry_base64)
+                print("enquiry_base64 is ", enquiry_base64)
+                note = base64.b64decode(enquiry_base64).decode('utf-8')
+                query_params['note'] = note
+                print("enquiry key is ", args["note"], note)
+            else:
+                query_params['note'] = None
+            print("query_params is ", query_params)
+            user_service = StockService()
+            account_note_list, prod_count = user_service.get_account_note(OpCode, timestamp, token, pageNo, query_params, ptype)
+            result = {"code": 200, "msg": "", "count": prod_count}
+            if account_note_list is not None:
+                json_list = []
+                for prod in account_note_list:
+                    json_list.append(prod.desc())
+                result["data"] = json_list
+            else:
+                result["data"] = []
+                result = {"code": 201, "msg": "note is not existed."}
+            return result, result["code"]
+        except Exception as e:
+            print('str(Exception):\t', str(Exception))
+            print('str(e):\t\t', str(e))
+            print('repr(e):\t', repr(e))
+            # Get information about the exception that is currently being handled
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            print('e.message:\t', exc_value)
+            print("Note, object e and exc of Class %s is %s the same." % (type(exc_value), ('not', '')[exc_value is e]))
+            print('traceback.print_exc(): ', traceback.print_exc())
+            print('traceback.format_exc():\n%s' % traceback.format_exc())
+            print('#' * 60)
+        finally:
+            time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            print("get account product ", OpCode, time_str)
+
+    def post(self):
+        try:
+            # 增加请求解析参数
+            parser = reqparse.RequestParser()
+            parser.add_argument('OpCode', location='headers')
+            parser.add_argument('token', location='headers')
+            parser.add_argument('timestamp', location='headers')
+            parser.add_argument('prod_list', location='json')
+            parser.add_argument('operate', location='json')
+            # 分析请求
+            args = parser.parse_args()
+            OpCode = args["OpCode"]
+            token = args["token"]
+            timestamp = args["timestamp"]
+            operate = args["operate"]
+            prod_list_json_base64 = args["prod_list"]
+            prod_list_json_base64 = urlsafe_base64(prod_list_json_base64)
+            prod_list_json = base64.b64decode(prod_list_json_base64).decode('utf-8')
+            run_time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            print(run_time_str, "prod json is ", prod_list_json)
+            result = {"code": 201, "msg": ""}
+            return result, result["code"]
+        except Exception as e:
+            print('str(Exception):\t', str(Exception))
+            print('str(e):\t\t', str(e))
+            print('repr(e):\t', repr(e))
+            # Get information about the exception that is currently being handled
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            print('e.message:\t', exc_value)
+            print("Note, object e and exc of Class %s is %s the same." % (type(exc_value), ('not', '')[exc_value is e]))
+            print('traceback.print_exc(): ', traceback.print_exc())
+            print('traceback.format_exc():\n%s' % traceback.format_exc())
+            print('#' * 60)
+        finally:
+            run_time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            print(run_time_str, "add order product ", OpCode)
+
 class AccountBatchNoResource(Resource):
 
     def get(self, pageNo):
