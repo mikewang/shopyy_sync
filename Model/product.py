@@ -132,6 +132,7 @@ class AccountProductInfo(object):
         self.note = ''
         # 销售合同号
         self.contractNo = ''
+        self.returnNum = 0
 
     def desc(self):
         product_dict = self.__dict__

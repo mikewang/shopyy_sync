@@ -965,7 +965,71 @@ class StockDao(object):
         product.createTime = row[10]
         product.accountNum = row[11]
         product.accountStat = row[12]
+        product.returnNum = row[13]
         return product
+
+    def select_presettlement_product(self, page_no, query_params, ptype):
+        # 检索 所有的 对账 数据异常（已采购量 != 退货 + 对账 ），需要取消对账或者充红的商品
+        # 批号 batchNo
+        #
+        #
+        try:
+            account_product_list = []
+            page_prod_count = 10
+            cnxn = pyodbc.connect(self._conn_str)
+            cursor = cnxn.cursor()
+            # 数据源
+            v_sql = "SELECT a.accountID, a.batchNo, a.orderID, a.stockProductID, a.OpCode, a.OrderNum, a.OrderPrice, a.Settlement, a.supplier,CONVERT(varchar, CreateTime, 120) AS CreateTime, a.accountNum, a.accountStat ,coalesce(b.OrderNum,0) as returnNum " \
+                    " FROM Stock_Product_Order_Account_App as a left join (select sourceOrderId, ordernum from Stock_Product_Order_App where orderstat = -1) b on a.orderID = b.sourceOrderId " \
+                    " where a.accountStat = 1 and a.OrderNum != a.accountNum + coalesce(b.OrderNum,0) "
+            v_time_column = "CreateTime"
+
+            filter_batchNo = query_params["batchNo"]
+            if filter_batchNo is not None:
+                v_sql = v_sql + " and a.batchNo = '" + filter_batchNo + "'"
+
+            # 过滤条件，商品描述
+
+            # 先总数
+            product_count = 0
+            topN = page_no*page_prod_count
+            # 再分页，需要增加排序功能
+            v_sql = "select row_number() over(order by v." + v_time_column + " desc,v.accountid desc) as rownumber,  v.* ,count(*) over() as product_count from (" + v_sql + ") as v"
+            v_sql = "select * from (" + v_sql + ") as v1 where v1.rownumber > " + str(topN - page_prod_count) + " and v1.rownumber <= " + str(topN) + " order by v1.rownumber"
+            print(ptype, "sql page is ", v_sql)
+            cursor.execute(v_sql)
+            orderID_set = set()
+            for row in cursor:
+                product = self.parse_account_product_cursor(row)
+                product_count = row[len(row)-1]
+                account_product_list.append(product)
+                orderID_set.add(product.orderID)
+            orderID_list_str = "0"
+            for orderID in orderID_set:
+                orderID_list_str = orderID_list_str + "," + str(orderID)
+            print("orderID_list_str", orderID_list_str.lstrip(","))
+            v_sql = "select 0 as rownumber,  v.* ,count(*) over() as product_count from v_app_stock_order as v where v.product_order_id in (" + orderID_list_str.lstrip(",") +")"
+            cursor.execute(v_sql)
+            product_list = []
+            for row in cursor:
+                parent_product = self.parse_product_cursor(row)
+                product_list.append(parent_product)
+            cursor.close()
+            cnxn.close()
+            return account_product_list, product_count, product_list
+        except Exception as e:
+            print('str(Exception):\t', str(Exception))
+            print('str(e):\t\t', str(e))
+            print('repr(e):\t', repr(e))
+            # Get information about the exception that is currently being handled
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            print('e.message:\t', exc_value)
+            print("Note, object e and exc of Class %s is %s the same." %
+                  (type(exc_value), ('not', '')[exc_value is e]))
+            print('traceback.print_exc(): ', traceback.print_exc())
+            print('traceback.format_exc():\n%s' % traceback.format_exc())
+            print('#' * 60)
+            return None, 0, None
 
     def select_account_product(self, page_no, query_params, ptype):
         # 检索 所有的 对账记录
@@ -980,6 +1044,9 @@ class StockDao(object):
             cursor = cnxn.cursor()
             # 数据源
             v_sql = "SELECT [accountID], [batchNo], [orderID], [stockProductID], [OpCode], [OrderNum], [OrderPrice], [Settlement], [supplier],CONVERT(varchar, CreateTime, 120) AS CreateTime, [accountNum], [accountStat] FROM [Stock_Product_Order_Account_App] where accountStat = 1"
+            v_sql = "select * from (SELECT a.accountID, a.batchNo, a.orderID, a.stockProductID, a.OpCode, a.OrderNum, a.OrderPrice, a.Settlement, a.supplier,CONVERT(varchar, CreateTime, 120) AS CreateTime, a.accountNum, a.accountStat ,coalesce(b.OrderNum,0) as returnNum " \
+                    " FROM Stock_Product_Order_Account_App as a left join (select sourceOrderId, ordernum from Stock_Product_Order_App where orderstat = -1) b on a.orderID = b.sourceOrderId " \
+                    " where a.accountStat = 1) as v where 1=1"
             v_time_column = "CreateTime"
 
             filter_orderID = query_params["orderID"]

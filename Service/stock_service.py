@@ -220,7 +220,10 @@ class StockService(UserInfo):
         product_count = 0
         user = self.get_checked_user(OpCode, timestamp, token)
         if user is not None:
-            account_product_list, product_count, product_list = self._dao.select_account_product(pageNo, query_params, ptype)
+            if ptype == cv.pre_settlement:
+                account_product_list, product_count, product_list = self._dao.select_presettlement_product(pageNo, query_params, ptype)
+            else:
+                account_product_list, product_count, product_list = self._dao.select_account_product(pageNo, query_params, ptype)
         else:
             account_product_list = None
             print(self.get_now_str(), "Error, get account product is failure.", OpCode, "PageNo=", pageNo)
