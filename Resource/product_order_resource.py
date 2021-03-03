@@ -37,6 +37,7 @@ class ProductOrderResource(Resource):
             parser.add_argument('supplier')
             parser.add_argument('contractNo')
             parser.add_argument('specNo')
+            parser.add_argument('willAccount')
             # 分析请求
             args = parser.parse_args()
             OpCode = args["OpCode"]
@@ -44,7 +45,8 @@ class ProductOrderResource(Resource):
             timestamp = args["timestamp"]
             ptype = args["ptype"]
             settlement = args["settlement"]
-            # 收货， 退货 两个状态的查询
+            willAccount = args["willAccount"]
+
             print("request args is ", args)
             filter_stock = {}
             contractNo_base64 = args["contractNo"]
@@ -116,7 +118,9 @@ class ProductOrderResource(Resource):
                 filter_stock['supplier'] = None
             # set settlement
             filter_stock['settlement'] = settlement
-            print("filter_stock is ", filter_stock)
+            filter_stock['willAccount'] = willAccount
+
+            print("order resource filter_stock is ", filter_stock)
             user_service = StockService()
             prod_list, prod_count = user_service.get_order_product(OpCode, timestamp, token, pageNo, filter_stock, ptype)
             result = {"code": 200, "msg": "", "count": prod_count}

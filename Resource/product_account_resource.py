@@ -244,10 +244,7 @@ class AccountNoteResource(Resource):
             account_note_list, prod_count = user_service.get_account_note(OpCode, timestamp, token, pageNo, query_params, ptype)
             result = {"code": 200, "msg": "", "count": prod_count}
             if account_note_list is not None:
-                json_list = []
-                for prod in account_note_list:
-                    json_list.append(prod.desc())
-                result["data"] = json_list
+                result["data"] = account_note_list
             else:
                 result["data"] = []
                 result = {"code": 201, "msg": "note is not existed."}

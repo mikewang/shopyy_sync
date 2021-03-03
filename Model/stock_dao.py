@@ -364,11 +364,22 @@ class StockDao(object):
             elif ptype == cv.settlement_goods:
                 v_sql = v_sql + "and settlement = 2 and OrderStat = 1"
                 v_time_column = "settlementTime"
+            elif ptype == cv.fullred_goods:
+                v_sql = v_sql + "and settlement = 2 and OrderStat = 1 and exists(select 1 from Stock_Product_Order_Account_fullred_App a where a.orderID = v_app_stock_order.product_order_id)"
+                v_time_column = "CreateTime"
             elif ptype == cv.history_goods:
                 v_sql = v_sql + " and settlement >= 0 and OrderStat = 1"
             else:
                 v_sql = v_sql + " and settlement = 0 and OrderStat = 1"
 
+            # 过滤条件，是否已经对账过部分，
+            filter_will_account = filter_stock["willAccount"]
+            if filter_will_account is not None:
+                # 没有对账过 为 1
+                if filter_will_account == '1':
+                    v_sql = v_sql + " and not exists(select 1 from Stock_Product_Order_Account_App a where a.orderID = v_app_stock_order.product_order_id and a.accountStat = 1)"
+                elif filter_will_account == '2':
+                    v_sql = v_sql + " and exists(select 1 from Stock_Product_Order_Account_App a where a.orderID = v_app_stock_order.product_order_id and a.accountStat = 1)"
             # 过滤条件，销售合同号
             filter_contractNo = filter_stock["contractNo"]
             if filter_contractNo is not None:
@@ -445,6 +456,14 @@ class StockDao(object):
                     index = product_list.index(return_product.product)
                     return_product.product = None
                     product_list.insert(index+1, return_product)
+            elif ptype == cv.fullred_goods:
+                for product in product_list:
+                    v_sql = "select fullredNum from Stock_Product_Order_Account_fullred_App  where orderid = ? "
+                    print(ptype, "sql fullred is ", v_sql)
+                    cursor.execute(v_sql, product.orderID)
+                    row = cursor.fetchone()
+                    if row is not None:
+                        product.orderNum = row[0]
             cursor.close()
             cnxn.close()
             return product_list, product_count
@@ -803,17 +822,26 @@ class StockDao(object):
                     cursor.execute(sql, orderID)
                     row = cursor.fetchone()
                     orderNum = row[0]
-                    sql = "select orderNum from Stock_Product_Order_App  where orderstat =  -1 and sourceOrderId = ? "
+                    sql = "select sum(orderNum) from Stock_Product_Order_App  where orderstat =  -1 and sourceOrderId = ? "
                     cursor.execute(sql, orderID)
                     row = cursor.fetchone()
                     if row is not None:
                         returnNum = row[0]
+                        if returnNum is None:
+                            returnNum = 0
                     else:
                         returnNum = 0
-                    sql = "select accountNum from Stock_Product_Order_Account_App  where orderid = ? and accountID = ? "
-                    cursor.execute(sql, orderID, accountID)
+                    sql = "select sum(accountNum) from Stock_Product_Order_Account_App  where orderid = ? "
+                    cursor.execute(sql, orderID)
+                    print("select accountNum sum is ", sql, orderID)
                     row = cursor.fetchone()
-                    accountNum = row[0]
+                    if row is not None:
+                        accountNum = row[0]
+                        if accountNum is None:
+                            accountNum = 0
+                    else:
+                        accountNum = 0
+                    print("orderNum is ", orderNum, "returnNum is ", returnNum, "accountNum is ", accountNum)
                     fullredNum = 0
                     # orderNum = returnNum + accountNum 则正常，否则需要充红。
                     fullredNum = orderNum - returnNum - accountNum
@@ -834,9 +862,13 @@ class StockDao(object):
                     cursor.execute(sql, settlementOpCode, settlement, orderID, stockProductID, settlement)
 
                     if fullredNum > 0:
-                        sql = "INSERT INTO [Stock_Product_Order_Account_fullred_App]([accountID],[batchNo],[orderID],[stockProductID],[OpCode],[CreateTime],[fullredNum],[fullredStat],[note]) VALUES(?,?,?,?,?,getdate(),?,0,'')"
-                        print("fullred sql --- \n", sql)
-                        cursor.execute(sql, accountID, batchNo, orderID, stockProductID, settlementOpCode, fullredNum)
+                        sql = "select fullredNum from Stock_Product_Order_Account_fullred_App  where orderid = ? "
+                        cursor.execute(sql, orderID)
+                        row = cursor.fetchone()
+                        if row is None:
+                            sql = "INSERT INTO [Stock_Product_Order_Account_fullred_App]([accountID],[batchNo],[orderID],[stockProductID],[OpCode],[CreateTime],[fullredNum],[fullredStat],[note]) VALUES(?,?,?,?,?,getdate(),?,0,'')"
+                            print("fullred sql --- \n", sql)
+                            cursor.execute(sql, accountID, batchNo, orderID, stockProductID, settlementOpCode, fullredNum)
                     # insert history row
                     sql = "insert INTO Stock_Product_Order_App_hist(stockProductID, OpCode, OrderNum,OrderPrice," \
                           " supplier, OperateType, orderId, note, orderPriceAccpt) VALUES(?,?,?,?,?,?,?,?,?)"
@@ -1202,12 +1234,13 @@ class StockDao(object):
             sql = "select distinct note,batchNo from Stock_Product_Order_Account_App where accountStat =1 and note=?"
             filter_note = query_params["note"]
             cursor.execute(sql, filter_note)
+            print("select_account_note sql is " , sql , filter_note)
             for row in cursor:
                 prod = dict()
                 prod["note"] = row[0]
                 prod["batchNo"] = row[1]
                 result_product_list.append(prod)
-            return result_product_list
+            return result_product_list, len(result_product_list)
         except Exception as e:
             print('str(Exception):\t', str(Exception))
             print('str(e):\t\t', str(e))
@@ -1220,7 +1253,7 @@ class StockDao(object):
             print('traceback.print_exc(): ', traceback.print_exc())
             print('traceback.format_exc():\n%s' % traceback.format_exc())
             print('#' * 60)
-            return None
+            return None, 0
 
 
     def create_account_product(self, account_prod_dict_list, operate_type):
@@ -1229,15 +1262,18 @@ class StockDao(object):
             cnxn = pyodbc.connect(self._conn_str)
             cursor = cnxn.cursor()
             for prod in account_prod_dict_list:
-                print("account product batchNo =", prod["batchNo"], prod["accountID"], prod["orderID"], prod["stockProductID"])
                 # 全局数据
+                batchNo = None
+                if prod.__contains__("batchNo"):
+                    batchNo = prod["batchNo"]
                 accountID = prod["accountID"]
-                batchNo = prod["batchNo"]
                 orderID = prod["orderID"]
                 stockProductID = prod["stockProductID"]
                 accountNum = prod["purchaseNum"]
                 purchasePrice = prod["purchasePrice"]
                 accountOpCode = prod["accountOpCode"]
+                print("account product batchNo =", batchNo, prod["accountID"], prod["orderID"],
+                      prod["stockProductID"])
 
                 # 返回结果集
                 result_product = AccountProductInfo()
@@ -1250,7 +1286,20 @@ class StockDao(object):
 
                 if operate_type == cv.account_goods:
                     accountStat = 1  # 对账状态 正常
-                    note = prod["note"]
+                    note = None
+                    if prod.__contains__("note"):
+                        note = prod["note"]
+                    if batchNo is None:
+                        sql = "select batchNo, note from Stock_Product_Order_Account_App where orderID = ?"
+                        cursor.execute(sql, orderID)
+                        row = cursor.fetchone()
+                        if row is not None:
+                            batchNo = row[0]
+                            note = row[1]
+                            print("追加对账单", note, stockProductID)
+                    if batchNo is None:
+                        continue
+                        #没有获取就不能操作
                     sql = "INSERT INTO [Stock_Product_Order_Account_App](batchNo,[orderID], [stockProductID], [OpCode], [OrderNum], [OrderPrice], [Settlement], [supplier], [CreateTime], [accountNum], [accountStat], [note])" \
                           " SELECT ?, [orderID], [stockProductID], ?, [OrderNum], ? , [Settlement], [supplier], getdate(), ?, ?, ? as nn FROM [Stock_Product_Order_App] WHERE [orderID] = ?"
                     print(operate_type, "insert sql ---\n ", sql)
@@ -1417,9 +1466,9 @@ class StockDao(object):
             page_prod_count = 10
             cnxn = pyodbc.connect(self._conn_str)
             cursor = cnxn.cursor()
-            # 数据源
+            # 数据源， 只取 对账过的商品
             v_sql_basic = "SELECT orderID,stockProductID,OpCode,OrderNum,OrderPrice,supplier,CONVERT(varchar, CreateTime, 120) as CreateTime, CONVERT(varchar, ensureTime, 120) as ensureTime,ensureOpCode " \
-                    " FROM Stock_Product_Order_App  where  OrderStat = 1 and Settlement > 0 "
+                    " FROM Stock_Product_Order_App  where  OrderStat = 1 and Settlement > 1 "
             filter_stockProductIDs = query_params["stockProductIDs"]
             if filter_stockProductIDs is not None:
                 str_arr = filter_stockProductIDs.split(';')
