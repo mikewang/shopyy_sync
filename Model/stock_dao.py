@@ -1289,14 +1289,15 @@ class StockDao(object):
                     note = None
                     if prod.__contains__("note"):
                         note = prod["note"]
-                    if batchNo is None:
-                        sql = "select batchNo, note from Stock_Product_Order_Account_App where orderID = ?"
-                        cursor.execute(sql, orderID)
-                        row = cursor.fetchone()
-                        if row is not None:
-                            batchNo = row[0]
-                            note = row[1]
-                            print("追加对账单", note, stockProductID)
+                    sql = "select batchNo, note from Stock_Product_Order_Account_App where orderID = ?"
+                    cursor.execute(sql, orderID)
+                    row = cursor.fetchone()
+                    if row is not None:
+                        batchNo = row[0]
+                        note = row[1]
+                        print("补充对账单", note, stockProductID)
+                    else:
+                        print("新增对账单", note, stockProductID)
                     if batchNo is None:
                         continue
                         #没有获取就不能操作
