@@ -1296,7 +1296,7 @@ class StockDao(object):
                         batchNo = row[0]
                         note = row[1]
                         print("补充对账单", note, stockProductID)
-                        sql = "update Stock_Product_Order_Account_App set OrderNum = OrderNum + ? where orderID =? "
+                        sql = "update Stock_Product_Order_Account_App set accountNum = accountNum + ? where orderID =? "
                         print(operate_type, "update sql ---\n ", sql)
                         cursor.execute(sql, accountNum, orderID)
                     else:
