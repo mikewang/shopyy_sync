@@ -1296,15 +1296,20 @@ class StockDao(object):
                         batchNo = row[0]
                         note = row[1]
                         print("补充对账单", note, stockProductID)
+                        sql = "update Stock_Product_Order_Account_App set OrderNum = OrderNum + ? where orderID =? "
+                        print(operate_type, "update sql ---\n ", sql)
+                        cursor.execute(sql, accountNum, orderID)
                     else:
+                        if batchNo is None:
+                            continue
+                            # 没有获取就不能操作
                         print("新增对账单", note, stockProductID)
-                    if batchNo is None:
-                        continue
-                        #没有获取就不能操作
-                    sql = "INSERT INTO [Stock_Product_Order_Account_App](batchNo,[orderID], [stockProductID], [OpCode], [OrderNum], [OrderPrice], [Settlement], [supplier], [CreateTime], [accountNum], [accountStat], [note])" \
-                          " SELECT ?, [orderID], [stockProductID], ?, [OrderNum], ? , [Settlement], [supplier], getdate(), ?, ?, ? as nn FROM [Stock_Product_Order_App] WHERE [orderID] = ?"
-                    print(operate_type, "insert sql ---\n ", sql)
-                    cursor.execute(sql, batchNo, accountOpCode, purchasePrice, accountNum, accountStat, note, orderID)
+                        sql = "INSERT INTO [Stock_Product_Order_Account_App](batchNo,[orderID], [stockProductID], [OpCode], [OrderNum], [OrderPrice], [Settlement], [supplier], [CreateTime], [accountNum], [accountStat], [note])" \
+                              " SELECT ?, [orderID], [stockProductID], ?, [OrderNum], ? , [Settlement], [supplier], getdate(), ?, ?, ? as nn FROM [Stock_Product_Order_App] WHERE [orderID] = ?"
+                        print(operate_type, "insert sql ---\n ", sql)
+                        cursor.execute(sql, batchNo, accountOpCode, purchasePrice, accountNum, accountStat, note,
+                                       orderID)
+
                     sql = "select sum(ordernum*orderStat) as goodsnum,sum(ordernum*orderprice*orderStat) as allprice " \
                           "from Stock_Product_Order_App " \
                           "where stockProductID = ? and (orderStat = -1 or orderStat = 1)"
