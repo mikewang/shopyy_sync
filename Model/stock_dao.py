@@ -1289,16 +1289,17 @@ class StockDao(object):
                     note = None
                     if prod.__contains__("note"):
                         note = prod["note"]
-                    sql = "select batchNo, note from Stock_Product_Order_Account_App where orderID = ?"
+                    sql = "select batchNo, note, accountID from Stock_Product_Order_Account_App where accountStat = 1 and orderID = ?"
                     cursor.execute(sql, orderID)
                     row = cursor.fetchone()
                     if row is not None:
                         batchNo = row[0]
                         note = row[1]
+                        accountID = row[2]
                         print("补充对账单", note, stockProductID)
-                        sql = "update Stock_Product_Order_Account_App set accountNum = accountNum + ? where orderID =? "
+                        sql = "update Stock_Product_Order_Account_App set accountNum = accountNum + ? where orderID =? and accountID = ?"
                         print(operate_type, "update sql ---\n ", sql)
-                        cursor.execute(sql, accountNum, orderID)
+                        cursor.execute(sql, accountNum, orderID, accountID)
                     else:
                         if batchNo is None:
                             continue
