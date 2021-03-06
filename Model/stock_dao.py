@@ -1171,9 +1171,11 @@ class StockDao(object):
             cursor = cnxn.cursor()
             # 数据源
 
-            v_sql = "SELECT distinct [batchNo], CONVERT(varchar, min(CreateTime) over(partition by [batchNo]), 120) AS CreateTime, count(*) over(partition by [batchNo]) as batchProdCount, note  FROM [Stock_Product_Order_Account_App] where accountStat = 1"
+            v_sql = "SELECT distinct [batchNo], CONVERT(varchar, min(CreateTime) over(partition by [batchNo]), 120) AS CreateTime, count(*) over(partition by [batchNo]) as batchProdCount, note,settlement  FROM [Stock_Product_Order_Account_App] where accountStat = 1"
 
             if ptype == cv.batchno_list:
+                v_sql = v_sql + " and settlement >= 1"
+            elif ptype == cv.account_goods:
                 v_sql = v_sql + " and settlement != 2"
             elif ptype == cv.settlement_goods:
                 v_sql = v_sql + " and settlement = 2 and batchNo not in (select batchNo from [Stock_Product_Order_Account_App] where  accountStat = 1 and settlement = 1)"
@@ -1207,6 +1209,7 @@ class StockDao(object):
                 product.createTime = row[2]
                 product.batchProdCount = row[3]
                 product.note = row[4]
+                product.settlement = row[5]
                 product_count = row[len(row)-1]
                 account_batchNo_list.append(product)
             cursor.close()
@@ -1278,7 +1281,6 @@ class StockDao(object):
                 # 返回结果集
                 result_product = AccountProductInfo()
                 result_product.accountID = accountID
-                result_product.orderID = orderID
                 result_product.stockProductID = stockProductID
                 result_product.orderPrice = purchasePrice
                 result_product.accountNum = accountNum
