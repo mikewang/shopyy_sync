@@ -215,7 +215,8 @@ class StockService(UserInfo):
         return account_batchno_note_list, prod_count
 
     def get_account_product(self, OpCode, timestamp, token, pageNo, query_params, ptype):
-        print(self.get_now_str(), "PageNo=", pageNo, query_params, "get account product by " + OpCode, "-"*30)
+        print(self.get_now_str(), "PageNo=", pageNo, query_params, "get acco "
+                                                                   "unt product by " + OpCode, "-"*30)
         product_list = None
         product_count = 0
         user = self.get_checked_user(OpCode, timestamp, token)
