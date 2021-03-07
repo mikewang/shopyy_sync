@@ -845,11 +845,11 @@ class StockDao(object):
                     fullredNum = 0
                     # orderNum = returnNum + accountNum 则正常，否则需要充红。
                     fullredNum = orderNum - returnNum - accountNum
-                    note = '结算成功, 结算' + str(accountNum) + ' 退货' + str(returnNum) + " =  采购" + str(orderNum)
+                    note = "结算成功, " + "已采购:" + str(orderNum) + " = 结算:" + str(accountNum) + ' + 退货:' + str(returnNum)
                     if fullredNum > 0:
-                        note = note + ' -充红: ' + str(fullredNum)
+                        note = note + "+ 充红:" + str(fullredNum)
                     elif fullredNum < 0:
-                        note = '数据异常，结算' + str(accountNum) + ' 退货' + str(returnNum) + " !=  采购" + str(orderNum)
+                        note = "结算异常, " + "已采购:" + str(orderNum) + " != 结算:" + str(accountNum) + ' + 退货:' + str(returnNum)
 
                     sql = "UPDATE [Stock_Product_Order_Account_App] SET [Settlement] = 2  WHERE accountID = ? "
                     print(operate_type, "update Stock_Product_Order_Account_App sql ---\n ", sql, settlement, accountID)
