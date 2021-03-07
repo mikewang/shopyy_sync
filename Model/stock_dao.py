@@ -1281,6 +1281,7 @@ class StockDao(object):
                 # 返回结果集
                 result_product = AccountProductInfo()
                 result_product.accountID = accountID
+                result_product.orderID = orderID
                 result_product.stockProductID = stockProductID
                 result_product.orderPrice = purchasePrice
                 result_product.accountNum = accountNum
