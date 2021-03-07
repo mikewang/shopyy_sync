@@ -831,7 +831,7 @@ class StockDao(object):
                             returnNum = 0
                     else:
                         returnNum = 0
-                    sql = "select sum(accountNum) from Stock_Product_Order_Account_App  where orderid = ? "
+                    sql = "select sum(accountNum) from Stock_Product_Order_Account_App  where accountStat = 1 and orderid = ? "
                     cursor.execute(sql, orderID)
                     print("select accountNum sum is ", sql, orderID)
                     row = cursor.fetchone()
