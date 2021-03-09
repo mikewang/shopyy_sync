@@ -1174,7 +1174,8 @@ class StockDao(object):
             v_sql = "SELECT distinct [batchNo], CONVERT(varchar, min(CreateTime) over(partition by [batchNo]), 120) AS CreateTime, count(*) over(partition by [batchNo]) as batchProdCount, note,settlement  FROM [Stock_Product_Order_Account_App] where accountStat = 1"
 
             if ptype == cv.batchno_list:
-                v_sql = v_sql + " and settlement >= 1"
+                v_sql = v_sql + " and settlement != 2"
+                # 只搜 已对账的商品，已结算的不算。
             elif ptype == cv.account_goods:
                 v_sql = v_sql + " and settlement != 2"
             elif ptype == cv.settlement_goods:
