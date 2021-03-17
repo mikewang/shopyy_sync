@@ -17,12 +17,18 @@ def make_inp_file(iteration, file_list, i, q_out):
     f1 = open(file_name, "r")
     content = f1.read()
     f1.close()
-    with open(file_name + "_bk" + str(iteration), "w") as f2:
+
+    with open(file_name + "_bk" + str(iteration-1), "w") as f2:
         f2.write(content)
     # 拆分 按行 数组
     content = content.splitlines()
     # 矩阵处理，成一个 一维数组。
-    entries_updated = q_out
+
+    entries_updated = (q_out.tolist())[i]
+    print("*" * 100)
+    print("写入inp文件的数组")
+    print("q1 is ", entries_updated)
+
     # for entries in q:
     #     for entry in entries:
     #         entries_updated.append(entry)
@@ -46,14 +52,14 @@ def make_inp_file(iteration, file_list, i, q_out):
                 row_entries_updated = []
                 for row_entry in row_entries:
                     entry_updated = entries_updated.pop(0)
-                    row_entries_updated.append(entry_updated)
-                    print("q len is ", len(entries_updated), entry_updated)
+                    sss = np.format_float_scientific(entry_updated, unique=False, precision=8)
+                    row_entries_updated.append(sss)
+                    print("q len is ", len(entries_updated), sss)
                 line = row1 + "  " + row2 + "".join(row_entries_updated)
             if line.__contains__("$VEC"):
                 data_begin = True
             temp_content.append(line)
-    print(temp_content)
-
+    #print(temp_content)
     t = "\n".join(temp_content)
     with open(file_name, "w") as f2:
         f2.write(t)
@@ -86,7 +92,7 @@ def open_agent_file(file):
         return ""
 
 
-def get_q(file_name, agent_index, q_dict):
+def get_q_last(file_name, agent_index, q_dict):
     file_name_out = file_name + ".out"
     file_name_q = file_name + ".gradmatrix"
     print("get_q", file_name_out, file_name_q)
@@ -108,16 +114,52 @@ def get_q(file_name, agent_index, q_dict):
         for line in file:
             entry = line.split()
             for col_value in entry:
-                q.append(col_value)
-    print(q)
+                print("col_value is ",np.float64(col_value), col_value)
+                q.append(np.float64(col_value))
+    print("*"*100)
+    print("q array is ", q)
     q_dict[agent_index] = q
     return q_dict
 
 
-def get_dat_gradient(file_name, agent_index, q_dict, gradient_dict):
-    file_name_dat = file_name + ".dat"
+def get_q(file_name, agent_index, q_dict):
     data_lines = []
     data_begin = False
+
+    with open(file_name) as file:
+        for line in file:
+            if line.__contains__("$END"):
+                data_begin = False
+            if data_begin:
+                entries = line.split("  ")
+                del entries[0]
+                aline = " ".join(entries)
+                aline = aline[1:]
+                # print(aline)
+                data_lines.append(aline)
+            if line.__contains__("$VEC"):
+                data_begin = True
+    # print all data line
+    line_text = "".join(data_lines)
+    #getEntries(line_text)
+    print("q1 line text is ", line_text)
+    entries = re.findall(r'.{15}', line_text)
+    q1 = []
+    for entry in entries:
+        entry = entry.strip()
+        q1.append(np.float64(entry))
+    print("*"*100)
+    print("q1 array is ", q1)
+    q_dict[agent_index] = q1
+    return q_dict
+
+
+def get_dat_gradient(file_name, agent_index, q_dict, gradient_dict):
+    file_name_dat = file_name.replace(".inp", ".dat")
+    data_lines = []
+    data_begin = False
+    #
+    file_name_dat = "/scratch/snyder/r/rong10/" + file_name_dat
 
     with open(file_name_dat) as file:
         for line in file:
@@ -130,28 +172,28 @@ def get_dat_gradient(file_name, agent_index, q_dict, gradient_dict):
                 aline = aline[1:]
                 # print(aline)
                 data_lines.append(aline)
-                #print(len("-7.91460261E-07"))
             if line.__contains__("$VEC"):
                 data_begin = True
     # print all data line
     line_text = "".join(data_lines)
     #getEntries(line_text)
     entries = re.findall(r'.{15}', line_text)
-    N_orbitals = 19
     q2 = []
-    q_entry = []
     for entry in entries:
-        q_entry.append(entry)
-        if len(q_entry) == N_orbitals:
-            q2.append(q_entry)
-            q_entry = []
+        entry = entry.strip()
+        q2.append(np.float64(entry))
+    print("*"*100)
+    print("q2 array is ", q2)
     # 返回 结果矩阵
     q1 = q_dict[agent_index]
-    gradient_dict[agent_index] = q2 - q1
+    gradient = np.array(q2) - np.array(q1)
+    gradient_dict[agent_index] = gradient.tolist()
+    print("*" * 100)
+    print("q2 - q1 array is ", gradient.tolist())
     return gradient_dict
 
 
-def make_mace(file_list, i, q_dict):
+def make_mace(file_list, i, q_dict, gradient_dict):
     file_name = file_list[i]
     run_time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     print("agent work info , agent_index is", i, "file is ", file_name, run_time_str)
@@ -206,6 +248,18 @@ if __name__ == '__main__':
     #
     # file_name = "water_631g_create"
     # create_inp_file(1, file_name, q, None, None)
+
+    # a = np.array([1, 2])
+    # b = np.array([-1, 2])
+    #
+    # c = a - b
+    # print(c)
+    # s = "1.28424950E-02"
+    # ss = np.float64(s)
+    # sss = np.format_float_scientific(ss, unique=False, precision=8)
+    # print(sss.upper())
+    # print(s)
+    # exit()
 
     # exit()
     #test end.
@@ -270,6 +324,8 @@ if __name__ == '__main__':
             print("Total time elapsed: %s seconds" % tot_time)
             done = 1
         else:
+            if iterationcount == 2:
+                done = 1
             # 根据 q_out 生成新的.inp文件。
             run_time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             print(" create new inp file BEGIN: " + run_time_str)
@@ -282,14 +338,9 @@ if __name__ == '__main__':
                 res.join()
             run_time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             print(" create new inp file END: " + run_time_str)
-
-
-
-
     run_time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     print("End MACE job on the following agents:", run_time_str)
     # the end
-
 
 
 
