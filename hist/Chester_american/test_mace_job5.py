@@ -1,4 +1,4 @@
-    # -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 import datetime, time
 from multiprocessing import Pool
@@ -20,14 +20,15 @@ def make_inp_file(iteration, file_list, i, q_out):
 
     with open(file_name + "_bk" + str(iteration-1), "w") as f2:
         f2.write(content)
+        print("inp文件的备份完成，", file_name + "_bk" + str(iteration-1))
     # 拆分 按行 数组
     content = content.splitlines()
     # 矩阵处理，成一个 一维数组。
 
     entries_updated = (q_out.tolist())[i]
     print("*" * 100)
-    print("写入inp文件的数组")
-    print("q1 is ", entries_updated)
+    print("写入inp文件的数组 应该是科学计数格式的字符串")
+    print("q2 is ", entries_updated)
 
     # for entries in q:
     #     for entry in entries:
@@ -52,9 +53,12 @@ def make_inp_file(iteration, file_list, i, q_out):
                 row_entries_updated = []
                 for row_entry in row_entries:
                     entry_updated = entries_updated.pop(0)
-                    sss = np.format_float_scientific(entry_updated, unique=False, precision=8)
-                    row_entries_updated.append(sss)
-                    print("q len is ", len(entries_updated), sss)
+                    ss = np.format_float_scientific(entry_updated, unique=False, precision=8)
+                    prefixss = ss[:1]
+                    if prefixss != "-":
+                        ss = " " + ss
+                    row_entries_updated.append(ss)
+                    print("q len is ", len(ss), "old is ", row_entry, "new is ", ss)
                 line = row1 + "  " + row2 + "".join(row_entries_updated)
             if line.__contains__("$VEC"):
                 data_begin = True
@@ -92,36 +96,6 @@ def open_agent_file(file):
         return ""
 
 
-def get_q_last(file_name, agent_index, q_dict):
-    file_name_out = file_name + ".out"
-    file_name_q = file_name + ".gradmatrix"
-    print("get_q", file_name_out, file_name_q)
-    extract_gradmatrix_sh = os.path.normpath(os.path.join(os.curdir, "extract_gradmatrix.sh"))
-    print("extract_gradmatrix.sh filepath = ", extract_gradmatrix_sh)
-    returncode = subprocess.run(["./extract_gradmatrix.sh", file_name_out, file_name_q])
-    if returncode.returncode != 0:
-        print("Error extracting gradient from GAMESS output.  Agent in question:")
-        print(file_name)
-        return
-    N_orbitals = 0
-    with open(file_name_q) as file:
-        for line in file:
-            N_orbitals = N_orbitals + 1
-    # get N_orbitals = 19
-    print('size of N_orbitals', N_orbitals - 1)
-    q = []
-    with open(file_name_q) as file:
-        for line in file:
-            entry = line.split()
-            for col_value in entry:
-                print("col_value is ",np.float64(col_value), col_value)
-                q.append(np.float64(col_value))
-    print("*"*100)
-    print("q array is ", q)
-    q_dict[agent_index] = q
-    return q_dict
-
-
 def get_q(file_name, agent_index, q_dict):
     data_lines = []
     data_begin = False
@@ -147,19 +121,27 @@ def get_q(file_name, agent_index, q_dict):
     q1 = []
     for entry in entries:
         entry = entry.strip()
-        q1.append(np.float64(entry))
+        q1.append(entry)
     print("*"*100)
     print("q1 array is ", q1)
     q_dict[agent_index] = q1
     return q_dict
 
 
-def get_dat_gradient(file_name, agent_index, q_dict, gradient_dict):
+def get_dat_gradient(file_name, agent_index, q_dict, gradient_dict, iteration):
     file_name_dat = file_name.replace(".inp", ".dat")
     data_lines = []
     data_begin = False
     #
     file_name_dat = "/scratch/snyder/r/rong10/" + file_name_dat
+
+    f1 = open(file_name_dat, "r")
+    content = f1.read()
+    f1.close()
+
+    with open(file_name_dat + "_bk" + str(iteration-1), "w") as f2:
+        f2.write(content)
+        print("dat文件备份完成，", file_name_dat + "_bk" + str(iteration-1))
 
     with open(file_name_dat) as file:
         for line in file:
@@ -181,19 +163,35 @@ def get_dat_gradient(file_name, agent_index, q_dict, gradient_dict):
     q2 = []
     for entry in entries:
         entry = entry.strip()
-        q2.append(np.float64(entry))
+        q2.append(entry)
     print("*"*100)
     print("q2 array is ", q2)
     # 返回 结果矩阵
     q1 = q_dict[agent_index]
-    gradient = np.array(q2) - np.array(q1)
-    gradient_dict[agent_index] = gradient.tolist()
+
+    np_q2 = np.zeros([len(q2)], dtype=np.float64)
+    for i in range(len(np_q2)):
+        np_q2[i] = np.float64(q2[i])
+
+    np_q1 = np.zeros([len(q1)], dtype=np.float64)
+    for i in range(len(np_q1)):
+        np_q1[i] = np.float64(q1[i])
+
+    np_gradient = np_q2 - np_q1
+
+    gradient = []
+    for i in range(len(np_gradient)):
+        v = np_gradient[i]
+        ss = np.format_float_scientific(v, unique=False, precision=8)
+        gradient.append(ss)
+
+    gradient_dict[agent_index] = gradient
     print("*" * 100)
-    print("q2 - q1 array is ", gradient.tolist())
+    print("q2 - q1 array is ", gradient)
     return gradient_dict
 
 
-def make_mace(file_list, i, q_dict, gradient_dict):
+def make_mace(file_list, i, q_dict, gradient_dict, iteration):
     file_name = file_list[i]
     run_time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     print("agent work info , agent_index is", i, "file is ", file_name, run_time_str)
@@ -201,7 +199,7 @@ def make_mace(file_list, i, q_dict, gradient_dict):
     open_agent_file(file_name)
     # create .gradmatrix from first .out file
     q1 = get_q(file_name, i, q_dict)
-    q2 = get_dat_gradient(file_name, i, q_dict, gradient_dict) # 结果为最终结果，两个矩阵的差。
+    q2 = get_dat_gradient(file_name, i, q_dict, gradient_dict, iteration) # 结果为最终结果，两个矩阵的差。
 
     run_time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
     #print("agent work info , agent_index is", i, "file is ", current_file, run_time_str)
@@ -249,16 +247,18 @@ if __name__ == '__main__':
     # file_name = "water_631g_create"
     # create_inp_file(1, file_name, q, None, None)
 
-    # a = np.array([1, 2])
-    # b = np.array([-1, 2])
-    #
-    # c = a - b
-    # print(c)
     # s = "1.28424950E-02"
     # ss = np.float64(s)
-    # sss = np.format_float_scientific(ss, unique=False, precision=8)
-    # print(sss.upper())
-    # print(s)
+    # # sss = np.format_float_scientific(ss, unique=False, precision=8)
+    #
+    # a = np.array([ss])
+    # b = np.array([ss])
+    #
+    # c = a - b
+    # print(len(c), c[0])
+    #
+    # # print(sss.upper())
+    # # print(s)
     # exit()
 
     # exit()
@@ -285,7 +285,7 @@ if __name__ == '__main__':
         print("iterate " + str(iterationcount) + ":", run_time_str)
         p_list = []
         for i in range(len(file_list)):
-            p = Process(target=make_mace, args=(file_list, i, q_dict, gradient_dict))
+            p = Process(target=make_mace, args=(file_list, i, q_dict, gradient_dict, iterationcount))
             p.start()
             p_list.append(p)
         for res in p_list:
@@ -367,6 +367,36 @@ def make_mace_last(file_list, i, q_dict):
     #print("agent work info , agent_index is", i, "file is ", current_file, run_time_str)
     time.sleep(25)
 
+
+
+def get_q_last(file_name, agent_index, q_dict):
+    file_name_out = file_name + ".out"
+    file_name_q = file_name + ".gradmatrix"
+    print("get_q", file_name_out, file_name_q)
+    extract_gradmatrix_sh = os.path.normpath(os.path.join(os.curdir, "extract_gradmatrix.sh"))
+    print("extract_gradmatrix.sh filepath = ", extract_gradmatrix_sh)
+    returncode = subprocess.run(["./extract_gradmatrix.sh", file_name_out, file_name_q])
+    if returncode.returncode != 0:
+        print("Error extracting gradient from GAMESS output.  Agent in question:")
+        print(file_name)
+        return
+    N_orbitals = 0
+    with open(file_name_q) as file:
+        for line in file:
+            N_orbitals = N_orbitals + 1
+    # get N_orbitals = 19
+    print('size of N_orbitals', N_orbitals - 1)
+    q = []
+    with open(file_name_q) as file:
+        for line in file:
+            entry = line.split()
+            for col_value in entry:
+                print("col_value is ",np.float64(col_value), col_value)
+                q.append(np.float64(col_value))
+    print("*"*100)
+    print("q array is ", q)
+    q_dict[agent_index] = q
+    return q_dict
 
 
 def getEntries(line_text):
