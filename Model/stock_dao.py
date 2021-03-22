@@ -199,9 +199,12 @@ class StockDao(object):
                 product.ModuleID = row[12]
                 product.FileDate = row[13]
                 thumbImage = row[14]
-                base64_bytes = base64.b64encode(thumbImage)
-                base64_image = base64_bytes.decode("utf8")
-                product.imageBase64 = base64_image
+                if thumbImage != None:
+                    base64_bytes = base64.b64encode(thumbImage)
+                    base64_image = base64_bytes.decode("utf8")
+                    product.imageBase64 = base64_image
+                else:
+                    product.imageBase64 = ""
                 product.supplier = row[15]
                 product.permittedNum = row[16]
                 product.shouldPrice = row[17]
@@ -1546,7 +1549,7 @@ class StockDao(object):
             print('#' * 60)
             return None, 0, None
 
-    def select_dict_item_list(self, item_type):
+    def select_dict_item_list(self, item_type, OpCode):
         # select ID, DictValue from CustomDict where DictType=501027 and status = 0
         try:
             item_list = []
@@ -1554,14 +1557,28 @@ class StockDao(object):
             cursor = cnxn.cursor()
             if item_type == "brand":
                 sql = "select ID, DictValue from CustomDict where DictType=501027 and status=0"
-            else:
+                cursor.execute(sql)
+                for row in cursor:
+                    item = dict()
+                    item["code"] = row[0]
+                    item["name"] = row[1]
+                    item_list.append(item)
+            elif item_type == "supplier":
                 sql = "Select ID, custname from Cust_Info where grouptype=9 and status=0"
-            cursor.execute(sql)
-            for row in cursor:
-                item = dict()
-                item["code"] = row[0]
-                item["name"] = row[1]
-                item_list.append(item)
+                cursor.execute(sql)
+                for row in cursor:
+                    item = dict()
+                    item["code"] = row[0]
+                    item["name"] = row[1]
+                    item_list.append(item)
+            elif item_type == "role":
+                sql = "select b.approle from User_Info a join User_Info_App b on a.ID = b.Id  where  a.OpCode = ? and b.status = 1"
+                cursor.execute(sql, OpCode)
+                for row in cursor:
+                    item = dict()
+                    role = row[0]
+                    item["role"] = role
+                    item_list.append(item)
             cursor.close()
             cnxn.close()
             return item_list

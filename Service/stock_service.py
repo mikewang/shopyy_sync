@@ -83,7 +83,7 @@ class StockService(UserInfo):
         item_list = None
         user = self.get_checked_user(OpCode, timestamp, token)
         if user is not None:
-            item_list = self._dao.select_dict_item_list(item_type)
+            item_list = self._dao.select_dict_item_list(item_type, OpCode)
         else:
             print(self.get_now_str(), "Error, get dictionary type is failure.", item_type)
         return item_list
