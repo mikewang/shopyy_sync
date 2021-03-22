@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import configparser
+import logging
 import traceback
 import sys
 import os
@@ -29,6 +30,11 @@ class StockDao(object):
                     pass
             self._conn_str = config.get("db", "conn_str")
             self.disk_path = config.get("db", "disk_path")
+
+            logging.basicConfig(format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s',
+                                level=logging.WARNING,
+                                filename='app_tuoli.log',
+                                filemode='a')
         except Exception as e:
             print('str(Exception):\t', str(Exception))
             print('str(e):\t\t', str(e))
@@ -66,6 +72,7 @@ class StockDao(object):
                 user_info.PositionName = row[7]
             else:
                 print("User: " + OpCode + " Not Existed.")
+                logging.warning("用户：" + OpCode + " 登陆失败，不存在")
             cursor.close()
             cnxn.close()
         except Exception as e:
