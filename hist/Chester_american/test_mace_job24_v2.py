@@ -10,7 +10,7 @@ import numpy as np
 import re
 
 run_times_limit = 10
-n_basis = 1
+N_BASIS = 1
 
 
 def make_inp_file(iteration, file_list, i, q_out):
@@ -42,25 +42,23 @@ def make_inp_file(iteration, file_list, i, q_out):
             data_begin = False
             temp_content.append(line)
         else:
-            if data_begin:
+            if data_begin and len(entry_updated) > 0:
                 entries = line.split("  ")
-                row1 = entries.pop(0)
+                col1 = entries.pop(0)
                 aline = "  ".join(entries)
-                #print(entries)
-                row2 = aline[:1]
+                col2 = aline[:1]
                 aline = aline[1:]
-                #print(row1, row2, aline)
                 row_entries = re.findall(r'.{15}', aline)
-                row_entries_updated = []
+                row_entries_new = []
                 for row_entry in row_entries:
                     entry_updated = entries_updated.pop(0)
                     ss = np.format_float_scientific(entry_updated, unique=False, precision=8)
                     prefixss = ss[:1]
                     if prefixss != "-":
                         ss = " " + ss
-                    row_entries_updated.append(ss)
+                    row_entries_new.append(ss)
                     print("q len is ", len(ss), "old is ", row_entry, "new is ", ss)
-                line = row1 + "  " + row2 + "".join(row_entries_updated)
+                line = col1 + "  " + col2 + "".join(row_entries_new)
             if line.__contains__("$VEC"):
                 data_begin = True
             temp_content.append(line)
@@ -122,12 +120,12 @@ def get_q(file_name, agent_index, q_dict):
     entries = re.findall(r'.{15}', line_text)
     q1 = []
     i = 0
-    global n_basis
+    global N_BASIS
     for entry in entries:
         entry = entry.strip()
         q1.append(entry)
         i += 1
-        if i >= n_basis*19:
+        if i >= N_BASIS*19:
             break
     print("*"*100)
     print("q1 array is ", q1)
@@ -169,12 +167,12 @@ def get_dat_gradient(file_name, agent_index, q_dict, gradient_dict, iteration):
     entries = re.findall(r'.{15}', line_text)
     q2 = []
     i = 0
-    global n_basis
+    global N_BASIS
     for entry in entries:
         entry = entry.strip()
         q2.append(entry)
         i += 1
-        if i >= n_basis * 19:
+        if i >= N_BASIS * 19:
             break
 
     print("*"*100)
@@ -292,8 +290,8 @@ if __name__ == '__main__':
     gradient_dict = manager.dict()  # 所有进程可以读写的全局对象，用于并发操作。
 
     file_list = manager.list()  # 生成一个列表
-    global n_basis
-    temp_file_list, gamma, tolerance, n_basis = get_agent_filelist()
+    global N_BASIS
+    temp_file_list, gamma, tolerance, N_BASIS = get_agent_filelist()
     for file in temp_file_list:
         file_list.append(file)  # 填充文件
     while not done:
