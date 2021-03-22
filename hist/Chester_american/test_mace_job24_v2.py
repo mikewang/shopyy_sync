@@ -10,6 +10,7 @@ import numpy as np
 import re
 
 run_times_limit = 10
+n_basis = 1
 
 
 def make_inp_file(iteration, file_list, i, q_out):
@@ -17,10 +18,10 @@ def make_inp_file(iteration, file_list, i, q_out):
     f1 = open(file_name, "r")
     content = f1.read()
     f1.close()
-
-    with open(file_name + "_bk" + str(iteration-1), "w") as f2:
+    bk_file_name = file_name + "_bk" + str(iteration-1)
+    with open(bk_file_name, "w") as f2:
         f2.write(content)
-        print("inp文件的备份完成，", file_name + "_bk" + str(iteration-1))
+        print("inp文件的备份完成，", bk_file_name)
     # 拆分 按行 数组
     content = content.splitlines()
     # 矩阵处理，成一个 一维数组。
@@ -28,7 +29,7 @@ def make_inp_file(iteration, file_list, i, q_out):
     entries_updated = (q_out.tolist())[i]
     print("*" * 100)
     print("写入inp文件的数组 应该是科学计数格式的字符串")
-    print("q2 is ", entries_updated)
+    # print("q2 is ", entries_updated)
 
     # for entries in q:
     #     for entry in entries:
@@ -64,9 +65,9 @@ def make_inp_file(iteration, file_list, i, q_out):
                 data_begin = True
             temp_content.append(line)
     #print(temp_content)
-    t = "\n".join(temp_content)
+    file_content = "\n".join(temp_content)
     with open(file_name, "w") as f2:
-        f2.write(t)
+        f2.write(file_content)
 
 
 def get_agent_filelist():
@@ -77,8 +78,9 @@ def get_agent_filelist():
     file_list = file_list_str.split(";")
     gamma = config.get("agent", "gamma")
     tolerance = config.get("agent", "tolerance")
+    n_basis = config.get("agent", "n_basis")
     # print(file_list)
-    return file_list, gamma, tolerance
+    return file_list, gamma, tolerance, n_basis
 
 
 def open_agent_file(file):
@@ -119,9 +121,14 @@ def get_q(file_name, agent_index, q_dict):
     print("q1 line text is ", line_text)
     entries = re.findall(r'.{15}', line_text)
     q1 = []
+    i = 0
+    global n_basis
     for entry in entries:
         entry = entry.strip()
         q1.append(entry)
+        i += 1
+        if i >= n_basis*19:
+            break
     print("*"*100)
     print("q1 array is ", q1)
     q_dict[agent_index] = q1
@@ -161,9 +168,15 @@ def get_dat_gradient(file_name, agent_index, q_dict, gradient_dict, iteration):
     #getEntries(line_text)
     entries = re.findall(r'.{15}', line_text)
     q2 = []
+    i = 0
+    global n_basis
     for entry in entries:
         entry = entry.strip()
         q2.append(entry)
+        i += 1
+        if i >= n_basis * 19:
+            break
+
     print("*"*100)
     print("q2 array is ", q2)
     # 返回 结果矩阵
@@ -217,8 +230,8 @@ def compute_MACE_step(q, gradient, gamma, tolerance):
     gamma = float(gamma)
     Fx = q - gamma*gradient
     v = 2*Fx - q
-    Gx = np.average(q,axis=1,weights=weights).reshape((len(q),1))
-    Gv = np.average(v,axis=1,weights=weights).reshape((len(q),1))
+    Gx = np.average(q, axis=1, weights=weights).reshape((len(q), 1))
+    Gv = np.average(v, axis=1, weights=weights).reshape((len(q), 1))
     q_out = 2*Gv - v
     print('iteration is,', iterationcount)
     print("The current state is:")
@@ -279,7 +292,8 @@ if __name__ == '__main__':
     gradient_dict = manager.dict()  # 所有进程可以读写的全局对象，用于并发操作。
 
     file_list = manager.list()  # 生成一个列表
-    temp_file_list, gamma, tolerance = get_agent_filelist()
+    global n_basis
+    temp_file_list, gamma, tolerance, n_basis = get_agent_filelist()
     for file in temp_file_list:
         file_list.append(file)  # 填充文件
     while not done:
@@ -345,62 +359,6 @@ if __name__ == '__main__':
     run_time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     print("End MACE job on the following agents:", run_time_str)
     # the end
-
-
-
-def make_mace_last(file_list, i, q_dict):
-    file_name = file_list[i]
-    run_time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    print("agent work info , agent_index is", i, "file is ", file_name, run_time_str)
-    # create .out file from .inp file
-    open_agent_file(file_name)
-    # create .gradmatrix from first .out file
-    q1 = get_q(file_name, i, q_dict)
-
-    # get q from second file
-    current_file = file_name
-    extract_dat_to_inp_sh = os.path.normpath(os.path.join(os.curdir, "extract_dat_to_inp.sh"))
-    subprocess.run(["./extract_dat_to_inp.sh"])
-    file_num = int(current_file.split('.')[1]) + 1
-    file_next = current_file.split('.')[0] + "." + str(file_num) + ".inp"
-    if not os.path.isfile(file_next):
-        print("Error file is not existed .", file_next)
-    file_list[i] = file_next
-    print("set after", i, file_list[i])
-    run_time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
-    #print("agent work info , agent_index is", i, "file is ", current_file, run_time_str)
-    time.sleep(25)
-
-
-
-def get_q_last(file_name, agent_index, q_dict):
-    file_name_out = file_name + ".out"
-    file_name_q = file_name + ".gradmatrix"
-    print("get_q", file_name_out, file_name_q)
-    extract_gradmatrix_sh = os.path.normpath(os.path.join(os.curdir, "extract_gradmatrix.sh"))
-    print("extract_gradmatrix.sh filepath = ", extract_gradmatrix_sh)
-    returncode = subprocess.run(["./extract_gradmatrix.sh", file_name_out, file_name_q])
-    if returncode.returncode != 0:
-        print("Error extracting gradient from GAMESS output.  Agent in question:")
-        print(file_name)
-        return
-    N_orbitals = 0
-    with open(file_name_q) as file:
-        for line in file:
-            N_orbitals = N_orbitals + 1
-    # get N_orbitals = 19
-    print('size of N_orbitals', N_orbitals - 1)
-    q = []
-    with open(file_name_q) as file:
-        for line in file:
-            entry = line.split()
-            for col_value in entry:
-                print("col_value is ",np.float64(col_value), col_value)
-                q.append(np.float64(col_value))
-    print("*"*100)
-    print("q array is ", q)
-    q_dict[agent_index] = q
-    return q_dict
 
 
 def getEntries(line_text):
