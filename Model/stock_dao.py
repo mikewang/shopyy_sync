@@ -526,12 +526,14 @@ class StockDao(object):
                           "[其它.app采购量] = coalesce([其它.app采购量], 0) + ?," \
                           "[其它.供应商名称] = ? " \
                           "where [MainID] = ?"
-                    cursor.execute(sql, purchaseNum,purchaseNum, supplier, stockProductID)
+                    cursor.execute(sql, purchaseNum, purchaseNum, supplier, stockProductID)
+                    logging.warning(sql + " " + str(purchaseNum) + " " + supplier + " " + str(stockProductID))
                     sql = "insert into Stock_Product_Order_App(stockProductID,opCode, OrderNum, OrderPrice,orderStat," \
                           "supplier, settlement, orderPriceAccpt) " \
                           " values(?,?,?,?,?,?,?,?)"
                     print("add order", "insert Stock_Product_Order_App sql is ", sql)
                     cursor.execute(sql, stockProductID, opCode, purchaseNum, purchasePrice, orderStat, supplier, settlement, orderPriceAccpt)
+                    logging.warning(sql + " " + str(stockProductID) + " " + opCode + " " + supplier + " " + str(purchaseNum) + " " + str(purchasePrice))
                     sql = "select @@IDENTITY"
                     cursor.execute(sql)
                     lastOrderID = cursor.fetchone()[0] # 生成的主键字段值。
@@ -688,6 +690,8 @@ class StockDao(object):
                             cursor.execute(sql, unitprice, stockProductID)
                             sql = "update Stock_Product_Info set goodsnum=? where stockProductID = ?"
                             cursor.execute(sql, goodsnum, stockProductID)
+                            sql = "update Contract_Product_InfoPlan set StockNum =? where ContractProductID= (select c.ContractProductID from Stock_Product_Info b join  Stock_Product_InfoBase c  on b.StockProductID=c.StockProductID and b.Status=0 and b.StockProductID=?)"
+                            cursor.execute(sql, goodsnum, stockProductID)
                             cursor.commit()
                             result_product.note = "1:订货完成成功" + ":" + str(orderNum - purchaseNum)
                         else:
@@ -759,6 +763,8 @@ class StockDao(object):
                             cursor.execute(sql, unitprice, stockProductID)
                             sql = "update Stock_Product_Info set goodsnum=? where stockProductID = ?"
                             cursor.execute(sql, goodsnum, stockProductID)
+                            sql = "update Contract_Product_InfoPlan set StockNum =? where ContractProductID= (select c.ContractProductID from Stock_Product_Info b join  Stock_Product_InfoBase c  on b.StockProductID=c.StockProductID and b.Status=0 and b.StockProductID=?)"
+                            cursor.execute(sql, goodsnum, stockProductID)
                             cursor.commit()
 
                             result_product.note = "1:退货成功，采购量 " + str(doneOrderNum) + ", 退货量 "+str(purchaseNum) + ", 共退货 "+ str(returnOrderNum+purchaseNum) + ":" + str(returnOrderNum+purchaseNum) + ":" + str(doneOrderNum-returnOrderNum-purchaseNum)
@@ -805,6 +811,8 @@ class StockDao(object):
                         sql = "update Stock_Product_InfoBase set unitprice=? where stockProductID = ?"
                         cursor.execute(sql, unitprice, stockProductID)
                         sql = "update Stock_Product_Info set goodsnum=? where stockProductID = ?"
+                        cursor.execute(sql, goodsnum, stockProductID)
+                        sql = "update Contract_Product_InfoPlan set StockNum =? where ContractProductID= (select c.ContractProductID from Stock_Product_Info b join  Stock_Product_InfoBase c  on b.StockProductID=c.StockProductID and b.Status=0 and b.StockProductID=?)"
                         cursor.execute(sql, goodsnum, stockProductID)
                         # insert history row
                         sql = "insert INTO Stock_Product_Order_App_hist(stockProductID, OpCode, OrderNum,OrderPrice," \
@@ -969,6 +977,8 @@ class StockDao(object):
                             sql = "update Stock_Product_InfoBase set unitprice=? where stockProductID = ?"
                             cursor.execute(sql, unitprice, stockProductID)
                             sql = "update Stock_Product_Info set goodsnum=? where stockProductID = ?"
+                            cursor.execute(sql, goodsnum, stockProductID)
+                            sql = "update Contract_Product_InfoPlan set StockNum =? where ContractProductID= (select c.ContractProductID from Stock_Product_Info b join  Stock_Product_InfoBase c  on b.StockProductID=c.StockProductID and b.Status=0 and b.StockProductID=?)"
                             cursor.execute(sql, goodsnum, stockProductID)
                         cursor.commit()
                         result_product.orderPrice = orderPrice
@@ -1340,6 +1350,8 @@ class StockDao(object):
                     sql = "update Stock_Product_InfoBase set unitprice=? where stockProductID = ?"
                     cursor.execute(sql, unitprice, stockProductID)
                     sql = "update Stock_Product_Info set goodsnum=? where stockProductID = ?"
+                    cursor.execute(sql, goodsnum, stockProductID)
+                    sql = "update Contract_Product_InfoPlan set StockNum =? where ContractProductID= (select c.ContractProductID from Stock_Product_Info b join  Stock_Product_InfoBase c  on b.StockProductID=c.StockProductID and b.Status=0 and b.StockProductID=?)"
                     cursor.execute(sql, goodsnum, stockProductID)
                     # insert history row
                     sql = "insert INTO Stock_Product_Order_App_hist(stockProductID, OpCode, OrderNum,OrderPrice," \
