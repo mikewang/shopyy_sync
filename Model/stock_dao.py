@@ -390,6 +390,10 @@ class StockDao(object):
                     v_sql = v_sql + " and not exists(select 1 from Stock_Product_Order_Account_App a where a.orderID = v_app_stock_order.product_order_id and a.accountStat = 1)"
                 elif filter_will_account == '2':
                     v_sql = v_sql + " and exists(select 1 from Stock_Product_Order_Account_App a where a.orderID = v_app_stock_order.product_order_id and a.accountStat = 1)"
+            # 过滤条件，采购员工
+            filter_orderOpCode = filter_stock["orderOpCode"]
+            if filter_orderOpCode is not None:
+                v_sql = v_sql + " and order_opcode like '%" + filter_orderOpCode + "%'"
             # 过滤条件，销售合同号
             filter_contractNo = filter_stock["contractNo"]
             if filter_contractNo is not None:

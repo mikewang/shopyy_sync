@@ -42,7 +42,7 @@ def make_inp_file(iteration, file_list, i, q_out):
             data_begin = False
             temp_content.append(line)
         else:
-            if data_begin and len(entry_updated) > 0:
+            if data_begin and len(entries_updated) > 0:
                 entries = line.split("  ")
                 col1 = entries.pop(0)
                 aline = "  ".join(entries)
@@ -78,7 +78,7 @@ def get_agent_filelist():
     tolerance = config.get("agent", "tolerance")
     n_basis = config.get("agent", "n_basis")
     # print(file_list)
-    return file_list, gamma, tolerance, n_basis
+    return file_list, gamma, tolerance, int(n_basis)
 
 
 def open_agent_file(file):
@@ -128,7 +128,7 @@ def get_q(file_name, agent_index, q_dict):
         if i >= N_BASIS*19:
             break
     print("*"*100)
-    print("q1 array is ", q1)
+    print("agent_index is ", agent_index, "q1 array is ", q1)
     q_dict[agent_index] = q1
     return q_dict
 
@@ -176,7 +176,7 @@ def get_dat_gradient(file_name, agent_index, q_dict, gradient_dict, iteration):
             break
 
     print("*"*100)
-    print("q2 array is ", q2)
+    print("agent_index is ", agent_index, "q2 array is ", q2)
     # 返回 结果矩阵
     q1 = q_dict[agent_index]
 
@@ -198,7 +198,7 @@ def get_dat_gradient(file_name, agent_index, q_dict, gradient_dict, iteration):
 
     gradient_dict[agent_index] = gradient
     print("*" * 100)
-    print("q2 - q1 array is ", gradient)
+    print("agent_index is ", agent_index, "q2-q1 array is ", gradient)
     return gradient_dict
 
 
@@ -256,6 +256,13 @@ def compute_MACE_step(q, gradient, gamma, tolerance):
 if __name__ == '__main__':
     run_time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     print("Beginning MACE job on the following agents:", run_time_str)
+
+    # a = np.array([[1, 2], [3, 4], [5, 6]])
+    # a_trans = a.transpose()
+    # print(a_trans)
+    # exit()
+    # N_BASIS = 2
+    # exit()
     # file_name = "water_631g_mo6.0"
     # q = get_dat_q(file_name,  None, None)
     #
@@ -290,7 +297,7 @@ if __name__ == '__main__':
     gradient_dict = manager.dict()  # 所有进程可以读写的全局对象，用于并发操作。
 
     file_list = manager.list()  # 生成一个列表
-    global N_BASIS
+    # global N_BASIS
     temp_file_list, gamma, tolerance, N_BASIS = get_agent_filelist()
     for file in temp_file_list:
         file_list.append(file)  # 填充文件
@@ -324,7 +331,10 @@ if __name__ == '__main__':
             item = gradient_dict[k]
             for i in range(len(item)):
                 q2[k][i] = item[i]
+        q1 = q1.transpose()
+        q2 = q2.transpose()
         q_out, convergence_flag = compute_MACE_step(q1, q2, gamma, tolerance)
+        q_out = q_out.transpose()
         iterationcount += 1
         iter_time_fin = time.time() - iter_time_start
         tot_time = tot_time + iter_time_fin

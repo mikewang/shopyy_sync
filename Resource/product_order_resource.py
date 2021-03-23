@@ -38,6 +38,7 @@ class ProductOrderResource(Resource):
             parser.add_argument('contractNo')
             parser.add_argument('specNo')
             parser.add_argument('willAccount')
+            parser.add_argument('orderOpCode')
             # 分析请求
             args = parser.parse_args()
             OpCode = args["OpCode"]
@@ -49,6 +50,14 @@ class ProductOrderResource(Resource):
 
             print("request args is ", args)
             filter_stock = {}
+            orderOpCode_base64 = args["orderOpCode"]
+            if orderOpCode_base64 is not None:
+                orderOpCode_base64 = urlsafe_base64(orderOpCode_base64)
+                orderOpCode = base64.b64decode(orderOpCode_base64).decode('utf-8')
+                filter_stock['orderOpCode'] = orderOpCode
+                print("orderOpCode key is ", args["orderOpCode"], orderOpCode)
+            else:
+                filter_stock['orderOpCode'] = None
             contractNo_base64 = args["contractNo"]
             if contractNo_base64 is not None:
                 contractNo_base64 = urlsafe_base64(contractNo_base64)
