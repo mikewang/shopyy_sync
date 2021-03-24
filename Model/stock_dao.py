@@ -430,7 +430,7 @@ class StockDao(object):
             filter_supplier = filter_stock["supplier"]
             if filter_supplier is not None:
                 filter_sql = ''
-                for b in filter_supplier:
+                for b in filter_supplier.split(";"):
                     filter_sql = filter_sql + "'" + b + "',"
                 filter_sql = filter_sql.rstrip(',')
                 v_sql = v_sql + " and supplier in (" + filter_sql + ")"
