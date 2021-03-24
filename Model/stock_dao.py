@@ -540,10 +540,11 @@ class StockDao(object):
                     logging.warning(sql + " " + str(stockProductID) + " " + opCode + " " + supplier + " " + str(purchaseNum) + " " + str(purchasePrice))
                     sql = "select @@IDENTITY"
                     cursor.execute(sql)
-                    lastOrderID = cursor.fetchone()[0] # 生成的主键字段值。
+                    lastOrderID = cursor.fetchone()[0]  # 生成的主键字段值。
                     sql = "insert INTO Stock_Product_Order_App_hist(stockProductID, OpCode, OrderNum," \
                           "OrderPrice, supplier, OperateType, orderId, note, orderPriceAccpt) " \
                           "VALUES(?,?,?,?,?,?,?,?,?)"
+
                     cursor.execute(sql, stockProductID, opCode, purchaseNum, purchasePrice, supplier, 'order', lastOrderID, '', orderPriceAccpt)
                     cursor.commit()
                     result_product.note = "1:采购成功"
