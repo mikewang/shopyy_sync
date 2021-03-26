@@ -1505,9 +1505,9 @@ class StockDao(object):
             page_prod_count = 10
             cnxn = pyodbc.connect(self._conn_str)
             cursor = cnxn.cursor()
-            # 数据源， 只取 对账过的商品
+            # 数据源， 只取 对账过的商品, 又改为取 订货成功的商品
             v_sql_basic = "SELECT orderID,stockProductID,OpCode,OrderNum,OrderPrice,supplier,CONVERT(varchar, CreateTime, 120) as CreateTime, CONVERT(varchar, ensureTime, 120) as ensureTime,ensureOpCode " \
-                    " FROM Stock_Product_Order_App  where  OrderStat = 1 and Settlement > 1 "
+                    " FROM Stock_Product_Order_App  where  OrderStat = 1 and Settlement >= 1 "
             filter_stockProductIDs = query_params["stockProductIDs"]
             if filter_stockProductIDs is not None:
                 str_arr = filter_stockProductIDs.split(';')
