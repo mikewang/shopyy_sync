@@ -378,7 +378,7 @@ class StockDao(object):
                 v_sql = v_sql + "and settlement = 2 and OrderStat = 1 and exists(select 1 from Stock_Product_Order_Account_fullred_App a where a.orderID = v_app_stock_order.product_order_id)"
                 v_time_column = "CreateTime"
             elif ptype == cv.history_goods:
-                v_sql = v_sql + " and settlement >= 0 and OrderStat = 1"
+                v_sql = v_sql + " and settlement >= 1 and OrderStat = 1 and orderPriceAccpt=1 and orderNum > returnNum"
             else:
                 v_sql = v_sql + " and settlement = 0 and OrderStat = 1"
 
