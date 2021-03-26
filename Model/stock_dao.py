@@ -691,8 +691,8 @@ class StockDao(object):
                             else:
                                 unitprice = allprice / goodsnum
                             logging.warning("写入erp数据库" + str(stockProductID) + " " + str(unitprice) + " " + str(goodsnum))
-                            sql = "update Stock_Product_InfoBase set unitprice=? where stockProductID = ?"
-                            cursor.execute(sql, unitprice, stockProductID)
+                            sql = "update Stock_Product_InfoBase set OldNum=?,StdNum=?, unitprice=? where stockProductID = ?"
+                            cursor.execute(sql, goodsnum, goodsnum, unitprice, stockProductID)
                             sql = "update Stock_Product_Info set goodsnum=? where stockProductID = ?"
                             cursor.execute(sql, goodsnum, stockProductID)
                             sql = "update Contract_Product_InfoPlan set StockNum =? where ContractProductID= (select c.ContractProductID from Stock_Product_Info b join  Stock_Product_InfoBase c  on b.StockProductID=c.StockProductID and b.Status=0 and b.StockProductID=?)"
@@ -764,8 +764,8 @@ class StockDao(object):
                             else:
                                 unitprice = allprice / goodsnum
                             logging.warning("写入erp数据库" + str(stockProductID) + " " + str(unitprice) + " " + str(goodsnum))
-                            sql = "update Stock_Product_InfoBase set unitprice=? where stockProductID = ?"
-                            cursor.execute(sql, unitprice, stockProductID)
+                            sql = "update Stock_Product_InfoBase set OldNum=?,StdNum=?, unitprice=? where stockProductID = ?"
+                            cursor.execute(sql, goodsnum, goodsnum, unitprice, stockProductID)
                             sql = "update Stock_Product_Info set goodsnum=? where stockProductID = ?"
                             cursor.execute(sql, goodsnum, stockProductID)
                             sql = "update Contract_Product_InfoPlan set StockNum =? where ContractProductID= (select c.ContractProductID from Stock_Product_Info b join  Stock_Product_InfoBase c  on b.StockProductID=c.StockProductID and b.Status=0 and b.StockProductID=?)"
@@ -813,8 +813,8 @@ class StockDao(object):
                         else:
                             unitprice = allprice / goodsnum
                         logging.warning("写入erp数据库" + str(stockProductID) + " " + str(unitprice) + " " + str(goodsnum))
-                        sql = "update Stock_Product_InfoBase set unitprice=? where stockProductID = ?"
-                        cursor.execute(sql, unitprice, stockProductID)
+                        sql = "update Stock_Product_InfoBase set OldNum=?,StdNum=?, unitprice=? where stockProductID = ?"
+                        cursor.execute(sql, goodsnum, goodsnum, unitprice, stockProductID)
                         sql = "update Stock_Product_Info set goodsnum=? where stockProductID = ?"
                         cursor.execute(sql, goodsnum, stockProductID)
                         sql = "update Contract_Product_InfoPlan set StockNum =? where ContractProductID= (select c.ContractProductID from Stock_Product_Info b join  Stock_Product_InfoBase c  on b.StockProductID=c.StockProductID and b.Status=0 and b.StockProductID=?)"
@@ -979,8 +979,8 @@ class StockDao(object):
                             else:
                                 unitprice = allprice / goodsnum
                             print("写入erp数据库", stockProductID, unitprice, goodsnum)
-                            sql = "update Stock_Product_InfoBase set unitprice=? where stockProductID = ?"
-                            cursor.execute(sql, unitprice, stockProductID)
+                            sql = "update Stock_Product_InfoBase set OldNum=?,StdNum=?, unitprice=? where stockProductID = ?"
+                            cursor.execute(sql, goodsnum, goodsnum, unitprice, stockProductID)
                             sql = "update Stock_Product_Info set goodsnum=? where stockProductID = ?"
                             cursor.execute(sql, goodsnum, stockProductID)
                             sql = "update Contract_Product_InfoPlan set StockNum =? where ContractProductID= (select c.ContractProductID from Stock_Product_Info b join  Stock_Product_InfoBase c  on b.StockProductID=c.StockProductID and b.Status=0 and b.StockProductID=?)"
@@ -1352,8 +1352,8 @@ class StockDao(object):
                     else:
                         unitprice = allprice / goodsnum
                     print("写入erp数据库", stockProductID, unitprice, goodsnum)
-                    sql = "update Stock_Product_InfoBase set unitprice=? where stockProductID = ?"
-                    cursor.execute(sql, unitprice, stockProductID)
+                    sql = "update Stock_Product_InfoBase set OldNum=?,StdNum=?, unitprice=? where stockProductID = ?"
+                    cursor.execute(sql, goodsnum, goodsnum, unitprice, stockProductID)
                     sql = "update Stock_Product_Info set goodsnum=? where stockProductID = ?"
                     cursor.execute(sql, goodsnum, stockProductID)
                     sql = "update Contract_Product_InfoPlan set StockNum =? where ContractProductID= (select c.ContractProductID from Stock_Product_Info b join  Stock_Product_InfoBase c  on b.StockProductID=c.StockProductID and b.Status=0 and b.StockProductID=?)"
