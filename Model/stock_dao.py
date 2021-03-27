@@ -231,9 +231,13 @@ class StockDao(object):
             for product in product_list:
                 stockProductID = product.stockProductID
                 orderpriceProds = []
-                # 数据源
+                # 数据源   订货成功，价格确认过的，且没有全部退货的，作为价格参考。
                 v_sql_basic = "SELECT orderID,stockProductID,OpCode,OrderNum,OrderPrice,supplier,CONVERT(varchar, CreateTime, 120) as CreateTime, CONVERT(varchar, ensureTime, 120) as ensureTime,ensureOpCode " \
                               " FROM Stock_Product_Order_App  where  OrderStat = 1 and Settlement > 0 "
+
+                v_sql_basic = "SELECT orderID,stockProductID,OpCode,OrderNum,OrderPrice,supplier,CONVERT(varchar, CreateTime, 120) as CreateTime, CONVERT(varchar, ensureTime, 120) as ensureTime,ensureOpCode " \
+                              " FROM Stock_Product_Order_App a where  OrderStat = 1 and Settlement >= 1 and orderPriceAccpt = 1 " \
+                              " and OrderNum > (select  coalesce(sum(OrderNum),0) from csidbo.Stock_Product_Order_App b where  b.OrderStat = -1 and b.sourceOrderId =  a.orderID)"
                 v_sql_basic = v_sql_basic + "and stockProductID = " + str(stockProductID)
                 v_sql = "select top 1 1 as rowno, v.* from (" + v_sql_basic + ") as v order by ensureTime desc"
                 cursor.execute(v_sql)
@@ -1551,7 +1555,7 @@ class StockDao(object):
                     v_sql = "select * from (" + v_sql + ") as v1 where v1.rownumber > " + str(
                         topN - page_prod_count) + " and v1.rownumber <= " + str(topN) + " order by v1.rownumber"
 
-                # print(ptypes, "select_product_orderprice_list sql page is ", v_sql)
+                print(ptypes, "select_product_orderprice_list sql page is ", v_sql)
                 logging.warning("select_product_orderprice_list sql page is " + v_sql)
                 cursor.execute(v_sql)
                 for row in cursor:
