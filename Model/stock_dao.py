@@ -378,7 +378,7 @@ class StockDao(object):
                 v_sql = v_sql + "and settlement = 2 and OrderStat = 1 and exists(select 1 from Stock_Product_Order_Account_fullred_App a where a.orderID = v_app_stock_order.product_order_id)"
                 v_time_column = "CreateTime"
             elif ptype == cv.history_goods:
-                v_sql = v_sql + " and settlement >= 1 and OrderStat = 1 and orderPriceAccpt=1 and orderNum > returnNum"
+                v_sql = v_sql + " and settlement >= 1 and OrderStat = 1 and orderPriceAccpt = 1 and orderNum > returnNum"
             else:
                 v_sql = v_sql + " and settlement = 0 and OrderStat = 1"
 
@@ -1508,7 +1508,7 @@ class StockDao(object):
             # 数据源， 只取 对账过的商品, 又改为取 订货成功的商品, 如果订货全退 则也不要。
             # 订货成功，价格确认过的，且没有全部退货的，作为价格参考。
             v_sql_basic = "SELECT orderID,stockProductID,OpCode,OrderNum,OrderPrice,supplier,CONVERT(varchar, CreateTime, 120) as CreateTime, CONVERT(varchar, ensureTime, 120) as ensureTime,ensureOpCode " \
-                    " FROM Stock_Product_Order_App a where  OrderStat = 1 and Settlement >= 1 and orderPriceAccpt = 1 and OrderNum > (select sum(OrderNum) from csidbo.Stock_Product_Order_App b where  b.OrderStat = -1 and b.sourceOrderId =  a.orderID)"
+                    " FROM Stock_Product_Order_App a where  OrderStat = 1 and Settlement >= 1 and orderPriceAccpt = 1 and OrderNum > (select  coalesce(sum(OrderNum),0) from csidbo.Stock_Product_Order_App b where  b.OrderStat = -1 and b.sourceOrderId =  a.orderID)"
             filter_stockProductIDs = query_params["stockProductIDs"]
             if filter_stockProductIDs is not None:
                 str_arr = filter_stockProductIDs.split(';')
