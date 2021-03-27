@@ -237,8 +237,10 @@ class StockDao(object):
 
                 v_sql_basic = "SELECT orderID,stockProductID,OpCode,OrderNum,OrderPrice,supplier,CONVERT(varchar, CreateTime, 120) as CreateTime, CONVERT(varchar, ensureTime, 120) as ensureTime,ensureOpCode " \
                               " FROM Stock_Product_Order_App a where  OrderStat = 1 and Settlement >= 1 and orderPriceAccpt = 1 " \
-                              " and OrderNum > (select  coalesce(sum(OrderNum),0) from csidbo.Stock_Product_Order_App b where  b.OrderStat = -1 and b.sourceOrderId =  a.orderID)"
-                v_sql_basic = v_sql_basic + "and stockProductID = " + str(stockProductID)
+                              " and OrderNum > (select  coalesce(sum(OrderNum),0) from csidbo.Stock_Product_Order_App b where  b.OrderStat = -1 and b.sourceOrderId =  a.orderID) "
+
+                v_sql_basic = v_sql_basic + " and stockProductID  in (select stockProductID from Stock_Product_Info where specNo = '" + product.specNo + "')"
+
                 v_sql = "select top 1 1 as rowno, v.* from (" + v_sql_basic + ") as v order by ensureTime desc"
                 cursor.execute(v_sql)
                 for row in cursor:
@@ -252,7 +254,7 @@ class StockDao(object):
                     orderprice.ptype = cv.orderprice_top1_price
                     orderpriceProds.append(orderprice.desc())
                 product.orderpriceList = orderpriceProds
-                print("orderpriceProds is ", stockProductID, orderpriceProds)
+                print("orderpriceProds is ", stockProductID, orderpriceProds, v_sql)
             cnxn.close()
             print(product_list, product_count)
             return product_list, product_count
