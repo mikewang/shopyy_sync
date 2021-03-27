@@ -1551,7 +1551,8 @@ class StockDao(object):
                     v_sql = "select * from (" + v_sql + ") as v1 where v1.rownumber > " + str(
                         topN - page_prod_count) + " and v1.rownumber <= " + str(topN) + " order by v1.rownumber"
 
-                print(ptypes, "select_product_orderprice_list sql page is ", v_sql)
+                # print(ptypes, "select_product_orderprice_list sql page is ", v_sql)
+                logging.warning("select_product_orderprice_list sql page is " + v_sql)
                 cursor.execute(v_sql)
                 for row in cursor:
                     orderprice_product = self.parse_orderprice_product_cursor(row)
