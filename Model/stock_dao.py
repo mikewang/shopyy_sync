@@ -667,7 +667,7 @@ class StockDao(object):
                                       "set orderNum = ?, OrderPrice = ?, orderPriceAccpt=? " \
                                       ",ensureTime=getdate() " \
                                       "where orderID = ? and stockProductID = ? and settlement <> ? "
-                                print(operate_type, "update sql ---\n ", sql, "other ordernum is ",orderNum - purchaseNum)
+                                print(operate_type, "update sql ---\n ", sql, "other ordernum is ", orderNum - purchaseNum)
                                 cursor.execute(sql, orderNum - purchaseNum, purchasePrice,orderPriceAccpt, orderID, stockProductID, settlement)
                             elif orderNum == purchaseNum:
                                 sql = "update Stock_Product_Order_App " \
