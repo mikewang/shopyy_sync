@@ -45,7 +45,7 @@ def make_inp_file(iteration, file_list, i, q_out):
         else:
             if data_begin and len(entries_updated) > 0:
                 col1 = line[0:2]
-                col2 = line[2:2]
+                col2 = line[3:5]
                 aline = line[5:]
                 row_entries = re.findall(r'.{15}', aline)
                 row_entries_new = []
@@ -76,8 +76,9 @@ def get_agent_filelist():
     gamma = config.get("agent", "gamma")
     tolerance = config.get("agent", "tolerance")
     n_basis = config.get("agent", "n_basis")
+    n_matrix = config.get("agent", "n_matrix")
     # print(file_list)
-    return file_list, gamma, tolerance, int(n_basis)
+    return file_list, gamma, tolerance, int(n_basis), int(n_matrix)
 
 
 def open_agent_file(file):
@@ -270,9 +271,20 @@ def compute_MACE_step(q, gradient, gamma, tolerance):
 if __name__ == '__main__':
     run_time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     print("Beginning MACE job on the following agents:", run_time_str)
-    # ss = "17 14-1.03944197E+00-3.59411359E-02-6.83185346E-01"
-    # ss = ss[5:]
-    # print("ss is ", ss)
+    # line = " 1 13-8.71733879E-06 1.27711726E-05-6.80073587E-06-7.11459061E-05-6.80064164E-06"
+    # #line = "1234567"
+    # col1 = line[0:2]
+    # print(line)
+    #
+    # col2 = line[3:5]
+    # aline = line[5:]
+    # print("col1")
+    # print(col1)
+    # print(col2)
+    # print(aline)
+    #
+    # print(line)
+    #
     # exit()
 
     # a = np.array([[1, 2], [3, 4], [5, 6]])
@@ -316,7 +328,7 @@ if __name__ == '__main__':
 
     file_list = manager.list()  # 生成一个列表
     # global N_BASIS
-    temp_file_list, gamma, tolerance, N_BASIS = get_agent_filelist()
+    temp_file_list, gamma, tolerance, N_BASIS , N_MATRIX = get_agent_filelist()
     for file in temp_file_list:
         file_list.append(file)  # 填充文件
     while not done:

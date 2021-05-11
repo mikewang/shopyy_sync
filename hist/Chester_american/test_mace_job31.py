@@ -11,7 +11,6 @@ import re
 
 run_times_limit = 10
 N_BASIS = 1
-N_MATRIX = 19
 
 
 def make_inp_file(iteration, file_list, i, q_out):
@@ -44,9 +43,11 @@ def make_inp_file(iteration, file_list, i, q_out):
             temp_content.append(line)
         else:
             if data_begin and len(entries_updated) > 0:
-                col1 = line[0:2]
-                col2 = line[2:2]
-                aline = line[5:]
+                entries = line.split("  ")
+                col1 = entries.pop(0)
+                aline = "  ".join(entries)
+                col2 = aline[:1]
+                aline = aline[1:]
                 row_entries = re.findall(r'.{15}', aline)
                 row_entries_new = []
                 for row_entry in row_entries:
@@ -57,7 +58,7 @@ def make_inp_file(iteration, file_list, i, q_out):
                         ss = " " + ss
                     row_entries_new.append(ss)
                     print("q len is ", len(ss), "old is ", row_entry, "new is ", ss)
-                line = col1 + " " + col2 + "".join(row_entries_new)
+                line = col1 + "  " + col2 + "".join(row_entries_new)
             if line.__contains__("$VEC"):
                 data_begin = True
             temp_content.append(line)
@@ -104,11 +105,10 @@ def get_q(file_name, agent_index, q_dict):
             if line.__contains__("$END"):
                 data_begin = False
             if data_begin:
-                # entries = line.split("  ")
-                # del entries[0]
-                # aline = " ".join(entries)
-                # aline = aline[1:]
-                aline = line[5:]
+                entries = line.split("  ")
+                del entries[0]
+                aline = " ".join(entries)
+                aline = aline[1:]
                 # print(aline)
                 data_lines.append(aline)
             if line.__contains__("$VEC"):
@@ -121,14 +121,11 @@ def get_q(file_name, agent_index, q_dict):
     q1 = []
     i = 0
     global N_BASIS
-    global N_MATRIX
-    n_limited = N_BASIS*N_MATRIX
-    print("MATRIX is ", n_limited)
     for entry in entries:
         entry = entry.strip()
         q1.append(entry)
         i += 1
-        if i >= n_limited:
+        if i >= N_BASIS*68:
             break
     print("*"*100)
     #print("agent_index is ", agent_index, "q1 array is ", q1)
@@ -156,11 +153,10 @@ def get_dat_gradient(file_name, agent_index, q_dict, gradient_dict, iteration):
             if line.__contains__("$END"):
                 data_begin = False
             if data_begin:
-                # entries = line.split("  ")
-                # del entries[0]
-                # aline = " ".join(entries)
-                # aline = aline[1:]
-                aline = line[5:]
+                entries = line.split("  ")
+                del entries[0]
+                aline = " ".join(entries)
+                aline = aline[1:]
                 # print(aline)
                 data_lines.append(aline)
             if line.__contains__("$VEC"):
@@ -168,19 +164,15 @@ def get_dat_gradient(file_name, agent_index, q_dict, gradient_dict, iteration):
     # print all data line
     line_text = "".join(data_lines)
     #getEntries(line_text)
-    # 长度为15的字符串 拆分成数组
     entries = re.findall(r'.{15}', line_text)
     q2 = []
     i = 0
     global N_BASIS
-    global N_MATRIX
-    n_limited = N_BASIS * N_MATRIX
-    print("MATRIX is ", n_limited)
     for entry in entries:
         entry = entry.strip()
         q2.append(entry)
         i += 1
-        if i >= n_limited:
+        if i >= N_BASIS * 68:
             break
 
     print("*"*100)
@@ -270,10 +262,6 @@ def compute_MACE_step(q, gradient, gamma, tolerance):
 if __name__ == '__main__':
     run_time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     print("Beginning MACE job on the following agents:", run_time_str)
-    # ss = "17 14-1.03944197E+00-3.59411359E-02-6.83185346E-01"
-    # ss = ss[5:]
-    # print("ss is ", ss)
-    # exit()
 
     # a = np.array([[1, 2], [3, 4], [5, 6]])
     # a_trans = a.transpose()
@@ -396,7 +384,7 @@ def getEntries(line_text):
         if len(entry) == 15:
             print(rows, cols, entry)
             entry = ''
-            if cols == 19:
+            if cols == 68:
                 cols = 1
                 rows = rows + 1
             else:

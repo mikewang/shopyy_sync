@@ -10,8 +10,8 @@ import numpy as np
 import re
 
 run_times_limit = 10
-N_BASIS = 1
-N_MATRIX = 19
+n_state = 1
+n_basis = 19
 
 
 def make_inp_file(iteration, file_list, i, q_out):
@@ -45,7 +45,7 @@ def make_inp_file(iteration, file_list, i, q_out):
         else:
             if data_begin and len(entries_updated) > 0:
                 col1 = line[0:2]
-                col2 = line[2:2]
+                col2 = line[3:5]
                 aline = line[5:]
                 row_entries = re.findall(r'.{15}', aline)
                 row_entries_new = []
@@ -75,9 +75,10 @@ def get_agent_filelist():
     file_list = file_list_str.split(";")
     gamma = config.get("agent", "gamma")
     tolerance = config.get("agent", "tolerance")
+    n_state = config.get("agent", "n_state")
     n_basis = config.get("agent", "n_basis")
     # print(file_list)
-    return file_list, gamma, tolerance, int(n_basis)
+    return file_list, gamma, tolerance, int(n_state), int(n_basis)
 
 
 def open_agent_file(file):
@@ -120,9 +121,9 @@ def get_q(file_name, agent_index, q_dict):
     entries = re.findall(r'.{15}', line_text)
     q1 = []
     i = 0
-    global N_BASIS
-    global N_MATRIX
-    n_limited = N_BASIS*N_MATRIX
+    global n_state
+    global n_basis
+    n_limited = n_state*n_basis
     print("MATRIX is ", n_limited)
     for entry in entries:
         entry = entry.strip()
@@ -172,9 +173,9 @@ def get_dat_gradient(file_name, agent_index, q_dict, gradient_dict, iteration):
     entries = re.findall(r'.{15}', line_text)
     q2 = []
     i = 0
-    global N_BASIS
-    global N_MATRIX
-    n_limited = N_BASIS * N_MATRIX
+    global n_state
+    global n_basis
+    n_limited = n_state * n_basis
     print("MATRIX is ", n_limited)
     for entry in entries:
         entry = entry.strip()
@@ -242,7 +243,13 @@ def compute_MACE_step(q, gradient, gamma, tolerance):
     print('iteration is,', iterationcount)
     print("The v:")
     print(v)
+    for row in v:
+        for col in row:
+            print(col)
     print('Gv is',Gv)
+    for row in Gv:
+        for col in row:
+            print(col)
     print('iteration is,', iterationcount)
     print("The current state is:")
     print(q)
@@ -270,16 +277,27 @@ def compute_MACE_step(q, gradient, gamma, tolerance):
 if __name__ == '__main__':
     run_time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     print("Beginning MACE job on the following agents:", run_time_str)
-    # ss = "17 14-1.03944197E+00-3.59411359E-02-6.83185346E-01"
-    # ss = ss[5:]
-    # print("ss is ", ss)
+    # line = " 1 13-8.71733879E-06 1.27711726E-05-6.80073587E-06-7.11459061E-05-6.80064164E-06"
+    # #line = "1234567"
+    # col1 = line[0:2]
+    # print(line)
+    #
+    # col2 = line[3:5]
+    # aline = line[5:]
+    # print("col1")
+    # print(col1)
+    # print(col2)
+    # print(aline)
+    #
+    # print(line)
+    #
     # exit()
 
     # a = np.array([[1, 2], [3, 4], [5, 6]])
     # a_trans = a.transpose()
     # print(a_trans)
     # exit()
-    # N_BASIS = 2
+    # n_state = 2
     # exit()
     # file_name = "water_631g_mo6.0"
     # q = get_dat_q(file_name,  None, None)
@@ -315,8 +333,8 @@ if __name__ == '__main__':
     gradient_dict = manager.dict()  # 所有进程可以读写的全局对象，用于并发操作。
 
     file_list = manager.list()  # 生成一个列表
-    # global N_BASIS
-    temp_file_list, gamma, tolerance, N_BASIS = get_agent_filelist()
+    # global n_state
+    temp_file_list, gamma, tolerance, n_state , n_basis = get_agent_filelist()
     for file in temp_file_list:
         file_list.append(file)  # 填充文件
     while not done:
