@@ -8,6 +8,7 @@ import configparser
 import subprocess
 import numpy as np
 import re
+from scipy import spatial
 
 run_times_limit = 10
 n_state = 1
