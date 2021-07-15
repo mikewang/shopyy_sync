@@ -76,11 +76,11 @@ def getCredInfo(cred_no):
     sex = '先生'
     if len(cred_no) == 18:
         sexno = cred_no[16:17]
-        print(sexno)
+        # print(sexno)
         if int(sexno) % 2 == 0:
             sex = '女士'
         birthday = cred_no[10:14]
-        print(birthday)
+        # print(birthday)
         nowday = datetime.datetime.now().strftime('%m%d')
         if birthday == nowday:
             sex = sex + ' 生日快乐'
