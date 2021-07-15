@@ -396,14 +396,15 @@ if __name__ == '__main__':
         #处理新逻辑 2021-6-23
         for i in range(len(q1)):
             if i > 0:
-                x = np.dot(q1[0], q1[i])
-                if x > 0:
-                    pass
-                elif x < 0:
-                    q1[i] = - q1[i]
-                else:
-                    print("agent " + str(i + 1) + " orthogonal (垂直）")
-                    print(q1[i])
+                for j in range(len(q1[0])):
+                    x = np.dot(q1[0][j], q1[i][j])
+                    if x > 0:
+                        pass
+                    elif x < 0:
+                        q1[i][j] = - q1[i][j]
+                    else:
+                        print("agent " + str(i + 1) + "[" + str(j + 1) "]" + " orthogonal (垂直）")
+                        print(q1[i][j])
         q1 = q1.transpose()
         q2 = q2.transpose()
 
