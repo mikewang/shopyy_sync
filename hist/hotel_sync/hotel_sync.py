@@ -115,10 +115,15 @@ def home_days_sqlserver():
 
 def client_mysql():
     try:
+        config = configparser.ConfigParser()
+        config_file = os.path.normpath(os.path.join(os.curdir, "config.ini"))
+        config.read(config_file)
+        hotelid = int(config.get("mysql_db", "hotelid"))
         room_client_list = []
         conn = conn_mysql()
         cur = conn.cursor()
-        cur.execute("select room,clientname from client")
+        values = [hotelid]
+        cur.execute("select room,clientname from client where hotelid=%s", values)
         for row in cur:
             room = row[0]
             if room is None:
@@ -139,9 +144,13 @@ def client_mysql():
 
 def update_client_mysql(room_client):
     try:
+        config = configparser.ConfigParser()
+        config_file = os.path.normpath(os.path.join(os.curdir, "config.ini"))
+        config.read(config_file)
+        hotelid = int(config.get("mysql_db", "hotelid"))
         conn = conn_mysql()
         cur = conn.cursor()
-        values = [room_client["name"], room_client["room"]]
+        values = [room_client["name"], room_client["room"], hotelid]
         if room_client["name"] == '':
             cur.execute("update client set clientname = %s ,status = 1 where room = %s", values)
         else:
