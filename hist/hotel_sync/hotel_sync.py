@@ -152,9 +152,9 @@ def update_client_mysql(room_client):
         cur = conn.cursor()
         values = [room_client["name"], room_client["room"], hotelid]
         if room_client["name"] == '':
-            cur.execute("update client set clientname = %s ,status = 1 where room = %s", values)
+            cur.execute("update client set clientname = %s ,status = 1 where room = %s and hotelid=%s", values)
         else:
-            cur.execute("update client set clientname = %s ,status = 0 where room = %s", values)
+            cur.execute("update client set clientname = %s ,status = 0 where room = %s and hotelid=%s", values)
         if cur.rowcount == 1:
             print("更新成功", room_client)
         else:
