@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 import sys
 import datetime
 import os
@@ -8,6 +7,9 @@ import pymysql
 import pyodbc
 import logging
 import Scheduler as Scheduler
+import requests
+import json
+import traceback
 
 
 def test_mysql_connect():
@@ -72,6 +74,89 @@ def conn_sqlserver():
         return conn
 
 
+def get_name_sex(Sex, Birt):
+    sex = '先生'
+    if Sex is not None:
+        if Sex == '女':
+            sex = '女士'
+    if Birt is not None:
+        birt = Birt[6:10]
+        nowday = datetime.datetime.now().strftime('%m-%d')
+        if birthday == nowday:
+            sex = sex + ' 生日快乐'
+    return sex
+
+
+def get_guest_list(json_dict):
+    try:
+        room_client_list = []
+        code = json_dict.get("Code")
+        if code == 1000:
+            result = json_dict.get("Result")
+            for row in result:
+                GuestName = row.get("GuestName")
+                Sex = row.get("Sex")
+                RoomNo = row.get("RoomNo")
+                Birt = row.get("Birt")
+                name_sex = GuestName + " " + get_name_sex(Sex, Birt)
+                room_client = {"room": RoomNo, "name": name_sex}
+                room_client_list.append(room_client)
+        else:
+            print(json_dict)
+        return room_client_list
+    except Exception as e:
+        print('str(Exception):\t', str(Exception))
+        print('str(e):\t\t', str(e))
+        print('repr(e):\t', repr(e))
+        # Get information about the exception that is currently being handled
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        print('e.message:\t', exc_value)
+        print("Note, object e and exc of Class %s is %s the same." %
+              (type(exc_value), ('not', '')[exc_value is e]))
+        print('traceback.print_exc(): ', traceback.print_exc())
+        print('traceback.format_exc():\n%s' % traceback.format_exc())
+        print('#' * 60)
+        return None
+
+
+def home_days_api():
+    try:
+        room_client_list = []
+        json_dict = {}
+        config = configparser.ConfigParser()
+        config_file = os.path.normpath(os.path.join(os.curdir, "config.ini"))
+        config.read(config_file)
+        api = config.get("sync", "api")
+        url = api
+        time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        print(url, time_str)
+        response = requests.session().get(url)
+        response_text = ""
+        if response.status_code == 200:
+            response_text = response.text
+            json_dict = json.loads(response_text)
+            print(json_dict)
+            room_client_list = get_guest_list(json_dict)
+            # self.signal.emit({"message": str(json_dict)})
+        else:
+            print("response.status_code=" + str(response.status_code))
+        print(url, "访问完成", time_str)
+    except Exception as e:
+        print('str(Exception):\t', str(Exception))
+        print('str(e):\t\t', str(e))
+        print('repr(e):\t', repr(e))
+        # Get information about the exception that is currently being handled
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        print('e.message:\t', exc_value)
+        print("Note, object e and exc of Class %s is %s the same." %
+              (type(exc_value), ('not', '')[exc_value is e]))
+        print('traceback.print_exc(): ', traceback.print_exc())
+        print('traceback.format_exc():\n%s' % traceback.format_exc())
+        print('#' * 60)
+    else:
+        return room_client_list
+
+
 def getCredInfo(cred_no):
     sex = '先生'
     if len(cred_no) == 18:
@@ -85,6 +170,7 @@ def getCredInfo(cred_no):
         if birthday == nowday:
             sex = sex + ' 生日快乐'
     return sex
+
 
 def home_days_sqlserver():
     try:
@@ -215,8 +301,9 @@ if __name__ == '__main__':
     # print(ss)
     #
     # sex = getCredInfo(cred_no)
-    # print(sex)
-    # exit()
+    list = home_days_api()
+    print(list)
+    exit()
     logging.basicConfig(format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s',
                         level=logging.WARNING,
                         filename=os.path.join('log', 'hotel_sync.log'),
