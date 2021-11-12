@@ -80,7 +80,7 @@ def get_name_sex(Sex, Birt):
         if Sex == '女':
             sex = '女士'
     if Birt is not None:
-        birt = Birt[6:10]
+        birthday = Birt[6:10]
         nowday = datetime.datetime.now().strftime('%m-%d')
         if birthday == nowday:
             sex = sex + ' 生日快乐'
@@ -259,7 +259,7 @@ def sync_romm_client():
         run_time_str = run_time.strftime('%Y-%m-%d %H:%M:%S')
         print("数据同步开始", run_time_str)
         rows_updated = 0
-        source_list = home_days_sqlserver()
+        source_list = home_days_api()
         target_list = client_mysql()
         for room_client_1 in source_list:
             for room_client_2 in target_list:
@@ -301,9 +301,9 @@ if __name__ == '__main__':
     # print(ss)
     #
     # sex = getCredInfo(cred_no)
-    list = home_days_api()
-    print(list)
-    exit()
+    # list = home_days_api()
+    # print(list)
+    # exit()
     logging.basicConfig(format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s',
                         level=logging.WARNING,
                         filename=os.path.join('log', 'hotel_sync.log'),
