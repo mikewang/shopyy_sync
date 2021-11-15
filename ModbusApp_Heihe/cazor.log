@@ -1,0 +1,19 @@
+2021-01-15 13:47:59,858 - Cazor_Worker.py[line:125] - WARNING: 鎵弿鎿嶄綔 鍦ㄥ悗鍙板畬鎴愩�俒{'name': 'check_alert_basic'}]
+2021-11-15 13:47:52,460 - Cazor_Worker.py[line:125] - WARNING: 扫描操作 在后台完成。[{'name': 'check_modbus_basic'}]
+2021-11-15 13:48:08,211 - Cazor_Worker.py[line:125] - WARNING: 扫描操作 在后台完成。[{'name': 'check_alert_basic'}]
+2021-11-15 13:48:19,307 - Cazor_Worker.py[line:125] - WARNING: 扫描操作 在后台完成。[{'name': 'check_modbus_basic'}]
+2021-11-15 13:49:35,500 - Cazor_Main.py[line:64] - WARNING: modbus监测 开始
+2021-11-15 13:49:35,501 - Cazor_Main.py[line:78] - WARNING: modbus监测 提交到后台
+2021-11-15 13:49:39,615 - Cazor_Worker.py[line:125] - WARNING: 扫描操作 在后台完成。[{'name': 'check_modbus_basic'}, {'name': 'check_modbus_basic'}]
+2021-11-15 13:50:36,020 - Cazor_Main.py[line:64] - WARNING: modbus监测 开始
+2021-11-15 13:50:36,021 - Cazor_Main.py[line:78] - WARNING: modbus监测 提交到后台
+2021-11-15 13:50:42,199 - Cazor_Worker.py[line:125] - WARNING: 扫描操作 在后台完成。[{'name': 'check_modbus_basic'}, {'name': 'check_modbus_basic'}, {'name': 'check_modbus_basic'}]
+2021-11-15 13:51:36,531 - Cazor_Main.py[line:64] - WARNING: modbus监测 开始
+2021-11-15 13:51:36,532 - Cazor_Main.py[line:78] - WARNING: modbus监测 提交到后台
+2021-11-15 13:51:44,775 - Cazor_Worker.py[line:125] - WARNING: 扫描操作 在后台完成。[{'name': 'check_modbus_basic'}, {'name': 'check_modbus_basic'}, {'name': 'check_modbus_basic'}, {'name': 'check_modbus_basic'}]
+2021-11-15 13:52:37,044 - Cazor_Main.py[line:64] - WARNING: modbus监测 开始
+2021-11-15 13:52:37,044 - Cazor_Main.py[line:78] - WARNING: modbus监测 提交到后台
+2021-11-15 13:52:47,354 - Cazor_Worker.py[line:125] - WARNING: 扫描操作 在后台完成。[{'name': 'check_modbus_basic'}, {'name': 'check_modbus_basic'}, {'name': 'check_modbus_basic'}, {'name': 'check_modbus_basic'}, {'name': 'check_modbus_basic'}]
+2021-11-15 13:53:37,549 - Cazor_Main.py[line:64] - WARNING: modbus监测 开始
+2021-11-15 13:53:37,549 - Cazor_Main.py[line:78] - WARNING: modbus监测 提交到后台
+2021-11-15 13:53:49,860 - Cazor_Worker.py[line:125] - WARNING: 扫描操作 在后台完成。[{'name': 'check_modbus_basic'}, {'name': 'check_modbus_basic'}, {'name': 'check_modbus_basic'}, {'name': 'check_modbus_basic'}, {'name': 'check_modbus_basic'}, {'name': 'check_modbus_basic'}]
